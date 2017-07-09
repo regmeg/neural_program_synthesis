@@ -25,6 +25,12 @@ param_init = 0.1
 def np_add(vec):
     return reduce((lambda x, y: x + y),vec)
 
+def np_mult(vec):
+    return reduce((lambda x, y: x * y),vec)
+
+def np_stall(vec):
+    return vec
+
 def samples_generator(fn, shape, rng, seed=None):
     '''
     Generate random samples for the model:
@@ -35,12 +41,12 @@ def samples_generator(fn, shape, rng, seed=None):
     Outputs a tuple of input and output features matrix
     '''
     x = (rng[1] - rng[0]) * np.random.random_sample(shape) + rng[0]
-    y = np.apply_along_axis(fn, 1, x).reshape((-1,1))
-
-    #x = x.reshape((batch_size, -1))  # The first index changing slowest, subseries as rows
-    #y = y.reshape((batch_size, -1))
-
-    return (x, y)
+    y = np.apply_along_axis(fn, 1, x).reshape((shape[0],-1))
+    z = np.zeros((shape[0],shape[1] - y.shape[1]))
+    y = np.concatenate((y, z), axis=1)
+    
+    return x,y
+    
 
 #model operations
 def tf_multiply(inpt):
@@ -154,8 +160,8 @@ def run_forward_pass(mode="train"):
 
 #cost function
 def calc_loss(output):
-    reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
-    math_error = tf.multiply(tf.constant(0.5, dtype=datatype), tf.square(tf.subtract(reduced_output , batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
+    #reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
+    math_error = tf.multiply(tf.constant(0.5, dtype=datatype), tf.square(tf.subtract(output , batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
     
     total_loss = tf.reduce_sum(math_error, name="red_total_loss")
     return total_loss, math_error
@@ -171,14 +177,13 @@ train_step = tf.train.AdamOptimizer(0.1, epsilon=1e-6 ,name="AdamOpt").apply_gra
 print("grads are")
 print(grads)
 
-x,y = samples_generator(np_add, (num_samples, num_features) , (0, 100))
-
 #numpy printpoints
 np.set_printoptions(precision=3)
 
 #model training
 with tf.Session() as sess:
     
+    ##enable debugger if necessary
     if (FLAGS.debug):
         print("Running in a debug mode")
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
@@ -192,7 +197,7 @@ with tf.Session() as sess:
 
     for epoch_idx in range(num_epochs):
         _current_state = np.zeros((batch_size, state_size))
-
+        x,y = samples_generator(np_stall, (num_samples, num_features) , (-100, 100))
         #print("\r New data, epoch", epoch_idx)
 
         for batch_idx in range(num_batches):
