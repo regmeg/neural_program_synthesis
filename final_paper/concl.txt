@@ -1,0 +1,6 @@
+1. latent vs code synthesid: functionality to reproduce
+2. Drawbacks of undifferantiable models
+3. applying reinforcement learning might solve some limitaitons
+4. sample starvation
+5. Binary trees might be better for suiting solving such problem
+6. Neural nets are 
