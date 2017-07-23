@@ -12,6 +12,8 @@ from tensorflow.python.client import timeline
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
+tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
+
 datatype = tf.float64
 FLAGS = tf.flags.FLAGS
 
@@ -20,18 +22,52 @@ FLAGS = tf.flags.FLAGS
 tf.set_random_seed(FLAGS.seed)
 
 #configuraion constants
-total_num_epochs = 1000000
+total_num_epochs = 10000000
 iters_per_epoch = 1
 num_epochs = total_num_epochs // iters_per_epoch
 state_size = 50
 num_of_operations = 3
-max_output_ops = 2
+max_output_ops = 5
 num_features = 3
-num_samples = 1000
+num_samples = 1500
 batch_size  = 100
-num_batches = num_samples//batch_size
 param_init = 0.1
 learning_rate = 0.005
+
+def variable_summaries(var):
+  """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
+  with tf.name_scope(var.name.replace(":","_")):
+    mean = tf.reduce_mean(var)
+    tf.summary.scalar('mean', mean)
+    tf.summary.scalar('stddev', tf.sqrt(tf.reduce_mean(tf.square(var - mean))))
+    tf.summary.scalar('max', tf.reduce_max(var))
+    tf.summary.scalar('min', tf.reduce_min(var))
+    tf.summary.histogram('histogram', var)
+
+
+def split_train_test (x, y , test_ratio):
+    
+    if y.shape != x.shape:
+        raise Exception('Model expects x and y shapes to be the same')
+    
+    test_len  = int(x.shape[0]*test_ratio)
+    train_len = x.shape[0] - test_len
+
+    x_train = x[0:train_len][:]
+    x_test  = x[-test_len:][:]
+    y_train = y[0:train_len][:]
+    y_test  = y[-test_len:][:]
+    
+    print(train_len)
+    print(test_len)
+
+    train_shape = (train_len, x.shape[1])
+    test_shape = (test_len, x.shape[1])
+    
+    if y_train.shape != train_shape or x_train.shape != train_shape or x_test.shape != test_shape or y_test.shape != test_shape:
+        raise Exception('One of the conversion test/train shapes gone wrong')
+    
+    return  x_train, x_test, y_train, y_test
 
 #helpder func
 def get_time_hhmmss(dif):
@@ -90,9 +126,13 @@ init_state = tf.placeholder(datatype, [batch_size, state_size], name="init_state
 #model parameters
 W = tf.Variable(tf.truncated_normal([state_size+num_features, state_size], -1*param_init, param_init, dtype=datatype), dtype=datatype, name="W")
 b = tf.Variable(np.zeros((state_size)), dtype=datatype, name="b")
+variable_summaries(W)
+variable_summaries(b)
 
 W2 = tf.Variable(tf.truncated_normal([state_size, num_of_operations], -1*param_init, param_init, dtype=datatype),dtype=datatype, name="W2")
 b2 = tf.Variable(np.zeros((num_of_operations)), dtype=datatype, name="b2")
+variable_summaries(W2)
+variable_summaries(b2)
 
     #forward pass
 def run_forward_pass(mode="train"):
@@ -194,30 +234,48 @@ def calc_loss(output):
     total_loss = tf.reduce_sum(math_error, name="red_total_loss")
     return total_loss, math_error
 
-output, current_state, softmax, outputs, softmaxes = run_forward_pass(mode = "train")
-total_loss, math_error = calc_loss(output)
-max_output_ops
-#output_test, current_state_test, softmax_test, outputs_test, softmaxes_test = run_forward_pass(mode = "test")
-#total_loss_test, math_error_test = calc_loss(output_test)
+output_train, current_state_train, softmax_train, outputs_train, softmaxes_train = run_forward_pass(mode = "train")
+total_loss_train, math_error_train = calc_loss(output_train)
 
-grads = tf.gradients(total_loss, [W,b,W2,b2], name="comp_gradients")
+output_test, current_state_test, softmax_test, outputs_test, softmaxes_test = run_forward_pass(mode = "test")
+total_loss_test, math_error_test = calc_loss(output_test)
+
+grads_raw = tf.gradients(output_train, [W,b,W2,b2], name="comp_gradients")
+
+#clip gradients by value
+grads, norms = tf.clip_by_global_norm(grads_raw, 10e2)
+
+
+#ad summaries
+for grad in grads: variable_summaries(grad)
+variable_summaries(norms)
+
 train_step = tf.train.AdamOptimizer(learning_rate, epsilon=1e-6 ,name="AdamOpt").apply_gradients(zip(grads, [W,b,W2,b2]), name="min_loss")
 print("grads are")
 print(grads)
 
 #pre training setting
 np.set_printoptions(precision=3, suppress=True)
-#train_fn = np_add
-train_fn = np_mult
+train_fn = np_add
+#train_fn = np_mult
 #train_fn = np_stall
 x,y = samples_generator(train_fn, (num_samples, num_features) , (-100, 100), FLAGS.seed)
+x_train, x_test, y_train, y_test = split_train_test (x, y , 0.33333333333)
+num_batches = x_train.shape[0]//batch_size
+num_test_batches = x_test.shape[0]//batch_size
 #model training
+
+# Merge all the summaries and write them out to /tmp/mnist_logs (by default)
+
 
 #Enable jit
 config = tf.ConfigProto()
 config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 
 with tf.Session(config=config) as sess:
+    
+    merged = tf.summary.merge_all()
+    train_writer = tf.summary.FileWriter('./summaries/' + FLAGS.name ,sess.graph)
     ##enable debugger if necessary
     if (FLAGS.debug):
         print("Running in a debug mode")
@@ -231,33 +289,64 @@ with tf.Session(config=config) as sess:
     globalstartTime = time.time()
     for epoch_idx in range(num_epochs):
         startTime = time.time()
-        loss_list_train = []
-        loss_list_test  = []
+        loss_list_train_soft = [0,0]
+        loss_list_train_hard = [0,0]
+        loss_list_test_soft = [0,0]
+        loss_list_test_hard = [0,0]
         
         for _iter in range(iters_per_epoch):
-            _current_state = np.zeros((batch_size, state_size))
-            #print("\r New data, epoch", epoch_idx)
-            coord = tf.train.Coordinator()
-            threads = []
+            _current_state_train = np.zeros((batch_size, state_size))
+            _current_state_test = np.zeros((batch_size, state_size))
+
             for batch_idx in range(num_batches):
                 start_idx = batch_size * batch_idx
                 end_idx   = batch_size * batch_idx + batch_size
 
-                batchX = x[start_idx:end_idx]
-                batchY = y[start_idx:end_idx]
-                _total_loss, _train_step, _current_state, _output, _grads, _softmaxes, _math_error = sess.run(
-                    [total_loss, train_step, current_state, output, grads, softmaxes, math_error],
+                batchX = x_train[start_idx:end_idx]
+                batchY = y_train[start_idx:end_idx]
+                
+                summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
                     feed_dict={
-                        init_state:_current_state,
+                        init_state:_current_state_train,
                         batchX_placeholder:batchX,
                         batchY_placeholder:batchY
                     })
+                loss_list_train_soft.append(_total_loss_train)
 
-        '''
-        for t in threads:
-          t.start()
-        coord.join(threads)    
-        '''
+                summary, _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([merged, total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
+                    feed_dict={
+                        init_state:_current_state_test,
+                        batchX_placeholder:batchX,
+                        batchY_placeholder:batchY
+                    })
+                loss_list_train_hard.append(_total_loss_test)
+                    
+            _current_state_train = np.zeros((batch_size, state_size))
+            _current_state_test = np.zeros((batch_size, state_size))
+            for batch_idx in range(num_test_batches):
+                start_idx = batch_size * batch_idx
+                end_idx   = batch_size * batch_idx + batch_size
+
+                batchX = x_test[start_idx:end_idx]
+                batchY = y_test[start_idx:end_idx]
+                
+                summary, _total_loss_train, _current_state_train = sess.run([merged, total_loss_train, current_state_train],
+                    feed_dict={
+                        init_state:_current_state_train,
+                        batchX_placeholder:batchX,
+                        batchY_placeholder:batchY
+                    })
+                loss_list_test_soft.append(_total_loss_train)
+
+                summary, _total_loss_test, _current_state_test = sess.run([merged, total_loss_test, current_state_test],
+                    feed_dict={
+                        init_state:_current_state_test,
+                        batchX_placeholder:batchX,
+                        batchY_placeholder:batchY
+                    })
+                loss_list_test_hard.append(_total_loss_test)
+            train_writer.add_summary(summary, epoch_idx)
+
         print("")
         #harmax test
         '''
@@ -271,8 +360,11 @@ with tf.Session(config=config) as sess:
         print("mat_error_train\t\t\t\t\math_error_test")
         print(np.column_stack((_math_error, _math_error_test)))
         '''
-        print("Epoch",epoch_idx, " Loss\t", reduce(lambda x, y: x+y, loss_list_train))
-        #print("Harmax test\t", reduce(lambda x, y: x+y, loss_list_test))
+        print("Epoch",epoch_idx)
+        print("Softmax train loss\t", reduce(lambda x, y: x+y, loss_list_train_soft))
+        print("Hardmax train loss\t", reduce(lambda x, y: x+y, loss_list_train_hard))
+        print("Sotfmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_soft))
+        print("Hardmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_hard))
         print("Epoch time: ", ((time.time() - startTime) % 60), " Global Time: ",  get_time_hhmmss(time.time() - globalstartTime))
         print("func: ", train_fn.__name__, "max_ops: ", max_output_ops, "sim_seed", FLAGS.seed)
         #print("grads[0] - W", _grads[0][0])
@@ -282,7 +374,3 @@ with tf.Session(config=config) as sess:
         #print("W", W.eval())
         #print("w2" , W2.eval())
         #record execution timeline
-        tl = timeline.Timeline(run_metadata.step_stats)
-        ctf = tl.generate_chrome_trace_format()
-        with open('./timeline.json', 'w') as f:
-            f.write(ctf)
