@@ -3,14 +3,13 @@ import tensorflow as tf
 from functools import reduce
 import matplotlib.pyplot as plt
 from tensorflow.python import debug as tf_debug
+from tensorflow.python.framework import ops
 from numpy.random import RandomState
 import random
 import time
-import threading 
-from tensorflow.python.client import timeline
 import os
-import json
 import sys
+import datetime
 
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
@@ -21,9 +20,6 @@ tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
 datatype = tf.float64
 FLAGS = tf.flags.FLAGS
 
-
-#set random seed
-tf.set_random_seed(FLAGS.seed)
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -53,12 +49,13 @@ def split_train_test (x, y , test_ratio):
     y_train = y[0:train_len][:]
     y_test  = y[-test_len:][:]
     
-    print(train_len)
-    print(test_len)
-
     train_shape = (train_len, x.shape[1])
     test_shape = (test_len, x.shape[1])
     
+    if test_ratio == 0:
+        x_test = np.zeros(test_shape)
+        y_test = np.zeros(test_shape)
+
     if y_train.shape != train_shape or x_train.shape != train_shape or x_test.shape != test_shape or y_test.shape != test_shape:
         raise Exception('One of the conversion test/train shapes gone wrong')
     
@@ -102,33 +99,37 @@ def samples_generator(fn, shape, rng, seed):
 total_num_epochs = 10000000
 iters_per_epoch = 1
 num_epochs = total_num_epochs // iters_per_epoch
-state_size = 100
+state_size = 50
 num_of_operations = 3
 max_output_ops = 5
 num_features = 3
-num_samples = 1500
+num_samples = 1000
 samples_value_rng = (-100, 100)
-test_ratio = 0.33333333333
+test_ratio = 0
 batch_size  = 100
 param_init = 0.1
 learning_rate = 0.005
 epsilon=1e-6
-grad_norm = 10e1
+grad_norm = 10e2
 seed = FLAGS.seed
 train_fn = np_add
 name = FLAGS.name
 norm = FLAGS.norm
+sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
 
-#dumpl globals
+
+#craete log and dumpl globals
 try:
     os.mkdir('./summaries/' + FLAGS.name)
 except FileExistsError as err:
     print("Dir already exists")
 
 stdout_org = sys.stdout
-sys.stdout = open('./summaries/' + FLAGS.name  + '/globals.txt', 'w')
+sys.stdout = open('./summaries/' + FLAGS.name  + '/log.log', 'w')
+print("###########Globals###########")
 print(globals())
-sys.stdout = stdout_org
+print("#############################")
+#sys.stdout = stdout_org
 
 #model operations
 def tf_multiply(inpt):
@@ -140,7 +141,6 @@ def tf_add(inpt):
 def tf_stall(a):
     return a
 
-
 #model constants
 dummy_matrix = tf.zeros([batch_size, num_features], dtype=datatype, name="dummy_constant")
 
@@ -149,6 +149,10 @@ batchX_placeholder = tf.placeholder(datatype, [batch_size, None], name="batchX")
 batchY_placeholder = tf.placeholder(datatype, [batch_size, None], name="batchY")
 
 init_state = tf.placeholder(datatype, [batch_size, state_size], name="init_state")
+
+
+#set random seed
+tf.set_random_seed(seed)
 
 #model parameters
 W = tf.Variable(tf.truncated_normal([state_size+num_features, state_size], -1*param_init, param_init, dtype=datatype), dtype=datatype, name="W")
@@ -264,10 +268,11 @@ def calc_loss(output):
 output_train, current_state_train, softmax_train, outputs_train, softmaxes_train = run_forward_pass(mode = "train")
 total_loss_train, math_error_train = calc_loss(output_train)
 
+'''
 output_test, current_state_test, softmax_test, outputs_test, softmaxes_test = run_forward_pass(mode = "test")
 total_loss_test, math_error_test = calc_loss(output_test)
-
-grads_raw = tf.gradients(output_train, [W,b,W2,b2], name="comp_gradients")
+'''
+grads_raw = tf.gradients(total_loss_train, [W,b,W2,b2], name="comp_gradients")
 
 #clip gradients by value and add summaries
 if norm:
@@ -292,6 +297,8 @@ x,y = samples_generator(train_fn, (num_samples, num_features) , samples_value_rn
 x_train, x_test, y_train, y_test = split_train_test (x, y , test_ratio)
 num_batches = x_train.shape[0]//batch_size
 num_test_batches = x_test.shape[0]//batch_size
+print("num batches train:", num_batches)
+print("num batches test:", num_test_batches)
 #model training
 
 #create a saver to save the trained model
@@ -311,10 +318,16 @@ with tf.Session(config=config) as sess:
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
         sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
 
+    #init the var
     sess.run(tf.global_variables_initializer())
     #plt.ion()
     #plt.figure()
     #plt.show() 
+    #Init vars:
+    _W = sess.run([W])
+    _W2 = sess.run([W2])
+    print(W.eval())
+    print(W2.eval())
     globalstartTime = time.time()
     for epoch_idx in range(num_epochs):
         startTime = time.time()
@@ -324,19 +337,19 @@ with tf.Session(config=config) as sess:
         loss_list_test_hard = [0,0]
         summary = None
         
-        for _iter in range(iters_per_epoch):
-            _current_state_train = np.zeros((batch_size, state_size))
-            _current_state_test = np.zeros((batch_size, state_size))
+        _current_state_train = np.zeros((batch_size, state_size))
+        _current_state_test = np.zeros((batch_size, state_size))
 
             #backprop and test training set for softmax and hardmax loss
-            for batch_idx in range(num_batches):
+        for batch_idx in range(num_batches):
                 start_idx = batch_size * batch_idx
                 end_idx   = batch_size * batch_idx + batch_size
 
                 batchX = x_train[start_idx:end_idx]
                 batchY = y_train[start_idx:end_idx]
                 
-                summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
+                #summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
+                _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
                     feed_dict={
                         init_state:_current_state_train,
                         batchX_placeholder:batchX,
@@ -344,6 +357,7 @@ with tf.Session(config=config) as sess:
                     })
                 loss_list_train_soft.append(_total_loss_train)
                 
+                ''' 
                 _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
                     feed_dict={
                         init_state:_current_state_test,
@@ -378,7 +392,7 @@ with tf.Session(config=config) as sess:
                         batchY_placeholder:batchY
                     })
                 loss_list_test_hard.append(_total_loss_test)
-            
+
             #save model            
             saver.save(sess, './summaries/' + FLAGS.name + '/model/',global_step=epoch_idx)
             #write variables/loss summaries after all training/testing done
@@ -387,6 +401,7 @@ with tf.Session(config=config) as sess:
             write_no_tf_summary(train_writer, "Hardmax_train_loss", reduce(lambda x, y: x+y, loss_list_train_hard), epoch_idx)
             write_no_tf_summary(train_writer, "Sotfmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_soft), epoch_idx)
             write_no_tf_summary(train_writer, "Hardmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_hard), epoch_idx)
+        '''
         print("")
         #harmax test
         '''
@@ -406,7 +421,7 @@ with tf.Session(config=config) as sess:
         print("Sotfmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_soft))
         print("Hardmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_hard))
         print("Epoch time: ", ((time.time() - startTime) % 60), " Global Time: ",  get_time_hhmmss(time.time() - globalstartTime))
-        print("func: ", train_fn.__name__, "max_ops: ", max_output_ops, "sim_seed", seed)
+        print("func: ", train_fn.__name__, "max_ops: ", max_output_ops, "sim_seed", seed, "tf seed", ops.get_default_graph().seed)
         #print("grads[0] - W", _grads[0][0])
         #print("grads[1] - b", _grads[1][0])
         #print("grads[2] - W2", _grads[2][0])

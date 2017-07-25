@@ -1,1 +1,5 @@
 func:  np_mult max_ops:  2 sim_seed 93489
+
+##func:  np_add max_ops:5
+    13560
+    
