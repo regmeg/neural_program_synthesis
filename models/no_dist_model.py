@@ -8,9 +8,13 @@ import random
 import time
 import threading 
 from tensorflow.python.client import timeline
+import os
+import json
+import sys
 
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
+tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
 tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
 
@@ -20,19 +24,6 @@ FLAGS = tf.flags.FLAGS
 
 #set random seed
 tf.set_random_seed(FLAGS.seed)
-
-#configuraion constants
-total_num_epochs = 10000000
-iters_per_epoch = 1
-num_epochs = total_num_epochs // iters_per_epoch
-state_size = 50
-num_of_operations = 3
-max_output_ops = 5
-num_features = 3
-num_samples = 1500
-batch_size  = 100
-param_init = 0.1
-learning_rate = 0.005
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -44,7 +35,11 @@ def variable_summaries(var):
     tf.summary.scalar('min', tf.reduce_min(var))
     tf.summary.histogram('histogram', var)
 
-
+def write_no_tf_summary(writer, tag, val, step):
+   summary=tf.Summary()
+   summary.value.add(tag=tag, simple_value = val)
+   writer.add_summary(summary, step)
+    
 def split_train_test (x, y , test_ratio):
     
     if y.shape != x.shape:
@@ -102,7 +97,38 @@ def samples_generator(fn, shape, rng, seed):
     y = np.concatenate((y, z), axis=1)
     
     return x,y
-    
+
+#configuraion constants
+total_num_epochs = 10000000
+iters_per_epoch = 1
+num_epochs = total_num_epochs // iters_per_epoch
+state_size = 100
+num_of_operations = 3
+max_output_ops = 5
+num_features = 3
+num_samples = 1500
+samples_value_rng = (-100, 100)
+test_ratio = 0.33333333333
+batch_size  = 100
+param_init = 0.1
+learning_rate = 0.005
+epsilon=1e-6
+grad_norm = 10e1
+seed = FLAGS.seed
+train_fn = np_add
+name = FLAGS.name
+norm = FLAGS.norm
+
+#dumpl globals
+try:
+    os.mkdir('./summaries/' + FLAGS.name)
+except FileExistsError as err:
+    print("Dir already exists")
+
+stdout_org = sys.stdout
+sys.stdout = open('./summaries/' + FLAGS.name  + '/globals.txt', 'w')
+print(globals())
+sys.stdout = stdout_org
 
 #model operations
 def tf_multiply(inpt):
@@ -113,6 +139,7 @@ def tf_add(inpt):
 
 def tf_stall(a):
     return a
+
 
 #model constants
 dummy_matrix = tf.zeros([batch_size, num_features], dtype=datatype, name="dummy_constant")
@@ -242,38 +269,40 @@ total_loss_test, math_error_test = calc_loss(output_test)
 
 grads_raw = tf.gradients(output_train, [W,b,W2,b2], name="comp_gradients")
 
-#clip gradients by value
-grads, norms = tf.clip_by_global_norm(grads_raw, 10e2)
+#clip gradients by value and add summaries
+if norm:
+    print("norming the grads")
+    grads, norms = tf.clip_by_global_norm(grads_raw, grad_norm)
+    variable_summaries(norms)
+else:
+    grads = grads_raw
 
-
-#ad summaries
 for grad in grads: variable_summaries(grad)
-variable_summaries(norms)
 
-train_step = tf.train.AdamOptimizer(learning_rate, epsilon=1e-6 ,name="AdamOpt").apply_gradients(zip(grads, [W,b,W2,b2]), name="min_loss")
+
+train_step = tf.train.AdamOptimizer(learning_rate, epsilon ,name="AdamOpt").apply_gradients(zip(grads, [W,b,W2,b2]), name="min_loss")
 print("grads are")
 print(grads)
 
 #pre training setting
 np.set_printoptions(precision=3, suppress=True)
-train_fn = np_add
 #train_fn = np_mult
 #train_fn = np_stall
-x,y = samples_generator(train_fn, (num_samples, num_features) , (-100, 100), FLAGS.seed)
-x_train, x_test, y_train, y_test = split_train_test (x, y , 0.33333333333)
+x,y = samples_generator(train_fn, (num_samples, num_features) , samples_value_rng, seed)
+x_train, x_test, y_train, y_test = split_train_test (x, y , test_ratio)
 num_batches = x_train.shape[0]//batch_size
 num_test_batches = x_test.shape[0]//batch_size
 #model training
 
-# Merge all the summaries and write them out to /tmp/mnist_logs (by default)
-
+#create a saver to save the trained model
+saver=tf.train.Saver(var_list=tf.trainable_variables())
 
 #Enable jit
 config = tf.ConfigProto()
 config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 
 with tf.Session(config=config) as sess:
-    
+    # Merge all the summaries and write them out 
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./summaries/' + FLAGS.name ,sess.graph)
     ##enable debugger if necessary
@@ -293,11 +322,13 @@ with tf.Session(config=config) as sess:
         loss_list_train_hard = [0,0]
         loss_list_test_soft = [0,0]
         loss_list_test_hard = [0,0]
+        summary = None
         
         for _iter in range(iters_per_epoch):
             _current_state_train = np.zeros((batch_size, state_size))
             _current_state_test = np.zeros((batch_size, state_size))
 
+            #backprop and test training set for softmax and hardmax loss
             for batch_idx in range(num_batches):
                 start_idx = batch_size * batch_idx
                 end_idx   = batch_size * batch_idx + batch_size
@@ -312,15 +343,17 @@ with tf.Session(config=config) as sess:
                         batchY_placeholder:batchY
                     })
                 loss_list_train_soft.append(_total_loss_train)
-
-                summary, _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([merged, total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
+                
+                _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
                     feed_dict={
                         init_state:_current_state_test,
                         batchX_placeholder:batchX,
                         batchY_placeholder:batchY
                     })
                 loss_list_train_hard.append(_total_loss_test)
-                    
+                
+            
+            ##test the testing set for sotmax/harmax loss
             _current_state_train = np.zeros((batch_size, state_size))
             _current_state_test = np.zeros((batch_size, state_size))
             for batch_idx in range(num_test_batches):
@@ -330,23 +363,30 @@ with tf.Session(config=config) as sess:
                 batchX = x_test[start_idx:end_idx]
                 batchY = y_test[start_idx:end_idx]
                 
-                summary, _total_loss_train, _current_state_train = sess.run([merged, total_loss_train, current_state_train],
+                _total_loss_train, _current_state_train = sess.run([total_loss_train, current_state_train],
                     feed_dict={
                         init_state:_current_state_train,
                         batchX_placeholder:batchX,
                         batchY_placeholder:batchY
                     })
                 loss_list_test_soft.append(_total_loss_train)
-
-                summary, _total_loss_test, _current_state_test = sess.run([merged, total_loss_test, current_state_test],
+                
+                _total_loss_test, _current_state_test = sess.run([total_loss_test, current_state_test],
                     feed_dict={
                         init_state:_current_state_test,
                         batchX_placeholder:batchX,
                         batchY_placeholder:batchY
                     })
                 loss_list_test_hard.append(_total_loss_test)
+            
+            #save model            
+            saver.save(sess, './summaries/' + FLAGS.name + '/model/',global_step=epoch_idx)
+            #write variables/loss summaries after all training/testing done
             train_writer.add_summary(summary, epoch_idx)
-
+            write_no_tf_summary(train_writer, "Softmax_train_loss", reduce(lambda x, y: x+y, loss_list_train_soft), epoch_idx)
+            write_no_tf_summary(train_writer, "Hardmax_train_loss", reduce(lambda x, y: x+y, loss_list_train_hard), epoch_idx)
+            write_no_tf_summary(train_writer, "Sotfmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_soft), epoch_idx)
+            write_no_tf_summary(train_writer, "Hardmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_hard), epoch_idx)
         print("")
         #harmax test
         '''
@@ -366,7 +406,7 @@ with tf.Session(config=config) as sess:
         print("Sotfmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_soft))
         print("Hardmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_hard))
         print("Epoch time: ", ((time.time() - startTime) % 60), " Global Time: ",  get_time_hhmmss(time.time() - globalstartTime))
-        print("func: ", train_fn.__name__, "max_ops: ", max_output_ops, "sim_seed", FLAGS.seed)
+        print("func: ", train_fn.__name__, "max_ops: ", max_output_ops, "sim_seed", seed)
         #print("grads[0] - W", _grads[0][0])
         #print("grads[1] - b", _grads[1][0])
         #print("grads[2] - W2", _grads[2][0])
