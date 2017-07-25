@@ -357,7 +357,7 @@ with tf.Session(config=config) as sess:
                     })
                 loss_list_train_soft.append(_total_loss_train)
                 
-                ''' 
+                
                 _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
                     feed_dict={
                         init_state:_current_state_test,
@@ -367,10 +367,10 @@ with tf.Session(config=config) as sess:
                 loss_list_train_hard.append(_total_loss_test)
                 
             
-            ##test the testing set for sotmax/harmax loss
-            _current_state_train = np.zeros((batch_size, state_size))
-            _current_state_test = np.zeros((batch_size, state_size))
-            for batch_idx in range(num_test_batches):
+        ##test the testing set for sotmax/harmax loss
+        _current_state_train = np.zeros((batch_size, state_size))
+        _current_state_test = np.zeros((batch_size, state_size))
+        for batch_idx in range(num_test_batches):
                 start_idx = batch_size * batch_idx
                 end_idx   = batch_size * batch_idx + batch_size
 
@@ -392,7 +392,7 @@ with tf.Session(config=config) as sess:
                         batchY_placeholder:batchY
                     })
                 loss_list_test_hard.append(_total_loss_test)
-
+        '''
             #save model            
             saver.save(sess, './summaries/' + FLAGS.name + '/model/',global_step=epoch_idx)
             #write variables/loss summaries after all training/testing done
