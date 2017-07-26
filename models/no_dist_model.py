@@ -4,6 +4,7 @@ from functools import reduce
 import matplotlib.pyplot as plt
 from tensorflow.python import debug as tf_debug
 from tensorflow.python.framework import ops
+import pprint
 from numpy.random import RandomState
 import random
 import time
@@ -13,7 +14,19 @@ import datetime
 
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
+
+tf.flags.DEFINE_integer("state_size", 50, "weather to norm grads")    
+tf.flags.DEFINE_integer("num_samples", 1500, "weather to norm grads")
+tf.flags.DEFINE_integer("batch_size", 100, "weather to norm grads")
+
+tf.flags.DEFINE_float("learning_rate", 0.005, "weather to norm grads")
+tf.flags.DEFINE_float("grad_norm", 10e2, "weather to norm grads")
+tf.flags.DEFINE_integer("max_output_ops", 5, "weather to norm grads")
+
+tf.flags.DEFINE_integer("num_features", 3, "weather to norm grads")
+tf.flags.DEFINE_string("train_fn", "np_mult", "weather to norm grads")
 tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
+
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
 tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
 
@@ -95,28 +108,46 @@ def samples_generator(fn, shape, rng, seed):
     
     return x,y
 
-#configuraion constants
-total_num_epochs = 10000000
-iters_per_epoch = 1
-num_epochs = total_num_epochs // iters_per_epoch
-state_size = 50
-num_of_operations = 3
-max_output_ops = 5
-num_features = 3
-num_samples = 1000
-samples_value_rng = (-100, 100)
-test_ratio = 0
-batch_size  = 100
-param_init = 0.1
-learning_rate = 0.005
-epsilon=1e-6
-grad_norm = 10e2
-seed = FLAGS.seed
-train_fn = np_add
-name = FLAGS.name
-norm = FLAGS.norm
-sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
+def get_syn_fn(fn_name):
+    if   fn_name == "np_add":   return np_add
+    elif fn_name == "np_mult":  return np_mult
+    elif fn_name == "np_stall": return np_stall
+    else: raise Exception('Function passed by the flag to be synthesised has not been defined')
 
+#configuraion constants
+global_cfg = dict(
+    total_num_epochs = 10000000,
+    iters_per_epoch = 1,
+    num_of_operations = 3,
+    samples_value_rng = (-100, 100),
+    test_ratio = 0.33333,
+    param_init = 0.1,
+    epsilon=1e-6,
+    test_cycle = 150,
+    convergance_check_epochs = 5000,
+    sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
+
+    #flagged
+    state_size = FLAGS.state_size,
+    num_samples = FLAGS.num_samples,
+    batch_size  = FLAGS.batch_size,
+
+    learning_rate = FLAGS.learning_rate,
+    grad_norm = FLAGS.grad_norm,
+    max_output_ops = FLAGS.max_output_ops,
+
+    num_features = FLAGS.num_features,
+    train_fn = get_syn_fn(FLAGS.train_fn),
+    norm = FLAGS.norm,
+
+    seed = FLAGS.seed,
+    name = FLAGS.name
+)
+global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']
+
+#populate the global env with dict variables - !!can lead to nasty bugs
+for name, value in global_cfg.items():
+    globals()[name] = value
 
 #craete log and dumpl globals
 try:
@@ -126,8 +157,10 @@ except FileExistsError as err:
 
 stdout_org = sys.stdout
 sys.stdout = open('./summaries/' + FLAGS.name  + '/log.log', 'w')
-print("###########Globals###########")
-print(globals())
+print("###########Global dict is###########")
+pprint.pprint(globals(), depth=3)
+print("###########CFG dict is###########")
+pprint.pprint(global_cfg, depth=3)
 print("#############################")
 #sys.stdout = stdout_org
 
@@ -268,10 +301,9 @@ def calc_loss(output):
 output_train, current_state_train, softmax_train, outputs_train, softmaxes_train = run_forward_pass(mode = "train")
 total_loss_train, math_error_train = calc_loss(output_train)
 
-'''
 output_test, current_state_test, softmax_test, outputs_test, softmaxes_test = run_forward_pass(mode = "test")
 total_loss_test, math_error_test = calc_loss(output_test)
-'''
+
 grads_raw = tf.gradients(total_loss_train, [W,b,W2,b2], name="comp_gradients")
 
 #clip gradients by value and add summaries
@@ -307,6 +339,8 @@ saver=tf.train.Saver(var_list=tf.trainable_variables())
 #Enable jit
 config = tf.ConfigProto()
 config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+#define congergance check list
+last_train_losses = []
 
 with tf.Session(config=config) as sess:
     # Merge all the summaries and write them out 
@@ -347,61 +381,72 @@ with tf.Session(config=config) as sess:
 
                 batchX = x_train[start_idx:end_idx]
                 batchY = y_train[start_idx:end_idx]
-                
-                #summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
-                _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
-                    feed_dict={
-                        init_state:_current_state_train,
-                        batchX_placeholder:batchX,
-                        batchY_placeholder:batchY
-                    })
-                loss_list_train_soft.append(_total_loss_train)
-                
-                
-                _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
-                    feed_dict={
-                        init_state:_current_state_test,
-                        batchX_placeholder:batchX,
-                        batchY_placeholder:batchY
-                    })
-                loss_list_train_hard.append(_total_loss_test)
-                
-            
-        ##test the testing set for sotmax/harmax loss
-        _current_state_train = np.zeros((batch_size, state_size))
-        _current_state_test = np.zeros((batch_size, state_size))
-        for batch_idx in range(num_test_batches):
-                start_idx = batch_size * batch_idx
-                end_idx   = batch_size * batch_idx + batch_size
 
-                batchX = x_test[start_idx:end_idx]
-                batchY = y_test[start_idx:end_idx]
+            
+                if epoch_idx % test_cycle != 0 :
+                    _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
+                        feed_dict={
+                            init_state:_current_state_train,
+                            batchX_placeholder:batchX,
+                            batchY_placeholder:batchY
+                        })
+                    loss_list_train_soft.append(_total_loss_train)
                 
-                _total_loss_train, _current_state_train = sess.run([total_loss_train, current_state_train],
+                else :
+                    summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
                     feed_dict={
                         init_state:_current_state_train,
                         batchX_placeholder:batchX,
                         batchY_placeholder:batchY
                     })
-                loss_list_test_soft.append(_total_loss_train)
+                    loss_list_train_soft.append(_total_loss_train)
                 
-                _total_loss_test, _current_state_test = sess.run([total_loss_test, current_state_test],
-                    feed_dict={
-                        init_state:_current_state_test,
-                        batchX_placeholder:batchX,
-                        batchY_placeholder:batchY
-                    })
-                loss_list_test_hard.append(_total_loss_test)
-        '''
+                    _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
+                        feed_dict={
+                            init_state:_current_state_test,
+                            batchX_placeholder:batchX,
+                            batchY_placeholder:batchY
+                        })
+                    loss_list_train_hard.append(_total_loss_test)
+        ##save loss for the convergance chessing        
+        reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
+        last_train_losses.append(reduced_loss_train_soft)
+        ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
+        if epoch_idx % test_cycle == 0 :
+            _current_state_train = np.zeros((batch_size, state_size))
+            _current_state_test = np.zeros((batch_size, state_size))
+            for batch_idx in range(num_test_batches):
+                    start_idx = batch_size * batch_idx
+                    end_idx   = batch_size * batch_idx + batch_size
+
+                    batchX = x_test[start_idx:end_idx]
+                    batchY = y_test[start_idx:end_idx]
+
+                    _total_loss_train, _current_state_train = sess.run([total_loss_train, current_state_train],
+                        feed_dict={
+                            init_state:_current_state_train,
+                            batchX_placeholder:batchX,
+                            batchY_placeholder:batchY
+                        })
+                    loss_list_test_soft.append(_total_loss_train)
+
+                    _total_loss_test, _current_state_test = sess.run([total_loss_test, current_state_test],
+                        feed_dict={
+                            init_state:_current_state_test,
+                            batchX_placeholder:batchX,
+                            batchY_placeholder:batchY
+                        })
+                    loss_list_test_hard.append(_total_loss_test)
+
             #save model            
             saver.save(sess, './summaries/' + FLAGS.name + '/model/',global_step=epoch_idx)
             #write variables/loss summaries after all training/testing done
             train_writer.add_summary(summary, epoch_idx)
-            write_no_tf_summary(train_writer, "Softmax_train_loss", reduce(lambda x, y: x+y, loss_list_train_soft), epoch_idx)
+            write_no_tf_summary(train_writer, "Softmax_train_loss", reduced_loss_train_soft, epoch_idx)
             write_no_tf_summary(train_writer, "Hardmax_train_loss", reduce(lambda x, y: x+y, loss_list_train_hard), epoch_idx)
             write_no_tf_summary(train_writer, "Sotfmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_soft), epoch_idx)
             write_no_tf_summary(train_writer, "Hardmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_hard), epoch_idx)
-        '''
+
         print("")
         #harmax test
         '''
@@ -416,7 +461,7 @@ with tf.Session(config=config) as sess:
         print(np.column_stack((_math_error, _math_error_test)))
         '''
         print("Epoch",epoch_idx)
-        print("Softmax train loss\t", reduce(lambda x, y: x+y, loss_list_train_soft))
+        print("Softmax train loss\t", reduced_loss_train_soft)
         print("Hardmax train loss\t", reduce(lambda x, y: x+y, loss_list_train_hard))
         print("Sotfmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_soft))
         print("Hardmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_hard))
@@ -429,3 +474,13 @@ with tf.Session(config=config) as sess:
         #print("W", W.eval())
         #print("w2" , W2.eval())
         #record execution timeline
+        ##check convergance over last 5000 epochs
+        if epoch_idx % convergance_check_epochs == 0 and epoch_idx >= convergance_check_epochs: 
+            if np.allclose(last_train_losses, last_train_losses[0], equal_nan=True, rtol=1e-05, atol=1e-02):
+                print("#################################")
+                print("Model has converged, breaking ...")
+                print("#################################")
+                break
+            else:
+                print("Reseting the loss conv array")
+                last_train_losses = []
