@@ -1,11 +1,18 @@
 import tensorflow as tf
 
-#model operations
-def tf_multiply(inpt, batch_size):
-    return tf.reshape( tf.reduce_prod(inpt, axis = 1, name = "tf_mult"), [batch_size, -1], name = "tf_mult_reshape")
+class Operations()
 
-def tf_add(inpt, batch_size):
-    return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [batch_size, -1], name = "tf_add_reshape")
+    def __init__(self, batch_size):
+        self.batch_size = batch_size
+        self.ops = [self.tf_multiply, self.tf_add, tf_stall]
+        self.num_of_ops = len(self.ops)
 
-def tf_stall(a):
-    return a
+    #model operations
+    def tf_multiply(self ,inpt):
+        return tf.reshape( tf.reduce_prod(inpt, axis = 1, name = "tf_mult"), [self.batch_size, -1], name = "tf_mult_reshape")
+
+    def tf_add(self, inpt):
+        return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [self.batch_size, -1], name = "tf_add_reshape")
+
+    def tf_stall(a):
+        return a

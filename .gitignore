@@ -1,4 +1,6 @@
 .ipynb_checkpoints
+.pyc
+__pycache__
 summaries
 logs
 old_proj

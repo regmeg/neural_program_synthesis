@@ -13,6 +13,7 @@ import sys
 import datetime
 from data_gen import *
 from params import get_cfg
+from ops import Operations
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -39,7 +40,7 @@ def get_time_hhmmss(dif):
 
 
 cfg = get_cfg()    
-
+ops = Operations(cfg['batch_size'])
 #craete log and dumpl globals
 try:
     os.mkdir('./summaries/' + cfg['name'])
@@ -143,7 +144,7 @@ def run_forward_pass(mode="train"):
         #in test change to hardmax
         if mode is "test":
             argmax  = tf.argmax(softmax, 1, )
-            softmax  = tf.one_hot(argmax, num_of_operations, dtype=cfg['datatype'])
+            softmax  = tf.one_hot(argmax, ops.num_of_ops, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
         add_softmax   = tf.slice(softmax, [0,0], [batch_size,1], name="slice_add_softmax_val")
         mult_softmax  = tf.slice(softmax, [0,1], [batch_size,1], name="slice_mult_softmax_val")
