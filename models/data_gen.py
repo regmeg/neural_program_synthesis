@@ -31,3 +31,28 @@ def get_syn_fn(fn_name):
     elif fn_name == "np_mult":  return np_mult
     elif fn_name == "np_stall": return np_stall
     else: raise Exception('Function passed by the flag to be synthesised has not been defined')
+        
+def split_train_test(x, y , test_ratio):
+    
+    if y.shape != x.shape:
+        raise Exception('Model expects x and y shapes to be the same')
+    
+    test_len  = int(x.shape[0]*test_ratio)
+    train_len = x.shape[0] - test_len
+
+    x_train = x[0:train_len][:]
+    x_test  = x[-test_len:][:]
+    y_train = y[0:train_len][:]
+    y_test  = y[-test_len:][:]
+    
+    train_shape = (train_len, x.shape[1])
+    test_shape = (test_len, x.shape[1])
+    
+    if test_ratio == 0:
+        x_test = np.zeros(test_shape)
+        y_test = np.zeros(test_shape)
+
+    if y_train.shape != train_shape or x_train.shape != train_shape or x_test.shape != test_shape or y_test.shape != test_shape:
+        raise Exception('One of the conversion test/train shapes gone wrong')
+    
+    return  x_train, x_test, y_train, y_test

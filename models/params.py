@@ -25,7 +25,6 @@ tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simul
 tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
 tf.flags.DEFINE_string("dst", "predef_sim_name" , "name of the simulation")
 
-datatype = tf.float64
 FLAGS = tf.flags.FLAGS
 
 def get_cfg():
@@ -41,6 +40,7 @@ def get_cfg():
         test_cycle = 150,
         convergance_check_epochs = 5000,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
+        datatype = tf.float64,
 
         #flagged
         state_size = FLAGS.state_size,

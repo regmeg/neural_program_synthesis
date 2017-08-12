@@ -29,30 +29,6 @@ def write_no_tf_summary(writer, tag, val, step):
    summary.value.add(tag=tag, simple_value = val)
    writer.add_summary(summary, step)
     
-def split_train_test(x, y , test_ratio):
-    
-    if y.shape != x.shape:
-        raise Exception('Model expects x and y shapes to be the same')
-    
-    test_len  = int(x.shape[0]*test_ratio)
-    train_len = x.shape[0] - test_len
-
-    x_train = x[0:train_len][:]
-    x_test  = x[-test_len:][:]
-    y_train = y[0:train_len][:]
-    y_test  = y[-test_len:][:]
-    
-    train_shape = (train_len, x.shape[1])
-    test_shape = (test_len, x.shape[1])
-    
-    if test_ratio == 0:
-        x_test = np.zeros(test_shape)
-        y_test = np.zeros(test_shape)
-
-    if y_train.shape != train_shape or x_train.shape != train_shape or x_test.shape != test_shape or y_test.shape != test_shape:
-        raise Exception('One of the conversion test/train shapes gone wrong')
-    
-    return  x_train, x_test, y_train, y_test
 
 #helpder func
 def get_time_hhmmss(dif):
@@ -62,57 +38,44 @@ def get_time_hhmmss(dif):
     return time_str
 
 
-
-
-
 cfg = get_cfg()    
 
 #craete log and dumpl globals
 try:
-    os.mkdir('./summaries/' + cfg.name)
+    os.mkdir('./summaries/' + cfg['name'])
 except FileExistsError as err:
     print("Dir already exists")
 
 stdout_org = sys.stdout
-sys.stdout = open('./summaries/' + cfg.name  + '/log.log', 'w')
+sys.stdout = open('./summaries/' + cfg['name']  + '/log.log', 'w')
 print("###########Global dict is###########")
 pprint.pprint(globals(), depth=3)
 print("###########CFG dict is###########")
-pprint.pprint(global_cfg, depth=3)
+pprint.pprint(cfg, depth=3)
 print("#############################")
 #sys.stdout = stdout_org
 
-#model operations
-def tf_multiply(inpt):
-    return tf.reshape( tf.reduce_prod(inpt, axis = 1, name = "tf_mult"), [cfg.batch_size, -1], name = "tf_mult_reshape")
-
-def tf_add(inpt):
-    return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [cfg.batch_size, -1], name = "tf_add_reshape")
-
-def tf_stall(a):
-    return a
-
 #model constants
-dummy_matrix = tf.zeros([cfg.batch_size, cfg.num_features.], dtype=cfg.datatype, name="dummy_constant")
+dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
 
 #model placeholders
-batchX_placeholder = tf.placeholder(cfg.datatype, [cfg.batch_size, None], name="batchX")
-batchY_placeholder = tf.placeholder(cfg.datatype, [cfg.batch_size, None], name="batchY")
+batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
+batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
 
-init_state = tf.placeholder(datatype, [batch_size, state_size], name="init_state")
+init_state = tf.placeholder(cff['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
 
 
 #set random seed
-tf.set_random_seed(seed)
+tf.set_random_seed(cfg['seed'])
 
 #model parameters
-W = tf.Variable(tf.truncated_normal([state_size+num_features, state_size], -1*param_init, param_init, dtype=datatype), dtype=datatype, name="W")
-b = tf.Variable(np.zeros((state_size)), dtype=datatype, name="b")
+W = tf.Variable(tf.truncated_normal([cfg['state_size']+cfg['num_features'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W")
+b = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b")
 variable_summaries(W)
 variable_summaries(b)
 
-W2 = tf.Variable(tf.truncated_normal([state_size, num_of_operations], -1*param_init, param_init, dtype=datatype),dtype=datatype, name="W2")
-b2 = tf.Variable(np.zeros((num_of_operations)), dtype=datatype, name="b2")
+W2 = tf.Variable(tf.truncated_normal([cfg['state_size'], cfg['num_of_operations']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2")
+b2 = tf.Variable(np.zeros((cfg['num_of_operations'])), dtype=cfg['datatype'], name="b2")
 variable_summaries(W2)
 variable_summaries(b2)
 
@@ -129,7 +92,7 @@ def run_forward_pass(mode="train"):
     #printtf = tf.Print(output, [output], message="Strated cycle")
     #output = tf.reshape( printtf, [batch_size, -1], name = "dummu_rehap")
     
-    for timestep in range(max_output_ops):
+    for timestep in range(cfg['max_output_ops']):
         print("timestep " + str(timestep))
         current_input = output
 
@@ -180,7 +143,7 @@ def run_forward_pass(mode="train"):
         #in test change to hardmax
         if mode is "test":
             argmax  = tf.argmax(softmax, 1, )
-            softmax  = tf.one_hot(argmax, num_of_operations, dtype=datatype)
+            softmax  = tf.one_hot(argmax, num_of_operations, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
         add_softmax   = tf.slice(softmax, [0,0], [batch_size,1], name="slice_add_softmax_val")
         mult_softmax  = tf.slice(softmax, [0,1], [batch_size,1], name="slice_mult_softmax_val")
