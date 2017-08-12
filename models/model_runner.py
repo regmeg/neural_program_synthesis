@@ -10,9 +10,10 @@ tf.flags.DEFINE_integer("seed", int(round(random.random()*100000)), "the global 
 FLAGS = tf.flags.FLAGS
 
 def gen_cmd(cfg_dict, seed):
-    string = "python3 ./no_dist_model.py"
+    string = "python3 ./model.py"
     name = " --name="
     for key, val in cfg_dict.items():
+        if key == 'max_output_ops' or key == 'train_fn': pass
         string += " --"+str(key)+"="+str(val)
         name += str(val)+"_"+str(key)+"-"
     name = name[:-1]
@@ -20,6 +21,7 @@ def gen_cmd(cfg_dict, seed):
     return string + seed + name
 
 #cfg to iterate over
+'''
 params=dict(
     state_size = [50, 100, 200],
     num_samples = [1500, 5000, 30000],
@@ -32,6 +34,11 @@ params=dict(
     num_features = [3],
     train_fn = ["np_mult"],
     norm = [True]
+)
+'''
+
+params=dict(
+    state_size = [50, 100]
 )
 #cfg which unlinkely is going to be iterated, but still can be configured
 

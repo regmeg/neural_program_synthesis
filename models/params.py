@@ -56,9 +56,9 @@ def get_cfg():
 
         seed = FLAGS.seed,
         name = FLAGS.name,
-        dst = train_fn.__name__ + "-" + max_output_ops +"ops" / + name,
         debug = FLAGS.debug
     )
+    global_cfg['dst'] = global_cfg['train_fn'].__name__ + "-" + str(global_cfg['max_output_ops']) +"ops/" + global_cfg['name']
     global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']
     
     return global_cfg

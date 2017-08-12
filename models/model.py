@@ -41,12 +41,12 @@ cfg = get_cfg()
 ops = Operations(cfg['batch_size'])
 #craete log and dumpl globals
 try:
-    os.mkdir('./summaries/' + cfg['name'])
+    os.makedirs('./summaries/' + cfg['dst'])
 except FileExistsError as err:
     print("Dir already exists")
 
 stdout_org = sys.stdout
-sys.stdout = open('./summaries/' + cfg['name']  + '/log.log', 'w')
+sys.stdout = open('./summaries/' + cfg['dst']  + '/log.log', 'w')
 print("###########Global dict is###########")
 pprint.pprint(globals(), depth=3)
 print("###########CFG dict is###########")
@@ -223,7 +223,7 @@ last_train_losses = []
 with tf.Session(config=config) as sess:
     # Merge all the summaries and write them out 
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter('./summaries/' + cfg['name'] ,sess.graph)
+    train_writer = tf.summary.FileWriter('./summaries/' + cfg['dst'] ,sess.graph)
     ##enable debugger if necessary
     if (cfg['debug']):
         print("Running in a debug mode")
@@ -318,7 +318,7 @@ with tf.Session(config=config) as sess:
                     loss_list_test_hard.append(_total_loss_test)
 
             #save model            
-            saver.save(sess, './summaries/' + cfg['name'] + '/model/',global_step=epoch_idx)
+            saver.save(sess, './summaries/' + cfg['dst'] + '/model/',global_step=epoch_idx)
             #write variables/loss summaries after all training/testing done
             train_writer.add_summary(summary, epoch_idx)
             write_no_tf_summary(train_writer, "Softmax_train_loss", reduced_loss_train_soft, epoch_idx)
