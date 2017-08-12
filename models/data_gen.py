@@ -1,4 +1,7 @@
 import numpy as np
+from functools import reduce
+from numpy.random import RandomState
+from numpy.random import RandomState
 
 #sample gen functions
 def np_add(vec):

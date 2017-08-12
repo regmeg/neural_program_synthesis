@@ -1,11 +1,9 @@
 import numpy as np
 import tensorflow as tf
-from functools import reduce
 import matplotlib.pyplot as plt
 from tensorflow.python import debug as tf_debug
-from tensorflow.python.framework import ops
+from tensorflow.python.framework import ops as tf_ops
 import pprint
-from numpy.random import RandomState
 import random
 import time
 import os
@@ -63,7 +61,7 @@ dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['dat
 batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
 batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
 
-init_state = tf.placeholder(cff['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
+init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
 
 
 #set random seed
@@ -187,7 +185,7 @@ total_loss_test, math_error_test = calc_loss(output_test)
 grads_raw = tf.gradients(total_loss_train, [W,b,W2,b2], name="comp_gradients")
 
 #clip gradients by value and add summaries
-if norm:
+if cfg['norm']:
     print("norming the grads")
     grads, norms = tf.clip_by_global_norm(grads_raw, cfg['grad_norm'])
     variable_summaries(norms)
@@ -205,10 +203,10 @@ print(grads)
 np.set_printoptions(precision=3, suppress=True)
 #train_fn = np_mult
 #train_fn = np_stall
-x,y = samples_generator(train_fn, (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])
+x,y = samples_generator(cfg['train_fn'], (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])
 x_train, x_test, y_train, y_test = split_train_test (x, y , cfg['test_ratio'])
-num_batches = x_train.shape[0]//batch_size
-num_test_batches = x_test.shape[0]//batch_size
+num_batches = x_train.shape[0]//cfg['batch_size']
+num_test_batches = x_test.shape[0]//cfg['batch_size']
 print("num batches train:", num_batches)
 print("num batches test:", num_test_batches)
 #model training
@@ -227,7 +225,7 @@ with tf.Session(config=config) as sess:
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./summaries/' + cfg['name'] ,sess.graph)
     ##enable debugger if necessary
-    if (FLAGS.debug):
+    if (cfg['debug']):
         print("Running in a debug mode")
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
         sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
@@ -255,15 +253,15 @@ with tf.Session(config=config) as sess:
         _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
 
             #backprop and test training set for softmax and hardmax loss
-        for batch_idx in range(cfg['num_batches']):
+        for batch_idx in range(num_batches):
                 start_idx = cfg['batch_size'] * batch_idx
                 end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
 
                 batchX = x_train[start_idx:end_idx]
                 batchY = y_train[start_idx:end_idx]
 
-            
-                if epoch_idx % test_cycle != 0 :
+                #for non testing cylce, simply do one forward and back prop with 1 batch with train data
+                if epoch_idx % cfg['test_cycle'] != 0 :
                     _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
                         feed_dict={
                             init_state:_current_state_train,
@@ -273,6 +271,7 @@ with tf.Session(config=config) as sess:
                     loss_list_train_soft.append(_total_loss_train)
                 
                 else :
+                #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
                     summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
                     feed_dict={
                         init_state:_current_state_train,
@@ -295,7 +294,7 @@ with tf.Session(config=config) as sess:
         if epoch_idx % cfg['test_cycle'] == 0 :
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-            for batch_idx in range(cfg['num_batches']):
+            for batch_idx in range(num_test_batches):
                     start_idx = cfg['batch_size'] * batch_idx
                     end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
 
@@ -346,7 +345,7 @@ with tf.Session(config=config) as sess:
         print("Sotfmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_soft))
         print("Hardmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_hard))
         print("Epoch time: ", ((time.time() - startTime) % 60), " Global Time: ",  get_time_hhmmss(time.time() - globalstartTime))
-        print("func: ", train_fn.__name__, "max_ops: ", max_output_ops, "sim_seed", seed, "tf seed", ops.get_default_graph().seed)
+        print("func: ", cfg['train_fn'].__name__, "max_ops: ", cfg['max_output_ops'], "sim_seed", cfg['seed'], "tf seed", tf_ops.get_default_graph().seed)
         #print("grads[0] - W", _grads[0][0])
         #print("grads[1] - b", _grads[1][0])
         #print("grads[2] - W2", _grads[2][0])

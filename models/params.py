@@ -56,7 +56,8 @@ def get_cfg():
         norm = FLAGS.norm,
 
         seed = FLAGS.seed,
-        name = FLAGS.name
+        name = FLAGS.name,
+        debug = FLAGS.debug
     )
     global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']
     
