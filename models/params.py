@@ -38,7 +38,7 @@ def get_cfg():
         param_init = 0.1,
         epsilon=1e-6,
         test_cycle = 150,
-        convergance_check_epochs = 5000,
+        convergance_check_epochs = 1000,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
         datatype = tf.float64,
 

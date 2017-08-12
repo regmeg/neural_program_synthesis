@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class Operations()
+class Operations:
 
     def __init__(self, batch_size):
         self.batch_size = batch_size
@@ -14,5 +14,5 @@ class Operations()
     def tf_add(self, inpt):
         return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [self.batch_size, -1], name = "tf_add_reshape")
 
-    def tf_stall(a):
+    def tf_stall(self, a):
         return a

@@ -114,9 +114,7 @@ def run_forward_pass(mode="train"):
         print(argmax)
         '''
         #perform ops
-        add   = tf_add(current_input)
-        mult  = tf_multiply(current_input)
-        stall = tf_stall(current_input)
+        op_res = [(op.__name__, op(current_input)) for op in ops.ops]
         #add = tf.reshape( tf.reduce_prod(current_input, axis = 1), [batch_size, -1])
         #mult = tf.reshape( tf.reduce_sum(current_input, axis = 1), [batch_size, -1])
         #stall = current_input
@@ -146,22 +144,22 @@ def run_forward_pass(mode="train"):
             argmax  = tf.argmax(softmax, 1, )
             softmax  = tf.one_hot(argmax, ops.num_of_ops, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
-        add_softmax   = tf.slice(softmax, [0,0], [batch_size,1], name="slice_add_softmax_val")
-        mult_softmax  = tf.slice(softmax, [0,1], [batch_size,1], name="slice_mult_softmax_val")
-        stall_softmax = tf.slice(softmax, [0,2], [batch_size,1], name="stall_mult_softmax_val")
+        add_softmax   = tf.slice(softmax, [0,0], [cfg['batch_size'],1], name="slice_add_softmax_val")
+        mult_softmax  = tf.slice(softmax, [0,1], [cfg['batch_size'],1], name="slice_mult_softmax_val")
+        stall_softmax = tf.slice(softmax, [0,2], [cfg['batch_size'],1], name="stall_mult_softmax_val")
 
-        add_width   = tf.shape(add, name="add_op_shape")[1]
-        mult_width  = tf.shape(mult, name="mult_op_shape")[1]
-        stall_width = tf.shape(stall, name="stall_op_shape")[1]
+        add_width   = tf.shape(op_res[0][1], name="add_op_shape")[1]
+        mult_width  = tf.shape(op_res[1][1], name="mult_op_shape")[1]
+        stall_width = tf.shape(op_res[2][1], name="stall_op_shape")[1]
 
 
-        add_final   = tf.multiply(add, add_softmax, name="mult_add_softmax")
-        mult_final  = tf.multiply(mult,mult_softmax, name="mult_mult_softmax")
-        stall_final = tf.multiply(stall, stall_softmax, name="mult_stall_softmax")
+        add_final   = tf.multiply(op_res[0][1], add_softmax, name="mult_add_softmax")
+        mult_final  = tf.multiply(op_res[1][1],mult_softmax, name="mult_mult_softmax")
+        stall_final = tf.multiply(op_res[2][1], stall_softmax, name="mult_stall_softmax")
 
         ##conact add and mult results with zeros matrix
-        add_final = tf.concat([add_final, tf.slice(dummy_matrix, [0,0], [batch_size, num_features - add_width], name="slice_dum_add")], 1, name="concat_add_op_dummy_zeros") 
-        mult_final = tf.concat([mult_final, tf.slice(dummy_matrix, [0,0], [batch_size, num_features - mult_width], name="slice_dum_mult")], 1, name="concat_mult_op_dummy_zeros") 
+        add_final = tf.concat([add_final, tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - add_width], name="slice_dum_add")], 1, name="concat_add_op_dummy_zeros") 
+        mult_final = tf.concat([mult_final, tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - mult_width], name="slice_dum_mult")], 1, name="concat_mult_op_dummy_zeros") 
 
 
         output = tf.add(add_final, mult_final, name="add_final_op_mult_add")
@@ -175,7 +173,7 @@ def run_forward_pass(mode="train"):
 #cost function
 def calc_loss(output):
     #reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
-    math_error = tf.multiply(tf.constant(0.5, dtype=datatype), tf.square(tf.subtract(output , batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
+    math_error = tf.multiply(tf.constant(0.5, dtype=cfg['datatype']), tf.square(tf.subtract(output , batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
     
     total_loss = tf.reduce_sum(math_error, name="red_total_loss")
     return total_loss, math_error
@@ -191,7 +189,7 @@ grads_raw = tf.gradients(total_loss_train, [W,b,W2,b2], name="comp_gradients")
 #clip gradients by value and add summaries
 if norm:
     print("norming the grads")
-    grads, norms = tf.clip_by_global_norm(grads_raw, grad_norm)
+    grads, norms = tf.clip_by_global_norm(grads_raw, cfg['grad_norm'])
     variable_summaries(norms)
 else:
     grads = grads_raw
@@ -199,7 +197,7 @@ else:
 for grad in grads: variable_summaries(grad)
 
 
-train_step = tf.train.AdamOptimizer(learning_rate, epsilon ,name="AdamOpt").apply_gradients(zip(grads, [W,b,W2,b2]), name="min_loss")
+train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, [W,b,W2,b2]), name="min_loss")
 print("grads are")
 print(grads)
 
@@ -207,8 +205,8 @@ print(grads)
 np.set_printoptions(precision=3, suppress=True)
 #train_fn = np_mult
 #train_fn = np_stall
-x,y = samples_generator(train_fn, (num_samples, num_features) , samples_value_rng, seed)
-x_train, x_test, y_train, y_test = split_train_test (x, y , test_ratio)
+x,y = samples_generator(train_fn, (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])
+x_train, x_test, y_train, y_test = split_train_test (x, y , cfg['test_ratio'])
 num_batches = x_train.shape[0]//batch_size
 num_test_batches = x_test.shape[0]//batch_size
 print("num batches train:", num_batches)
@@ -227,7 +225,7 @@ last_train_losses = []
 with tf.Session(config=config) as sess:
     # Merge all the summaries and write them out 
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter('./summaries/' + FLAGS.name ,sess.graph)
+    train_writer = tf.summary.FileWriter('./summaries/' + cfg['name'] ,sess.graph)
     ##enable debugger if necessary
     if (FLAGS.debug):
         print("Running in a debug mode")
@@ -245,7 +243,7 @@ with tf.Session(config=config) as sess:
     print(W.eval())
     print(W2.eval())
     globalstartTime = time.time()
-    for epoch_idx in range(num_epochs):
+    for epoch_idx in range(cfg['num_epochs']):
         startTime = time.time()
         loss_list_train_soft = [0,0]
         loss_list_train_hard = [0,0]
@@ -253,13 +251,13 @@ with tf.Session(config=config) as sess:
         loss_list_test_hard = [0,0]
         summary = None
         
-        _current_state_train = np.zeros((batch_size, state_size))
-        _current_state_test = np.zeros((batch_size, state_size))
+        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
 
             #backprop and test training set for softmax and hardmax loss
-        for batch_idx in range(num_batches):
-                start_idx = batch_size * batch_idx
-                end_idx   = batch_size * batch_idx + batch_size
+        for batch_idx in range(cfg['num_batches']):
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
 
                 batchX = x_train[start_idx:end_idx]
                 batchY = y_train[start_idx:end_idx]
@@ -294,12 +292,12 @@ with tf.Session(config=config) as sess:
         reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
         last_train_losses.append(reduced_loss_train_soft)
         ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
-        if epoch_idx % test_cycle == 0 :
-            _current_state_train = np.zeros((batch_size, state_size))
-            _current_state_test = np.zeros((batch_size, state_size))
-            for batch_idx in range(num_test_batches):
-                    start_idx = batch_size * batch_idx
-                    end_idx   = batch_size * batch_idx + batch_size
+        if epoch_idx % cfg['test_cycle'] == 0 :
+            _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+            for batch_idx in range(cfg['num_batches']):
+                    start_idx = cfg['batch_size'] * batch_idx
+                    end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
 
                     batchX = x_test[start_idx:end_idx]
                     batchY = y_test[start_idx:end_idx]
@@ -321,7 +319,7 @@ with tf.Session(config=config) as sess:
                     loss_list_test_hard.append(_total_loss_test)
 
             #save model            
-            saver.save(sess, './summaries/' + FLAGS.name + '/model/',global_step=epoch_idx)
+            saver.save(sess, './summaries/' + cfg['name'] + '/model/',global_step=epoch_idx)
             #write variables/loss summaries after all training/testing done
             train_writer.add_summary(summary, epoch_idx)
             write_no_tf_summary(train_writer, "Softmax_train_loss", reduced_loss_train_soft, epoch_idx)
@@ -357,7 +355,7 @@ with tf.Session(config=config) as sess:
         #print("w2" , W2.eval())
         #record execution timeline
         ##check convergance over last 5000 epochs
-        if epoch_idx % convergance_check_epochs == 0 and epoch_idx >= convergance_check_epochs: 
+        if epoch_idx % cfg['convergance_check_epochs'] == 0 and epoch_idx >= cfg['convergance_check_epochs']: 
             if np.allclose(last_train_losses, last_train_losses[0], equal_nan=True, rtol=1e-05, atol=1e-02):
                 print("#################################")
                 print("Model has converged, breaking ...")
