@@ -4,7 +4,7 @@ class Operations:
 
     def __init__(self, batch_size):
         self.batch_size = batch_size
-        self.ops = [self.tf_multiply, self.tf_add, tf_stall]
+        self.ops = [self.tf_multiply, self.tf_add, self.tf_stall]
         self.num_of_ops = len(self.ops)
 
     #model operations
