@@ -12,27 +12,6 @@ import os
 import sys
 import datetime
 
-#model flags
-tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
-
-tf.flags.DEFINE_integer("state_size", 50, "weather to norm grads")    
-tf.flags.DEFINE_integer("num_samples", 1500, "weather to norm grads")
-tf.flags.DEFINE_integer("batch_size", 100, "weather to norm grads")
-
-tf.flags.DEFINE_float("learning_rate", 0.005, "weather to norm grads")
-tf.flags.DEFINE_float("grad_norm", 10e2, "weather to norm grads")
-tf.flags.DEFINE_integer("max_output_ops", 5, "weather to norm grads")
-
-tf.flags.DEFINE_integer("num_features", 3, "weather to norm grads")
-tf.flags.DEFINE_string("train_fn", "np_mult", "weather to norm grads")
-tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
-
-tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
-tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
-
-datatype = tf.float64
-FLAGS = tf.flags.FLAGS
-
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -49,7 +28,7 @@ def write_no_tf_summary(writer, tag, val, step):
    summary.value.add(tag=tag, simple_value = val)
    writer.add_summary(summary, step)
     
-def split_train_test (x, y , test_ratio):
+def split_train_test(x, y , test_ratio):
     
     if y.shape != x.shape:
         raise Exception('Model expects x and y shapes to be the same')
@@ -114,40 +93,8 @@ def get_syn_fn(fn_name):
     elif fn_name == "np_stall": return np_stall
     else: raise Exception('Function passed by the flag to be synthesised has not been defined')
 
-#configuraion constants
-global_cfg = dict(
-    total_num_epochs = 10000000,
-    iters_per_epoch = 1,
-    num_of_operations = 3,
-    samples_value_rng = (-100, 100),
-    test_ratio = 0.33333,
-    param_init = 0.1,
-    epsilon=1e-6,
-    test_cycle = 150,
-    convergance_check_epochs = 5000,
-    sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
 
-    #flagged
-    state_size = FLAGS.state_size,
-    num_samples = FLAGS.num_samples,
-    batch_size  = FLAGS.batch_size,
-
-    learning_rate = FLAGS.learning_rate,
-    grad_norm = FLAGS.grad_norm,
-    max_output_ops = FLAGS.max_output_ops,
-
-    num_features = FLAGS.num_features,
-    train_fn = get_syn_fn(FLAGS.train_fn),
-    norm = FLAGS.norm,
-
-    seed = FLAGS.seed,
-    name = FLAGS.name
-)
-global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']
-
-#populate the global env with dict variables - !!can lead to nasty bugs
-for name, value in global_cfg.items():
-    globals()[name] = value
+cfg =         
 
 #craete log and dumpl globals
 try:
