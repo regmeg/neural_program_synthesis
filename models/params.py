@@ -31,7 +31,6 @@ def get_cfg():
     global_cfg = dict(
         total_num_epochs = 10000000,
         iters_per_epoch = 1,
-        num_of_operations = 3,
         samples_value_rng = (-100, 100),
         test_ratio = 0.33333,
         param_init = 0.1,

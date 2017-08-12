@@ -73,8 +73,8 @@ b = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b")
 variable_summaries(W)
 variable_summaries(b)
 
-W2 = tf.Variable(tf.truncated_normal([cfg['state_size'], cfg['num_of_operations']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2")
-b2 = tf.Variable(np.zeros((cfg['num_of_operations'])), dtype=cfg['datatype'], name="b2")
+W2 = tf.Variable(tf.truncated_normal([cfg['state_size'], ops.num_of_ops], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2")
+b2 = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2")
 variable_summaries(W2)
 variable_summaries(b2)
 
@@ -142,6 +142,7 @@ def run_forward_pass(mode="train"):
             argmax  = tf.argmax(softmax, 1, )
             softmax  = tf.one_hot(argmax, ops.num_of_ops, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
+        ops_softmax = [(op.__name__, op(current_input)) for op in ops.ops]
         add_softmax   = tf.slice(softmax, [0,0], [cfg['batch_size'],1], name="slice_add_softmax_val")
         mult_softmax  = tf.slice(softmax, [0,1], [cfg['batch_size'],1], name="slice_mult_softmax_val")
         stall_softmax = tf.slice(softmax, [0,2], [cfg['batch_size'],1], name="stall_mult_softmax_val")
