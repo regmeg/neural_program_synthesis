@@ -11,7 +11,8 @@ import time
 import os
 import sys
 import datetime
-
+from data_gen import *
+from params import get_cfg
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -61,49 +62,19 @@ def get_time_hhmmss(dif):
     return time_str
 
 
-#sample gen functions
-def np_add(vec):
-    return reduce((lambda x, y: x + y),vec)
-
-def np_mult(vec):
-    return reduce((lambda x, y: x * y),vec)
-
-def np_stall(vec):
-    return vec
-
-def samples_generator(fn, shape, rng, seed):
-    '''
-    Generate random samples for the model:
-    @fn - function to be applied on the input features to get the ouput
-    @shape - shape of the features matrix (num_samples, num_features)
-    @rng - range of the input features to be generated within (a,b)
-    Outputs a tuple of input and output features matrix
-    '''
-    prng = RandomState(seed)
-    x = (rng[1] - rng[0]) * prng.random_sample(shape) + rng[0]
-    y = np.apply_along_axis(fn, 1, x).reshape((shape[0],-1))
-    z = np.zeros((shape[0],shape[1] - y.shape[1]))
-    y = np.concatenate((y, z), axis=1)
-    
-    return x,y
-
-def get_syn_fn(fn_name):
-    if   fn_name == "np_add":   return np_add
-    elif fn_name == "np_mult":  return np_mult
-    elif fn_name == "np_stall": return np_stall
-    else: raise Exception('Function passed by the flag to be synthesised has not been defined')
 
 
-cfg =         
+
+cfg = get_cfg()    
 
 #craete log and dumpl globals
 try:
-    os.mkdir('./summaries/' + FLAGS.name)
+    os.mkdir('./summaries/' + cfg.name)
 except FileExistsError as err:
     print("Dir already exists")
 
 stdout_org = sys.stdout
-sys.stdout = open('./summaries/' + FLAGS.name  + '/log.log', 'w')
+sys.stdout = open('./summaries/' + cfg.name  + '/log.log', 'w')
 print("###########Global dict is###########")
 pprint.pprint(globals(), depth=3)
 print("###########CFG dict is###########")
@@ -113,20 +84,20 @@ print("#############################")
 
 #model operations
 def tf_multiply(inpt):
-    return tf.reshape( tf.reduce_prod(inpt, axis = 1, name = "tf_mult"), [batch_size, -1], name = "tf_mult_reshape")
+    return tf.reshape( tf.reduce_prod(inpt, axis = 1, name = "tf_mult"), [cfg.batch_size, -1], name = "tf_mult_reshape")
 
 def tf_add(inpt):
-    return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [batch_size, -1], name = "tf_add_reshape")
+    return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [cfg.batch_size, -1], name = "tf_add_reshape")
 
 def tf_stall(a):
     return a
 
 #model constants
-dummy_matrix = tf.zeros([batch_size, num_features], dtype=datatype, name="dummy_constant")
+dummy_matrix = tf.zeros([cfg.batch_size, cfg.num_features.], dtype=cfg.datatype, name="dummy_constant")
 
 #model placeholders
-batchX_placeholder = tf.placeholder(datatype, [batch_size, None], name="batchX")
-batchY_placeholder = tf.placeholder(datatype, [batch_size, None], name="batchY")
+batchX_placeholder = tf.placeholder(cfg.datatype, [cfg.batch_size, None], name="batchX")
+batchY_placeholder = tf.placeholder(cfg.datatype, [cfg.batch_size, None], name="batchY")
 
 init_state = tf.placeholder(datatype, [batch_size, state_size], name="init_state")
 

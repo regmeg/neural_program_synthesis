@@ -1,4 +1,10 @@
 import tensorflow as tf
+import random
+import time
+import os
+import sys
+import datetime
+import data_gen  
 
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
@@ -46,7 +52,7 @@ def get_cfg():
         max_output_ops = FLAGS.max_output_ops,
 
         num_features = FLAGS.num_features,
-        train_fn = get_syn_fn(FLAGS.train_fn),
+        train_fn = data_gen.get_syn_fn(FLAGS.train_fn),
         norm = FLAGS.norm,
 
         seed = FLAGS.seed,
