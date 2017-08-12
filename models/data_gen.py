@@ -28,12 +28,6 @@ def samples_generator(fn, shape, rng, seed):
     y = np.concatenate((y, z), axis=1)
     
     return x,y
-
-def get_syn_fn(fn_name):
-    if   fn_name == "np_add":   return np_add
-    elif fn_name == "np_mult":  return np_mult
-    elif fn_name == "np_stall": return np_stall
-    else: raise Exception('Function passed by the flag to be synthesised has not been defined')
         
 def split_train_test(x, y , test_ratio):
     

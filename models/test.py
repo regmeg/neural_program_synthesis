@@ -1,12 +1,10 @@
 from params import get_cfg
-from data_gen import *
+import data_gen
 
+import tensorflow as tf
 
-cfg = get_cfg()
+FLAGS = tf.flags.FLAGS
 
+fn = eval("data_gen."+FLAGS.train_fn)
 
-print(cfg)
-print("")
-print("")
-print("")
-print_cfg()
+print(fn.__name__)
