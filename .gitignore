@@ -1,5 +1,5 @@
 .ipynb_checkpoints
-.pyc
+*.pyc
 __pycache__
 summaries
 logs
