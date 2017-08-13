@@ -190,3 +190,52 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                 else:
                     print("Reseting the loss conv array")
                     last_train_losses = []
+                    
+def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
+    #create a saver to save the trained model
+    saver=tf.train.Saver(var_list=tf.trainable_variables())
+
+    #Enable jit
+    config = tf.ConfigProto()
+    config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+    #define congergance check list
+
+    with tf.Session(config=config) as sess:
+        ##enable debugger if necessary
+        if (cfg['debug']):
+            print("Running in a debug mode")
+            sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+            sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
+
+        #init the var
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, tf.train.latest_checkpoint(path))
+        
+
+        #get soft and hardmaxes out of the model for the last batches
+        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+
+            #backprop and test training set for softmax and hardmax loss
+        for batch_idx in range(num_batches):
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_train[start_idx:end_idx]
+                batchY = y_train[start_idx:end_idx]
+
+                #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
+                _softmaxes_train, _softmax_train = sess.run([softmaxes_train, softmax_train],
+                feed_dict={
+                    init_state:_current_state_train,
+                    batchX_placeholder:batchX,
+                    batchY_placeholder:batchY
+                })
+
+                _softmaxes_test, _softmax_test = sess.run([softmaxes_test, softmax_test],
+                    feed_dict={
+                        init_state:_current_state_test,
+                        batchX_placeholder:batchX,
+                        batchY_placeholder:batchY
+                    })
+        return  _softmaxes_train, _softmax_train, _softmaxes_test, _softmax_test
