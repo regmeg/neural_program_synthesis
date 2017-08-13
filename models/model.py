@@ -117,12 +117,7 @@ def run_forward_pass(mode="train"):
         #######################
         
         #perform all ops in the current timestep intput and save output results together with the op name
-        op_res = [(op.__name__, op(current_input)) for op in ops.ops]
-        ops_final = [tf.multiply(res[1],
-                                 tf.slice(softmax, [0,i], [cfg['batch_size'],1], name="slice_"+res[0]+"_softmax_val"),
-                                 name="mult_"+res[0]+"_softmax")
-                     for i,res in enumerate(op_res)]
-        '''
+
         op_res = []
         for op in ops.ops:
             name = op.__name__
@@ -143,8 +138,7 @@ def run_forward_pass(mode="train"):
             name = "mult_"+res[0]+"_softmax"
             op_selection =  tf.multiply(res[1], ops_softmax[i], name=name)
             ops_final.append(op_selection)
-        
-        '''
+       
         #add results from all operation with applied softmax together
         output = tf.add_n(ops_final)
         
