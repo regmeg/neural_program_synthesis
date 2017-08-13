@@ -5,6 +5,9 @@ from nn_base import NNbase
 class RNN(NNbase):
     
     def __init__(self, cfg, ops):
+
+        #init parent
+        super(RNN, self).__init__()
         
         #placeholder for the initial state of the model
         self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
@@ -33,6 +36,7 @@ class RNN(NNbase):
     
         #calc grads and hereby the backprop step
         self.grads, self.train_step  = self.calc_backprop(cfg)
+
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):
         current_state = self.init_state
