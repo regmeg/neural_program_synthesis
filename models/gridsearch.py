@@ -18,7 +18,7 @@ def gen_cmd(cfg_dict, seed):
     name = " --name="
     for key, val in cfg_dict.items():
         string += " --"+str(key)+"="+str(val)
-        if key == 'max_output_ops' or key == 'train_fn': continue
+        if key == 'max_output_ops' or key == 'train_fn' or key="model": continue
         name += str(val)+"_"+str(key)+"-"
     name = name[:-1]
     seed  = " --seed="+str(seed)
@@ -37,12 +37,22 @@ params=dict(
     max_output_ops = [5],
     num_features = [3],
     train_fn = ["np_mult"],
+    model = ["RNN"],
     norm = [True]
 )
 '''
 
 params=dict(
-    state_size = [50]
+    state_size = [20, 50],
+    num_samples = [1500],
+    batch_size  = [100],
+    learning_rate = [0.005],
+    grad_norm = [10e2],
+    max_output_ops = [5],
+    num_features = [3],
+    train_fn = ["np_mult"],
+    model = ["RNN"],
+    norm = [True]
 )
 #cfg which unlinkely is going to be iterated, but still can be configured
 

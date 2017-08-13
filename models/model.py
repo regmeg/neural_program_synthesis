@@ -14,8 +14,8 @@ def main():
     try:
         os.makedirs('./summaries/' + cfg['dst'])
     except FileExistsError as err:
-        print("Dir already exists")
-
+        raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
+        
     stdout_org = sys.stdout
     sys.stdout = open('./summaries/' + cfg['dst']  + '/log.log', 'w')
     print("###########Global dict is###########")
@@ -30,8 +30,8 @@ def main():
     #generate data 
     x,y = samples_generator(cfg['train_fn'], (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])
     x_train, x_test, y_train, y_test = split_train_test (x, y , cfg['test_ratio'])
-    # instanitae the model graph
-    model = RNN(cfg, ops)
+    # instanitae the model graph    
+    model = eval(cfg['model']+"(cfg, ops)")
     #run the tensorflow session with the selectted model
     run_session(model, cfg, x_train, x_test, y_train, y_test)
 

@@ -19,6 +19,7 @@ tf.flags.DEFINE_integer("max_output_ops", 5, "weather to norm grads")
 
 tf.flags.DEFINE_integer("num_features", 3, "weather to norm grads")
 tf.flags.DEFINE_string("train_fn", "np_add", "weather to norm grads")
+tf.flags.DEFINE_string("model", "RNN", "weather to norm grads")
 tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
 
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
@@ -51,13 +52,14 @@ def get_cfg():
 
         num_features = FLAGS.num_features,
         train_fn = eval("data_gen."+FLAGS.train_fn),
+        model = FLAGS.model
         norm = FLAGS.norm,
 
         seed = FLAGS.seed,
         name = FLAGS.name,
         debug = FLAGS.debug
     )
-    global_cfg['dst'] = global_cfg['train_fn'].__name__ + "-" + str(global_cfg['max_output_ops']) +"ops/" + global_cfg['name']
+    global_cfg['dst'] = global_cfg['model'] + "/" + global_cfg['train_fn'].__name__ + "-" + str(global_cfg['max_output_ops']) +"ops/" + global_cfg['name']
     global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']
     
     return global_cfg
