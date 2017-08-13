@@ -38,7 +38,7 @@ def get_time_hhmmss(dif):
 
 
 cfg = get_cfg()    
-ops = Operations(cfg['batch_size'])
+ops = Operations(cfg)
 #craete log and dumpl globals
 try:
     os.makedirs('./summaries/' + cfg['dst'])
