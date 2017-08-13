@@ -18,7 +18,7 @@ def gen_cmd(cfg_dict, seed):
     name = " --name="
     for key, val in cfg_dict.items():
         string += " --"+str(key)+"="+str(val)
-        if key == 'max_output_ops' or key == 'train_fn' or key="model": continue
+        if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
         name += str(val)+"_"+str(key)+"-"
     name = name[:-1]
     seed  = " --seed="+str(seed)

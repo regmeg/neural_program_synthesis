@@ -52,7 +52,7 @@ def get_cfg():
 
         num_features = FLAGS.num_features,
         train_fn = eval("data_gen."+FLAGS.train_fn),
-        model = FLAGS.model
+        model = FLAGS.model,
         norm = FLAGS.norm,
 
         seed = FLAGS.seed,
