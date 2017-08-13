@@ -140,7 +140,7 @@ def run_forward_pass(mode="train"):
         
         
         #add results from all operation with applied softmax together
-        output = tf.add_n(ops_matrixes)
+        output = tf.add_n(ops_final)
         
         #save the sequance of softmaxes and outputs
         outputs.append(output)

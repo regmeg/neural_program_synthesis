@@ -14,13 +14,13 @@ class Operations:
         result = tf.reduce_sum(inpt, axis = 1, name = "tf_add")
         reshape = tf.reshape(result, [self.batch_size, -1], name = "tf_add_reshape")
         pad_res = tf.pad(reshape, [[0,0],[0,self.num_features - 1]], "CONSTANT", name="tf_add_pad")
-        return  
+        return  pad_res
     
     def tf_multiply(self ,inpt):
         result = tf.reduce_prod(inpt, axis = 1, name = "tf_mult")
         reshape = tf.reshape(result , [self.batch_size, -1], name = "tf_mult_reshape")
         pad_res = tf.pad(reshape, [[0,0],[0,self.num_features - 1]], "CONSTANT", name="tf_mult_pad")
-        return
+        return pad_res
 
     #stall operation is simply simulated as returning the input back
     def tf_stall(self, inpt):
