@@ -7,7 +7,7 @@ class RNN(NNbase):
     def __init__(self, cfg, ops):
 
         #init parent
-        super(RNN, self).__init__()
+        super(RNN, self).__init__(cfg, ops)
         
         #placeholder for the initial state of the model
         self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
@@ -30,7 +30,7 @@ class RNN(NNbase):
         
         self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.output_train)
 
-        self.output_test, self.current_state_test, self.softmax_test, self.outputs_test, self.softmaxes_test =                         self.run_forward_pass(cfg, mode = "test")
+        self.output_test, self.current_state_test, self.softmax_test, self.outputs_test, self.softmaxes_test =                           self.run_forward_pass(cfg, mode = "test")
 
         self.total_loss_test, self.math_error_test = self.calc_loss(cfg, self.output_test)
     
@@ -69,7 +69,7 @@ class RNN(NNbase):
                 softmax  = tf.one_hot(argmax, self.ops.num_of_ops, dtype=cfg['datatype'])
             #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
 
-            output = self.select_op(current_input, softmax)
+            output = self.select_op(current_input, softmax, cfg)
 
             #save the sequance of softmaxes and outputs
             outputs.append(output)

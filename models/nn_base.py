@@ -13,7 +13,7 @@ class NNbase(object):
   
         #model params
         self.params = {}
-    def select_op(self,current_input, softmax):
+    def select_op(self,current_input, softmax, cfg):
             #######################
             #perform op selection #
             #######################
@@ -55,7 +55,7 @@ class NNbase(object):
         return total_loss, math_error
 
     def calc_backprop(self, cfg):
-        grads_raw = tf.gradients(self.total_loss_train, self.params.values(), name="comp_gradients")
+        grads_raw = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
 
         #clip gradients by value and add summaries
         if cfg['norm']:
@@ -67,8 +67,7 @@ class NNbase(object):
 
         for grad in grads: self.variable_summaries(grad)
 
-
-        train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, self.params.values()), name="min_loss")
+        train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), name="min_loss")
         print("grads are")
         print(grads)
 

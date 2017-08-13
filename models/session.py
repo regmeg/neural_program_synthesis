@@ -63,10 +63,10 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
         #plt.figure()
         #plt.show() 
         #Init vars:
-        _W = sess.run([m.W])
-        _W2 = sess.run([m.W2])
-        print(m.W.eval())
-        print(m.W2.eval())
+        _W = sess.run([m.params['W']])
+        _W2 = sess.run([m.params['W2']])
+        print(m.params['W'].eval())
+        print(m.params['W2'].eval())
         globalstartTime = time.time()
         for epoch_idx in range(cfg['num_epochs']):
             startTime = time.time()
