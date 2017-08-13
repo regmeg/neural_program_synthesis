@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from collections import OrderedDict
 
 class NNbase(object):
     def __init__(self, cfg, ops):   
@@ -12,7 +13,7 @@ class NNbase(object):
         self.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
   
         #model params
-        self.params = {}
+        self.params = OrderedDict()
     def select_op(self,current_input, softmax, cfg):
             #######################
             #perform op selection #
@@ -55,6 +56,7 @@ class NNbase(object):
         return total_loss, math_error
 
     def calc_backprop(self, cfg):
+        print(list(self.params.values()))
         grads_raw = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
 
         #clip gradients by value and add summaries
