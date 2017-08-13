@@ -116,20 +116,42 @@ def run_forward_pass(mode="train"):
         #perform op selection #
         #######################
         
-        #perform all ops in the current timestep intput
-        op_res = [(op.__name__, op(current_input)) for op in ops.ops]
+        #perform all ops in the current timestep intput and save output results together with the op name
+        op_res = []
+        for op in ops.ops:
+            name = op.__name__
+            op_outp = op(current_input)
+            op_res.append((name, op_outp))
         
         #slice softmax results for each operation
-        ops_softmax = [tf.slice(softmax, [0,i], [cfg['batch_size'],1], name="slice_"+op.__name__+"_softmax_val") for i, op in enumerate(ops.ops)]
-        
+        ops_softmax = []
+        for i, op in enumerate(ops.ops):
+            name = "slice_"+op.__name__+"_softmax_val"
+            softmax_slice = tf.slice(softmax, [0,i], [cfg['batch_size'],1], name=name)
+            ops_softmax.append(softmax_slice)
+
         #calculate the result matrix width produced by an op
-        ops_width = [tf.shape(res[1], name=res[0]+"_op_shape")[1] for res in op_res]
+        ops_width = []
+        for res in op_res:
+            name=res[0]+"_op_shape"
+            op_widht = tf.shape(res[1], name=name)[1]
+            ops_width.append(op_widht)
         
         #apply softmax on each operation so that operation selection is performed
-        ops_final = [tf.multiply(res[1], ops_softmax[i], name="mult_"+res[0]+"_softmax") for i,res in enumerate(op_res)]
+        ops_final = []
+        for i,res in enumerate(op_res):
+            name = "mult_"+res[0]+"_softmax"
+            op_selection =  tf.multiply(res[1], ops_softmax[i], name=name)
+            ops_final.append(op_selection)
         
         #slice the missing from the dummy zero matrix and concat it with the op produced output, so that all ops have same output
-        ops_matrixes = [tf.concat([ops_final[i], tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - ops_width[i]], name="slice_"+res[0])], 1, name="concat_"+res[0]+"_op_dummy_zeros") for i,res in enumerate(op_res)]
+        ops_matrixes = []
+        for i,res in enumerate(op_res):
+            slice_name = "slice_"+res[0]
+            zeros_slice = tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - ops_width[i]], name=slice_name)
+            concat_name = "concat_"+res[0]+"_op_dummy_zeros"
+            op_slize_concat = tf.concat([ops_final[i], zeros_slice], 1, name=concat_name)
+            ops_matrixes.append(op_slize_concat)
          
         #add results from all operation with applied softmax together
         output = tf.add_n(ops_matrixes)
