@@ -12,6 +12,7 @@ import datetime
 from data_gen import *
 from params import get_cfg
 from rnn_base import RNN
+from ops import Operations
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -55,7 +56,7 @@ print("#############################")
 #sys.stdout = stdout_org
 
 #model
-m = RNN(cfg,variable_summaries)
+m = RNN(cfg, ops, variable_summaries)
 #pre training setting
 np.set_printoptions(precision=3, suppress=True)
 #train_fn = np_mult
@@ -95,8 +96,8 @@ with tf.Session(config=config) as sess:
     #Init vars:
     _W = sess.run([m.W])
     _W2 = sess.run([m.W2])
-    print(W.eval())
-    print(W2.eval())
+    print(m.W.eval())
+    print(m.W2.eval())
     globalstartTime = time.time()
     for epoch_idx in range(cfg['num_epochs']):
         startTime = time.time()
@@ -121,9 +122,9 @@ with tf.Session(config=config) as sess:
                 if epoch_idx % cfg['test_cycle'] != 0 :
                     _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([m.total_loss_train, m.train_step, m.current_state_train, m.output_train, m.grads, m.softmaxes_train, m.math_error_train],
                         feed_dict={
-                            init_state:_current_state_train,
-                            batchX_placeholder:batchX,
-                            batchY_placeholder:batchY
+                            m.init_state:_current_state_train,
+                            m.batchX_placeholder:batchX,
+                            m.batchY_placeholder:batchY
                         })
                     loss_list_train_soft.append(_total_loss_train)
                 
@@ -131,17 +132,17 @@ with tf.Session(config=config) as sess:
                 #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
                     summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, m.total_loss_train, m.train_step, m.current_state_train, m.output_train, m.grads, m.softmaxes_train, m.math_error_train],
                     feed_dict={
-                        init_state:_current_state_train,
-                        batchX_placeholder:batchX,
-                        batchY_placeholder:batchY
+                        m.init_state:_current_state_train,
+                        m.batchX_placeholder:batchX,
+                        m.batchY_placeholder:batchY
                     })
                     loss_list_train_soft.append(_total_loss_train)
                 
                     _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([m.total_loss_test, m.current_state_test, m.output_test, m.softmaxes_test, m.math_error_test],
                         feed_dict={
-                            init_state:_current_state_test,
-                            batchX_placeholder:batchX,
-                            batchY_placeholder:batchY
+                            m.init_state:_current_state_test,
+                            m.batchX_placeholder:batchX,
+                            m.batchY_placeholder:batchY
                         })
                     loss_list_train_hard.append(_total_loss_test)
         ##save loss for the convergance chessing        
@@ -160,17 +161,17 @@ with tf.Session(config=config) as sess:
 
                     _total_loss_train, _current_state_train = sess.run([m.total_loss_train, m.current_state_train],
                         feed_dict={
-                            init_state:_current_state_train,
-                            batchX_placeholder:batchX,
-                            batchY_placeholder:batchY
+                            m.init_state:_current_state_train,
+                            m.batchX_placeholder:batchX,
+                            m.batchY_placeholder:batchY
                         })
                     loss_list_test_soft.append(_total_loss_train)
 
                     _total_loss_test, _current_state_test = sess.run([m.total_loss_test, m.current_state_test],
                         feed_dict={
-                            init_state:_current_state_test,
-                            batchX_placeholder:batchX,
-                            batchY_placeholder:batchY
+                            m.init_state:_current_state_test,
+                            m.batchX_placeholder:batchX,
+                            m.batchY_placeholder:batchY
                         })
                     loss_list_test_hard.append(_total_loss_test)
 
