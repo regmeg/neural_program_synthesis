@@ -3,7 +3,7 @@ import numpy as np
 
 class RNN:
     
-    def __init__(self, cfg, ops, variable_summaries):   
+    def __init__(self, cfg, ops):   
         self.ops = ops
         self.variable_summaries = variable_summaries
         #model constants
@@ -140,3 +140,13 @@ class RNN:
         print(grads)
 
         return grads, train_step
+    
+    def variable_summaries(var):
+      """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
+      with tf.name_scope(var.name.replace(":","_")):
+        mean = tf.reduce_mean(var)
+        tf.summary.scalar('mean', mean)
+        tf.summary.scalar('stddev', tf.sqrt(tf.reduce_mean(tf.square(var - mean))))
+        tf.summary.scalar('max', tf.reduce_max(var))
+        tf.summary.scalar('min', tf.reduce_min(var))
+        tf.summary.histogram('histogram', var)
