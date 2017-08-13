@@ -6,6 +6,10 @@ import time
 import tensorflow as tf
 import itertools
 
+'''
+This module simulates the gridsearch funtionality, in order to tune the hyperparmaters
+'''
+
 tf.flags.DEFINE_integer("seed", int(round(random.random()*100000)), "the global simulation seed for np and tf")
 FLAGS = tf.flags.FLAGS
 
