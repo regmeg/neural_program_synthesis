@@ -13,8 +13,8 @@ def gen_cmd(cfg_dict, seed):
     string = "python3 ./model.py"
     name = " --name="
     for key, val in cfg_dict.items():
-        if key == 'max_output_ops' or key == 'train_fn': pass
         string += " --"+str(key)+"="+str(val)
+        if key == 'max_output_ops' or key == 'train_fn': continue
         name += str(val)+"_"+str(key)+"-"
     name = name[:-1]
     seed  = " --seed="+str(seed)
