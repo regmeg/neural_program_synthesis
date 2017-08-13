@@ -11,7 +11,7 @@ import sys
 import datetime
 from data_gen import *
 from params import get_cfg
-from ops import Operations
+from rnn_base import RNN
 
 def variable_summaries(var):
   """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
@@ -54,129 +54,8 @@ pprint.pprint(cfg, depth=3)
 print("#############################")
 #sys.stdout = stdout_org
 
-#model placeholders
-batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
-batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
-
-init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
-
-
-#set random seed
-tf.set_random_seed(cfg['seed'])
-
-#model parameters
-W = tf.Variable(tf.truncated_normal([cfg['state_size']+cfg['num_features'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W")
-b = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b")
-variable_summaries(W)
-variable_summaries(b)
-
-W2 = tf.Variable(tf.truncated_normal([cfg['state_size'], ops.num_of_ops], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2")
-b2 = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2")
-variable_summaries(W2)
-variable_summaries(b2)
-
-    #forward pass
-def run_forward_pass(mode="train"):
-    current_state = init_state
-
-    output = batchX_placeholder
-
-    outputs = []
-
-    softmaxes = []
-    
-    #printtf = tf.Print(output, [output], message="Strated cycle")
-    #output = tf.reshape( printtf, [batch_size, -1], name = "dummu_rehap")
-    
-    for timestep in range(cfg['max_output_ops']):
-        print("timestep " + str(timestep))
-        current_input = output
-
-
-
-        input_and_state_concatenated = tf.concat([current_input, current_state], 1, name="concat_input_state")  # Increasing number of columns
-        next_state = tf.tanh(tf.add(tf.matmul(input_and_state_concatenated, W, name="input-state_mult_W"), b, name="add_bias"), name="tanh_next_state")  # Broadcasted addition
-        #next_state = tf.nn.relu(tf.add(tf.matmul(input_and_state_concatenated, W, name="input-state_mult_W"), b, name="add_bias"), name="relu_next-state")  # Broadcasted addition
-        current_state = next_state
-
-        #calculate softmax and produce the mask of operations
-        logits = tf.add(tf.matmul(next_state, W2, name="state_mul_W2"), b2, name="add_bias2") #Broadcasted addition
-        softmax = tf.nn.softmax(logits, name="get_softmax")
-        
-        #in test change to hardmax
-        if mode is "test":
-            argmax  = tf.argmax(softmax, 1, )
-            softmax  = tf.one_hot(argmax, ops.num_of_ops, dtype=cfg['datatype'])
-        #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
-        
-        #######################
-        #perform op selection #
-        #######################
-        
-        #perform all ops in the current timestep intput and save output results together with the op name
-
-        op_res = []
-        for op in ops.ops:
-            name = op.__name__
-            op_outp = op(current_input)
-            op_res.append((name, op_outp))
-        
-        #slice softmax results for each operation
-        ops_softmax = []
-        for i, op in enumerate(ops.ops):
-            name = "slice_"+op.__name__+"_softmax_val"
-            softmax_slice = tf.slice(softmax, [0,i], [cfg['batch_size'],1], name=name)
-            ops_softmax.append(softmax_slice)
-
-         
-        #apply softmax on each operation so that operation selection is performed
-        ops_final = []
-        for i,res in enumerate(op_res):
-            name = "mult_"+res[0]+"_softmax"
-            op_selection =  tf.multiply(res[1], ops_softmax[i], name=name)
-            ops_final.append(op_selection)
-       
-        #add results from all operation with applied softmax together
-        output = tf.add_n(ops_final)
-        
-        #save the sequance of softmaxes and outputs
-        outputs.append(output)
-        softmaxes.append(softmax)
-    #printtf = tf.Print(output, [output], message="Finished cycle")
-    #output = tf.reshape( printtf, [batch_size, -1], name = "dummu_rehap")
-    return output, current_state, softmax, outputs, softmaxes
-
-#cost function
-def calc_loss(output):
-    #reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
-    math_error = tf.multiply(tf.constant(0.5, dtype=cfg['datatype']), tf.square(tf.subtract(output , batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
-    
-    total_loss = tf.reduce_sum(math_error, name="red_total_loss")
-    return total_loss, math_error
-
-output_train, current_state_train, softmax_train, outputs_train, softmaxes_train = run_forward_pass(mode = "train")
-total_loss_train, math_error_train = calc_loss(output_train)
-
-output_test, current_state_test, softmax_test, outputs_test, softmaxes_test = run_forward_pass(mode = "test")
-total_loss_test, math_error_test = calc_loss(output_test)
-
-grads_raw = tf.gradients(total_loss_train, [W,b,W2,b2], name="comp_gradients")
-
-#clip gradients by value and add summaries
-if cfg['norm']:
-    print("norming the grads")
-    grads, norms = tf.clip_by_global_norm(grads_raw, cfg['grad_norm'])
-    variable_summaries(norms)
-else:
-    grads = grads_raw
-
-for grad in grads: variable_summaries(grad)
-
-
-train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, [W,b,W2,b2]), name="min_loss")
-print("grads are")
-print(grads)
-
+#model
+m = RNN(cfg,variable_summaries)
 #pre training setting
 np.set_printoptions(precision=3, suppress=True)
 #train_fn = np_mult
@@ -214,8 +93,8 @@ with tf.Session(config=config) as sess:
     #plt.figure()
     #plt.show() 
     #Init vars:
-    _W = sess.run([W])
-    _W2 = sess.run([W2])
+    _W = sess.run([m.W])
+    _W2 = sess.run([m.W2])
     print(W.eval())
     print(W2.eval())
     globalstartTime = time.time()
@@ -240,7 +119,7 @@ with tf.Session(config=config) as sess:
 
                 #for non testing cylce, simply do one forward and back prop with 1 batch with train data
                 if epoch_idx % cfg['test_cycle'] != 0 :
-                    _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
+                    _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([m.total_loss_train, m.train_step, m.current_state_train, m.output_train, m.grads, m.softmaxes_train, m.math_error_train],
                         feed_dict={
                             init_state:_current_state_train,
                             batchX_placeholder:batchX,
@@ -250,7 +129,7 @@ with tf.Session(config=config) as sess:
                 
                 else :
                 #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
-                    summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, total_loss_train, train_step, current_state_train, output_train, grads, softmaxes_train, math_error_train],
+                    summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, m.total_loss_train, m.train_step, m.current_state_train, m.output_train, m.grads, m.softmaxes_train, m.math_error_train],
                     feed_dict={
                         init_state:_current_state_train,
                         batchX_placeholder:batchX,
@@ -258,7 +137,7 @@ with tf.Session(config=config) as sess:
                     })
                     loss_list_train_soft.append(_total_loss_train)
                 
-                    _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([total_loss_test, current_state_test, output_test, softmaxes_test, math_error_test],
+                    _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([m.total_loss_test, m.current_state_test, m.output_test, m.softmaxes_test, m.math_error_test],
                         feed_dict={
                             init_state:_current_state_test,
                             batchX_placeholder:batchX,
@@ -279,7 +158,7 @@ with tf.Session(config=config) as sess:
                     batchX = x_test[start_idx:end_idx]
                     batchY = y_test[start_idx:end_idx]
 
-                    _total_loss_train, _current_state_train = sess.run([total_loss_train, current_state_train],
+                    _total_loss_train, _current_state_train = sess.run([m.total_loss_train, m.current_state_train],
                         feed_dict={
                             init_state:_current_state_train,
                             batchX_placeholder:batchX,
@@ -287,7 +166,7 @@ with tf.Session(config=config) as sess:
                         })
                     loss_list_test_soft.append(_total_loss_train)
 
-                    _total_loss_test, _current_state_test = sess.run([total_loss_test, current_state_test],
+                    _total_loss_test, _current_state_test = sess.run([m.total_loss_test, m.current_state_test],
                         feed_dict={
                             init_state:_current_state_test,
                             batchX_placeholder:batchX,
