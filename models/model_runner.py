@@ -38,7 +38,7 @@ params=dict(
 '''
 
 params=dict(
-    state_size = [50, 100]
+    state_size = [50]
 )
 #cfg which unlinkely is going to be iterated, but still can be configured
 

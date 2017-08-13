@@ -54,9 +54,6 @@ pprint.pprint(cfg, depth=3)
 print("#############################")
 #sys.stdout = stdout_org
 
-#model constants
-dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
-
 #model placeholders
 batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
 batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
