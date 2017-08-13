@@ -27,7 +27,7 @@ def get_time_hhmmss(dif):
     time_str = "%02d:%02d:%02d" % (h, m, s)
     return time_str
 
-def run_session(m):
+def run_session(m, cfg):
     #pre training setting
     np.set_printoptions(precision=3, suppress=True)
     #train_fn = np_mult

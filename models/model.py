@@ -30,7 +30,7 @@ def main():
     # instanitae the model
     model = RNN(cfg, ops)
     #run the tensorflow session with the selectted model
-    run_session(model)
+    run_session(model, cfg)
 
 if __name__ == "__main__":
     main()

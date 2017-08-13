@@ -5,7 +5,6 @@ class RNN:
     
     def __init__(self, cfg, ops):   
         self.ops = ops
-        self.variable_summaries = variable_summaries
         #model constants
         self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
 
@@ -141,7 +140,7 @@ class RNN:
 
         return grads, train_step
     
-    def variable_summaries(var):
+    def variable_summaries(self, var):
       """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
       with tf.name_scope(var.name.replace(":","_")):
         mean = tf.reduce_mean(var)
