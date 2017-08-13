@@ -27,13 +27,11 @@ def get_time_hhmmss(dif):
     time_str = "%02d:%02d:%02d" % (h, m, s)
     return time_str
 
-def run_session(m, cfg):
+def run_session(m, cfg, x_train, x_test, y_train, y_test):
     #pre training setting
     np.set_printoptions(precision=3, suppress=True)
     #train_fn = np_mult
     #train_fn = np_stall
-    x,y = samples_generator(cfg['train_fn'], (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])
-    x_train, x_test, y_train, y_test = split_train_test (x, y , cfg['test_ratio'])
     num_batches = x_train.shape[0]//cfg['batch_size']
     num_test_batches = x_test.shape[0]//cfg['batch_size']
     print("num batches train:", num_batches)
