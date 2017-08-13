@@ -4,7 +4,7 @@ class Operations:
 
     def __init__(self, batch_size):
         self.batch_size = batch_size
-        self.ops = [self.tf_multiply, self.tf_add, self.tf_stall]
+        self.ops = [self.tf_add, self.tf_multiply, self.tf_stall]
         self.num_of_ops = len(self.ops)
 
     #model operations
@@ -14,5 +14,5 @@ class Operations:
     def tf_add(self, inpt):
         return  tf.reshape( tf.reduce_sum(inpt, axis = 1, name = "tf_add"), [self.batch_size, -1], name = "tf_add_reshape")
 
-    def tf_stall(self, a):
-        return a
+    def tf_stall(self, inpt):
+        return  tf.reshape(inpt, [self.batch_size, -1], name = "tf_stall_reshape")

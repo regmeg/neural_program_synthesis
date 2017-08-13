@@ -142,27 +142,40 @@ def run_forward_pass(mode="train"):
             argmax  = tf.argmax(softmax, 1, )
             softmax  = tf.one_hot(argmax, ops.num_of_ops, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
-        ops_softmax = [(op.__name__, op(current_input)) for op in ops.ops]
+
+        ops_softmax = [tf.slice(softmax, [0,i], [cfg['batch_size'],1], name="slice_"+op.__name__+"_softmax_val") for i, op in enumerate(ops.ops)]
+        
+        ops_width = [tf.shape(res[1], name=res[0]+"_op_shape")[1] for res in op_res]
+        
+        ops_final = [tf.multiply(res[1], ops_softmax[i], name="mult_"+res[0]+"_softmax") for i,res in enumerate(op_res)]
+        
+        ops_matrixes = [tf.concat([ops_final[i], tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - ops_width[i]], name="slice_"+res[0])], 1, name="concat_"+res[0]+"_op_dummy_zeros") for i,res in enumerate(op_res)]
+                
+        output = tf.add_n(ops_matrixes)
+
+        '''
         add_softmax   = tf.slice(softmax, [0,0], [cfg['batch_size'],1], name="slice_add_softmax_val")
         mult_softmax  = tf.slice(softmax, [0,1], [cfg['batch_size'],1], name="slice_mult_softmax_val")
-        stall_softmax = tf.slice(softmax, [0,2], [cfg['batch_size'],1], name="stall_mult_softmax_val")
-
+        stall_softmax = tf.slice(softmax, [0,2], [cfg['batch_size'],1], name="stall_mult_softmax_val")             
+        
         add_width   = tf.shape(op_res[0][1], name="add_op_shape")[1]
         mult_width  = tf.shape(op_res[1][1], name="mult_op_shape")[1]
-        stall_width = tf.shape(op_res[2][1], name="stall_op_shape")[1]
-
-
+        stall_width = tf.shape(op_res[2][1], name="stall_op_shape")[1]       
+        
         add_final   = tf.multiply(op_res[0][1], add_softmax, name="mult_add_softmax")
         mult_final  = tf.multiply(op_res[1][1],mult_softmax, name="mult_mult_softmax")
         stall_final = tf.multiply(op_res[2][1], stall_softmax, name="mult_stall_softmax")
 
-        ##conact add and mult results with zeros matrix
-        add_final = tf.concat([add_final, tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - add_width], name="slice_dum_add")], 1, name="concat_add_op_dummy_zeros") 
-        mult_final = tf.concat([mult_final, tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - mult_width], name="slice_dum_mult")], 1, name="concat_mult_op_dummy_zeros") 
+        
+        ##conact add and mult results with zeros matrix               
+        add_final = tf.concat([add_final, tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - add_width], name="slice_dum_add")], 1, name="concat_add_op_dummy_zeros")
+        mult_final = tf.concat([mult_final, tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - mult_width], name="slice_dum_mult")], 1, name="concat_mult_op_dummy_zeros")
 
 
         output = tf.add(add_final, mult_final, name="add_final_op_mult_add")
         output =  tf.add(output, stall_final, name="add_final_op_stall")
+        
+        '''
         outputs.append(output)
         softmaxes.append(softmax)
     #printtf = tf.Print(output, [output], message="Finished cycle")
