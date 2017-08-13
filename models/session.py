@@ -198,8 +198,11 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
     #Enable jit
     config = tf.ConfigProto()
     config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
-    #define congergance check list
-
+    #def batches num
+    num_batches = x_train.shape[0]//cfg['batch_size']
+    num_test_batches = x_test.shape[0]//cfg['batch_size']
+    print("num batches train:", num_batches)
+    print("num batches test:", num_test_batches)
     with tf.Session(config=config) as sess:
         ##enable debugger if necessary
         if (cfg['debug']):
@@ -225,17 +228,17 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                 batchY = y_train[start_idx:end_idx]
 
                 #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
-                _softmaxes_train, _softmax_train = sess.run([softmaxes_train, softmax_train],
+                _softmaxes_train, _softmax_train = sess.run([m.softmaxes_train, m.softmax_train],
                 feed_dict={
-                    init_state:_current_state_train,
-                    batchX_placeholder:batchX,
-                    batchY_placeholder:batchY
+                    m.init_state:_current_state_train,
+                    m.batchX_placeholder:batchX,
+                    m.batchY_placeholder:batchY
                 })
 
-                _softmaxes_test, _softmax_test = sess.run([softmaxes_test, softmax_test],
+                _softmaxes_test, _softmax_test = sess.run([m.softmaxes_test, m.softmax_test],
                     feed_dict={
-                        init_state:_current_state_test,
-                        batchX_placeholder:batchX,
-                        batchY_placeholder:batchY
+                        m.init_state:_current_state_test,
+                        m.batchX_placeholder:batchX,
+                        m.batchY_placeholder:batchY
                     })
         return  _softmaxes_train, _softmax_train, _softmaxes_test, _softmax_test
