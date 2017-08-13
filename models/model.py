@@ -105,54 +105,36 @@ def run_forward_pass(mode="train"):
         #calculate softmax and produce the mask of operations
         logits = tf.add(tf.matmul(next_state, W2, name="state_mul_W2"), b2, name="add_bias2") #Broadcasted addition
         softmax = tf.nn.softmax(logits, name="get_softmax")
-        #argmax = tf.argmax(softmax, 1)
-        '''
-        print(logits)
-        print(softmax)
-        print(argmax)
-        '''
-        #perform ops
-        op_res = [(op.__name__, op(current_input)) for op in ops.ops]
-        #add = tf.reshape( tf.reduce_prod(current_input, axis = 1), [batch_size, -1])
-        #mult = tf.reshape( tf.reduce_sum(current_input, axis = 1), [batch_size, -1])
-        #stall = current_input
-        #values = tf.concat([add, mult, stall], 1)
-        #values = tf.concat([add, mult, stall], 1, name="concact_op_values")
-        #values = tf.cast(values,dtype=datatype)
-        #get softmaxes for operations
-        #add_softmax = tf.slice(softmax, [0,0], [batch_size,1])
-        #mult_softmax = tf.slice(softmax, [0,1], [batch_size,1])
-        #stall_softmax = tf.slice(softmax, [0,2], [batch_size,1])
-        #produce output matrix
-        #onehot  = tf.one_hot(argmax_dum, num_of_operations)
-        #stall_width = tf.shape(stall)[1]
-        #stall_select = tf.slice(onehot, [0,2], [batch_size,1])
-        #mask_arr = [onehot]
-        #for i in range(num_features-1):
-        #    mask_arr.append(stall_select)
-        #mask = tf.concat(mask_arr, 1)
-        #argmax = tf.reshape( softmax, [batch_size, -1])
-        #mask = onehot
-        #mask = tf.cast(mask, dtype=datatype)
-        #mask = tf.cast(mask, tf.bool)
-        #apply mask
-        #output = tf.boolean_mask(values,mask)
+        
         #in test change to hardmax
         if mode is "test":
             argmax  = tf.argmax(softmax, 1, )
             softmax  = tf.one_hot(argmax, ops.num_of_ops, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
-
+        
+        #######################
+        #perform op selection #
+        #######################
+        
+        #perform all ops in the current timestep intput
+        op_res = [(op.__name__, op(current_input)) for op in ops.ops]
+        
+        #slice softmax results for each operation
         ops_softmax = [tf.slice(softmax, [0,i], [cfg['batch_size'],1], name="slice_"+op.__name__+"_softmax_val") for i, op in enumerate(ops.ops)]
         
+        #calculate the result matrix width produced by an op
         ops_width = [tf.shape(res[1], name=res[0]+"_op_shape")[1] for res in op_res]
         
+        #apply softmax on each operation so that operation selection is performed
         ops_final = [tf.multiply(res[1], ops_softmax[i], name="mult_"+res[0]+"_softmax") for i,res in enumerate(op_res)]
         
+        #slice the missing from the dummy zero matrix and concat it with the op produced output, so that all ops have same output
         ops_matrixes = [tf.concat([ops_final[i], tf.slice(dummy_matrix, [0,0], [cfg['batch_size'], cfg['num_features'] - ops_width[i]], name="slice_"+res[0])], 1, name="concat_"+res[0]+"_op_dummy_zeros") for i,res in enumerate(op_res)]
-                
+         
+        #add results from all operation with applied softmax together
         output = tf.add_n(ops_matrixes)
-
+        
+        #save the sequance of softmaxes and outputs
         outputs.append(output)
         softmaxes.append(softmax)
     #printtf = tf.Print(output, [output], message="Finished cycle")
