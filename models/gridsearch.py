@@ -5,6 +5,7 @@ import random
 import time
 import tensorflow as tf
 import itertools
+from collections import OrderedDict
 
 '''
 This module simulates the gridsearch funtionality, in order to tune the hyperparmaters
@@ -42,7 +43,7 @@ params=dict(
 )
 '''
 
-params=dict(
+params=OrderedDict(
     state_size = [20, 50, 200],
     num_samples = [1500],
     batch_size  = [100],
