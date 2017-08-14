@@ -17,8 +17,7 @@ def main():
     try:
         os.makedirs('./summaries/' + cfg['dst'])
     except FileExistsError as err:
-        #raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
-        print("exists")
+        raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
         
     pickle.dump( cfg, open( './summaries/' + cfg['dst']+  '/cfg.p', "wb" ) )
 
