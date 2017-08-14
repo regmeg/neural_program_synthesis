@@ -58,7 +58,6 @@ params['norm'] = [True]
 
 #seed
 seed = FLAGS.seed
-print (params)
 #for n in range(len(cfg)):
 cfg_dicts = [OrderedDict(zip(params, x)) for x in itertools.product(*params.values())]
 
