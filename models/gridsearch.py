@@ -66,4 +66,4 @@ cmds = [gen_cmd(cdict, seed) for cdict in cfg_dicts]
 
 for ind,cmd in enumerate(cmds):
     print("Lnch[" + str(ind+1) +"]: " + cmd)
-    #subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
+    subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
