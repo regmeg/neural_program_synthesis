@@ -294,7 +294,7 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
         
         return total_loss_traind_train, softmaxes_traind_train, total_loss_traind_test, softmaxes_traind_test, total_loss_testd_train, softmaxes_testd_train, total_loss_testd_test, softmaxes_testd_test, last_softmax_state_train, last_hardmax_state_train, last_softmax_state_test, last_hardmax_state_test
 
-def predit_form_sess(m, cfg, x, state path, mode="hard"):
+def predict_form_sess(m, cfg, x, state, path, mode="hard"):
     #create a saver to restore saved model
     saver=tf.train.Saver(var_list=tf.trainable_variables())
 
@@ -305,9 +305,7 @@ def predit_form_sess(m, cfg, x, state path, mode="hard"):
 
         #init the var
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, tf.train.latest_checkpoint(path))
-        
-        self.output_test, self.current_state_test, self.softmax_test, self.outputs_test, self.softmaxes_test =                         self.run_forward_pass(cfg, mode = "test")
+        saver.restore(sess, tf.train.latest_checkpoint(path))      
         
         batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
         batchY = np.zeros((cfg['batch_size'], cfg['num_features']))
