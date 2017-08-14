@@ -44,14 +44,14 @@ params=OrderedDict(
 '''
 
 params=OrderedDict()
-params['state_size'] = [20, 50, 200]
+params['state_size'] = [100, 200]
 params['num_samples'] = [1500]
 params['batch_size']  = [100]
 params['learning_rate'] = [0.005]
-params['grad_norm'] = [10e2, 10e3]
+params['grad_norm'] = [10e2]
 params['max_output_ops'] = [5]
 params['num_features'] = [3]
-params['train_fn'] = ["np_mult"]
+params['train_fn'] = ["np_add", "np_mult", "np_stall"]
 params['model'] = ["RNN"]
 params['norm'] = [True]
 params['share_state'] = [True]
