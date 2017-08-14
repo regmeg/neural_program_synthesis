@@ -54,6 +54,7 @@ params['num_features'] = [3]
 params['train_fn'] = ["np_mult"]
 params['model'] = ["RNN"]
 params['norm'] = [True]
+params['share_state'] = [True]
 #cfg which unlinkely is going to be iterated, but still can be configured
 
 #seed

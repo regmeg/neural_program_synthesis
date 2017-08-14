@@ -9,18 +9,19 @@ import data_gen
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
 
-tf.flags.DEFINE_integer("state_size", 50, "weather to norm grads")    
-tf.flags.DEFINE_integer("num_samples", 1500, "weather to norm grads")
-tf.flags.DEFINE_integer("batch_size", 100, "weather to norm grads")
+tf.flags.DEFINE_integer("state_size", 50, "the state size of RNN")    
+tf.flags.DEFINE_integer("num_samples", 1500, "num of samples to generate")
+tf.flags.DEFINE_integer("batch_size", 100, "batch size for the input")
 
-tf.flags.DEFINE_float("learning_rate", 0.005, "weather to norm grads")
-tf.flags.DEFINE_float("grad_norm", 10e2, "weather to norm grads")
-tf.flags.DEFINE_integer("max_output_ops", 5, "weather to norm grads")
+tf.flags.DEFINE_float("learning_rate", 0.005, "learnig rate for the model")
+tf.flags.DEFINE_float("grad_norm", 10e2, "amount of normalisation for the gradient")
+tf.flags.DEFINE_integer("max_output_ops", 5, "number of output from RNN")
 
-tf.flags.DEFINE_integer("num_features", 3, "weather to norm grads")
-tf.flags.DEFINE_string("train_fn", "np_add", "weather to norm grads")
-tf.flags.DEFINE_string("model", "RNN", "weather to norm grads")
+tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
+tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")
+tf.flags.DEFINE_string("model", "RNN", "what model to use for training")
 tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
+tf.flags.DEFINE_boolean("share_state", True, "weather to share RNN state between training and testing stages")
 
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
 tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
@@ -54,7 +55,8 @@ def get_cfg():
         train_fn = eval("data_gen."+FLAGS.train_fn),
         model = FLAGS.model,
         norm = FLAGS.norm,
-
+        share_state = FLAGS.share_state,
+        
         seed = FLAGS.seed,
         name = FLAGS.name,
         debug = FLAGS.debug
