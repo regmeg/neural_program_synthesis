@@ -256,9 +256,10 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
         total_loss_testd_test = []
         softmaxes_testd_test =[]
         
+        '''
         _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
         _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-
+        '''
         for batch_idx in range(num_test_batches):
                 start_idx = cfg['batch_size'] * batch_idx
                 end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
