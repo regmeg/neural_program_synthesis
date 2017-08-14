@@ -251,6 +251,9 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                     })
                 total_loss_traind_test.append(_total_loss_traind_test)
                 softmaxes_traind_test.append(_softmaxes_traind_test)
+        
+        last_softmax_state_train = _current_state_train
+        last_hardmax_state_train = _current_state_test 
         #produce results ith with the testing data
         total_loss_testd_train = []
         softmaxes_testd_train = []
@@ -286,4 +289,7 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                 total_loss_testd_test.append(_total_loss_testd_test)
                 softmaxes_testd_test.append(_softmaxes_testd_test)
                 
-        return total_loss_traind_train, softmaxes_traind_train, total_loss_traind_test, softmaxes_traind_test, total_loss_testd_train, softmaxes_testd_train, total_loss_testd_test, softmaxes_testd_test
+        last_softmax_state_test = _current_state_train
+        last_hardmax_state_test = _current_state_test 
+        
+        return total_loss_traind_train, softmaxes_traind_train, total_loss_traind_test, softmaxes_traind_test, total_loss_testd_train, softmaxes_testd_train, total_loss_testd_test, softmaxes_testd_test, last_softmax_state_train, last_hardmax_state_train, last_softmax_state_test, last_hardmax_state_test
