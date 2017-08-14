@@ -50,7 +50,7 @@ params=dict(
     grad_norm = [10e2, 10e3],
     max_output_ops = [5],
     num_features = [3],
-    train_fn = ["np_stall"],
+    train_fn = ["np_mult"],
     model = ["RNN"],
     norm = [True]
 )

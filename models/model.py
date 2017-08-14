@@ -17,8 +17,9 @@ def main():
     try:
         os.makedirs('./summaries/' + cfg['dst'])
     except FileExistsError as err:
-        raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
-    
+        #raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
+        print("exists")
+        
     stdout_org = sys.stdout
     sys.stdout = open('./summaries/' + cfg['dst']  + '/log.log', 'w')
     print("###########Global dict is###########")
@@ -30,7 +31,7 @@ def main():
     
     #dump cfg
     pickle.dump( cfg, open( './summaries/' + cfg['dst']+'cfg.p', "wb" ) )
-
+    '''
     #instantiate containter with the operations avail for the selection
     ops = Operations(cfg)
     #generate data 
@@ -40,6 +41,6 @@ def main():
     model = eval(cfg['model']+"(cfg, ops)")
     #run the tensorflow session with the selectted model
     run_session(model, cfg, x_train, x_test, y_train, y_test)
-
+    '''
 if __name__ == "__main__":
     main()
