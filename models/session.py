@@ -293,3 +293,42 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
         last_hardmax_state_test = _current_state_test 
         
         return total_loss_traind_train, softmaxes_traind_train, total_loss_traind_test, softmaxes_traind_test, total_loss_testd_train, softmaxes_testd_train, total_loss_testd_test, softmaxes_testd_test, last_softmax_state_train, last_hardmax_state_train, last_softmax_state_test, last_hardmax_state_test
+
+def predit_form_sess(m, cfg, x, state path, mode="hard"):
+    #create a saver to restore saved model
+    saver=tf.train.Saver(var_list=tf.trainable_variables())
+
+    #Enable jit
+    config = tf.ConfigProto()
+    config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+    with tf.Session(config=config) as sess:
+
+        #init the var
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, tf.train.latest_checkpoint(path))
+        
+        self.output_test, self.current_state_test, self.softmax_test, self.outputs_test, self.softmaxes_test =                         self.run_forward_pass(cfg, mode = "test")
+        
+        batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+        batchY = np.zeros((cfg['batch_size'], cfg['num_features']))
+        
+        batchX = np.concatenate((x, batchX), axis=0)
+
+        if mode == "soft":
+            output = sess.run([m.output_train],
+                feed_dict={
+                    m.init_state:state,
+                    m.batchX_placeholder:batchX,
+                    m.batchY_placeholder:batchY
+                })
+        elif mode == "hard":
+            output = sess.run([m.output_test],
+                feed_dict={
+                    m.init_state:state,
+                    m.batchX_placeholder:batchX,
+                    m.batchY_placeholder:batchY
+                })
+        else: raise("Wrong mode selected for predicting variable")
+            
+    return output
+        
