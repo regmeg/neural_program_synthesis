@@ -1,11 +1,14 @@
 import pprint
 import os
 import sys
+import pickle
 from params import get_cfg
 from rnn_base import RNN
 from ops import Operations
 from session import run_session
 from data_gen import samples_generator, split_train_test
+
+
 def main():
     #get the global configuration
     cfg = get_cfg()
@@ -15,7 +18,7 @@ def main():
         os.makedirs('./summaries/' + cfg['dst'])
     except FileExistsError as err:
         raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
-        
+    
     stdout_org = sys.stdout
     sys.stdout = open('./summaries/' + cfg['dst']  + '/log.log', 'w')
     print("###########Global dict is###########")
@@ -24,6 +27,9 @@ def main():
     pprint.pprint(cfg, depth=3)
     print("#############################")
     #sys.stdout = stdout_org
+    
+    #dump cfg
+    pickle.dump( cfg, open( './summaries/' + cfg['dst']+'cfg.p', "wb" ) )
 
     #instantiate containter with the operations avail for the selection
     ops = Operations(cfg)
