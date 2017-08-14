@@ -119,8 +119,9 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
             last_train_losses.append(reduced_loss_train_soft)
             ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
             if epoch_idx % cfg['test_cycle'] == 0 :
-                _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
-                _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+                if cfg['share_state'] is False:
+                    _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+                    _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
                 for batch_idx in range(num_test_batches):
                         start_idx = cfg['batch_size'] * batch_idx
                         end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
@@ -256,10 +257,10 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
         total_loss_testd_test = []
         softmaxes_testd_test =[]
         
-        '''
-        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
-        _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-        '''
+        if cfg['share_state'] is False:
+            _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+        
         for batch_idx in range(num_test_batches):
                 start_idx = cfg['batch_size'] * batch_idx
                 end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
