@@ -22,7 +22,7 @@ def main():
         
     pickle.dump( cfg, open( './summaries/' + cfg['dst']+  '/cfg.p', "wb" ) )
 
-    '''
+
     stdout_org = sys.stdout
     sys.stdout = open('./summaries/' + cfg['dst']  + '/log.log', 'w')
     print("###########Global dict is###########")
@@ -43,6 +43,6 @@ def main():
     model = eval(cfg['model']+"(cfg, ops)")
     #run the tensorflow session with the selectted model
     run_session(model, cfg, x_train, x_test, y_train, y_test)
-    '''
+
 if __name__ == "__main__":
     main()
