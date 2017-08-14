@@ -20,6 +20,9 @@ def main():
         #raise Exception('Dir already exists, saving resultsi n the same dir will result in unreadable graphs')
         print("exists")
         
+    pickle.dump( cfg, open( './summaries/' + cfg['dst']+  '/cfg.p', "wb" ) )
+
+    '''
     stdout_org = sys.stdout
     sys.stdout = open('./summaries/' + cfg['dst']  + '/log.log', 'w')
     print("###########Global dict is###########")
@@ -30,8 +33,7 @@ def main():
     #sys.stdout = stdout_org
     
     #dump cfg
-    pickle.dump( cfg, open( './summaries/' + cfg['dst']+'cfg.p', "wb" ) )
-    '''
+
     #instantiate containter with the operations avail for the selection
     ops = Operations(cfg)
     #generate data 
