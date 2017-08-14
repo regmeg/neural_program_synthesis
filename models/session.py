@@ -216,6 +216,11 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
         
 
         #get soft and hardmaxes out of the model for the last batches
+        total_loss_traind_train = []
+        softmaxes_traind_train = []
+        total_loss_traind_test = []
+        softmaxes_traind_test = []
+
         _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
         _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
 
@@ -234,16 +239,26 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                     m.batchX_placeholder:batchX,
                     m.batchY_placeholder:batchY
                 })
-
+                total_loss_traind_train.append(_total_loss_traind_train)
+                softmaxes_traind_train.append(_softmaxes_traind_train)
+                
                 _total_loss_traind_test, _softmaxes_traind_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test],
                     feed_dict={
                         m.init_state:_current_state_test,
                         m.batchX_placeholder:batchX,
                         m.batchY_placeholder:batchY
                     })
+                total_loss_traind_test.append(_total_loss_traind_test)
+                softmaxes_traind_test.append(_softmaxes_traind_test)
         #produce results ith with the testing data
+        total_loss_testd_train = []
+        softmaxes_testd_train = []
+        total_loss_testd_test = []
+        softmaxes_testd_test =[]
+        
         _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
         _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+
         for batch_idx in range(num_test_batches):
                 start_idx = cfg['batch_size'] * batch_idx
                 end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
@@ -257,13 +272,16 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                     m.batchX_placeholder:batchX,
                     m.batchY_placeholder:batchY
                 })
-
+                total_loss_testd_train.append(_total_loss_testd_train)
+                softmaxes_testd_train.append(_softmaxes_testd_train)
+                
                 _total_loss_testd_test, _softmaxes_testd_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test],
-                  feed_dict={
+                feed_dict={
                       m.init_state:_current_state_test,
                       m.batchX_placeholder:batchX,
                       m.batchY_placeholder:batchY
-                    })
-
-                    
-        return _total_loss_traind_train, _softmaxes_traind_train, _total_loss_traind_test, _softmaxes_traind_test, _total_loss_testd_train, _softmaxes_testd_train, _total_loss_testd_test, _softmaxes_testd_test
+                })
+                total_loss_testd_test.append(_total_loss_testd_test)
+                softmaxes_testd_test.append(_softmaxes_testd_test)
+                
+        return total_loss_traind_train, softmaxes_traind_train, total_loss_traind_test, softmaxes_traind_test, total_loss_testd_train, softmaxes_testd_train, total_loss_testd_test, softmaxes_testd_test
