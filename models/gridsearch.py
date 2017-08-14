@@ -43,14 +43,14 @@ params=dict(
 '''
 
 params=dict(
-    state_size = [20, 50],
+    state_size = [20, 50, 200],
     num_samples = [1500],
     batch_size  = [100],
     learning_rate = [0.005],
-    grad_norm = [10e2],
+    grad_norm = [10e2, 10e3],
     max_output_ops = [5],
     num_features = [3],
-    train_fn = ["np_mult"],
+    train_fn = ["np_stall"],
     model = ["RNN"],
     norm = [True]
 )
