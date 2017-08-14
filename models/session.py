@@ -235,7 +235,7 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                     m.batchY_placeholder:batchY
                 })
 
-                _total_loss_traind_test, _softmaxes_traind_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test]],
+                _total_loss_traind_test, _softmaxes_traind_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test],
                     feed_dict={
                         m.init_state:_current_state_test,
                         m.batchX_placeholder:batchX,
@@ -259,14 +259,11 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                 })
 
                 _total_loss_testd_test, _softmaxes_testd_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test],
-                      feed_dict={
-                                m.init_state:_current_state_test,
-                                m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY
-                            })
-                        loss_list_test_hard.append(_total_loss_test)
+                  feed_dict={
+                      m.init_state:_current_state_test,
+                      m.batchX_placeholder:batchX,
+                      m.batchY_placeholder:batchY
+                    })
+
                     
-        return _total_loss_traind_train, _softmaxes_traind_train,
-               _total_loss_traind_test, _softmaxes_traind_test,
-               _total_loss_testd_train, _softmaxes_testd_train,
-               _total_loss_testd_test, _softmaxes_testd_test
+        return _total_loss_traind_train, _softmaxes_traind_train, _total_loss_traind_test, _softmaxes_traind_test, _total_loss_testd_train, _softmaxes_testd_train, _total_loss_testd_test, _softmaxes_testd_test
