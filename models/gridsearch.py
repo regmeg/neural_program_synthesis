@@ -22,6 +22,7 @@ def gen_cmd(cfg_dict, seed):
         if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
         name += str(val)+"_"+str(key)+"-"
     name = name[:-1]
+    name = += str(seed)+"_seed"
     seed  = " --seed="+str(seed)
     return string + seed + name
 
@@ -51,7 +52,7 @@ params['learning_rate'] = [0.005]
 params['grad_norm'] = [10e2]
 params['max_output_ops'] = [5]
 params['num_features'] = [3]
-params['train_fn'] = ["np_add", "np_mult", "np_stall"]
+params['train_fn'] = ["np_mult"]
 params['model'] = ["RNN"]
 params['norm'] = [True]
 params['share_state'] = [False]
