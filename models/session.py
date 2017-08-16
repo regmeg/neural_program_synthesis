@@ -307,7 +307,7 @@ def predict_form_sess(m, cfg, x, state, path, mode="hard"):
         sess.run(tf.global_variables_initializer())
         saver.restore(sess, tf.train.latest_checkpoint(path))      
         
-        batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+        batchX = np.zeros((cfg['batch_size']-x.shape[0], cfg['num_features']))
         batchY = np.zeros((cfg['batch_size'], cfg['num_features']))
         
         batchX = np.concatenate((x, batchX), axis=0)
