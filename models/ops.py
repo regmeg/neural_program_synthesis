@@ -38,7 +38,7 @@ class Operations:
         return  inpt
         
     #get value from saved store 
-    def tf_get_saved(self,inpt):
+    def tf_saved_input_concat(self,inpt):
         return  inpt
         
     
