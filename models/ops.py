@@ -25,3 +25,20 @@ class Operations:
     #stall operation is simply simulated as returning the input back
     def tf_stall(self, inpt):
         return  inpt
+    
+    #get input lenght
+    def tf_inpt_len(self,inpt):
+        return  inpt
+    
+    #divide selected delected numbers
+    def tf_div(self,inpt):
+        return  inpt
+    #save produced input in temp mem
+    def tf_save_inpt(self,inpt):
+        return  inpt
+        
+    #get value from saved store 
+    def tf_get_saved(self,inpt):
+        return  inpt
+        
+    
