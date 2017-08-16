@@ -46,6 +46,18 @@ class NNbase(object):
             #add results from all operation with applied softmax together
             output = tf.add_n(ops_final)
             return output
+        
+    def select_mem(self,current_input, softmax, cfg):
+            #######################
+            #perform mem selection #
+            #######################
+
+            #apply softmax to each memory cell
+            selection = tf.multiply(current_input,softmax, name="multi_mem_softmax")
+
+            #reduce results to produce final memory cell selection
+            output = tf.reduce_sum(selection, name="red_mem_select")
+            return output
 
     #cost function
     def calc_loss(self,cfg, output):
