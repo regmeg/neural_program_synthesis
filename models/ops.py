@@ -36,10 +36,16 @@ class Operations:
         pad_res = tf.pad(reshape, [[0,0],[0,self.num_features - 1]], "CONSTANT", name="tf_add_pad")
         return  pad_res
     
-    #divide selected delected numbers
-    def tf_divide(self,inpt):
-        
-        return  inpt
+    #divide selected delected numbers in the row, convetion is:
+    # only the first elem can be 0, other zeros are replaced with ones, so that no infs are produced
+    #the division is achieved by keeping the first elem as it is and then producing repriocals for all the rest, hence the reductions produces division
+    def tf_divide(inpt):
+        repriocal = tf.reciprocal(inpt, name="tf_div_rerp")
+        reg_slice = tf.slice(inpt, [0,0], [self.batch_size,1], name="tf_div_reg_slice")
+        repr_slice = tf.slice(repriocal, [0,1], [self.batch_size, self.num_features-1], name="tf_div_repr_slice")
+        intp  = tf.concat([reg_slice, repr_slice],1, name="tf_div_reg_repr")
+        masked_ones = tf.where(tf.is_inf(intp), tf.ones_like(inpt, dtype=cfg['datatype']), intp, name="tf_div_clean_inf")
+        return self.tf_multiply(masked_ones)
 
     #save produced input in temp mem
     def tf_save_inpt(self,inpt):
@@ -48,5 +54,13 @@ class Operations:
     #get value from saved store 
     def tf_saved_input_concat(self,inpt):
         return  inpt
+    
+    ######helper functions######
+    def not_zero(inpt):
+        greater = tf.greater(inpt,tf.zeros_like(inpt, dtype=cfg['datatype']))
+        less = tf.less(inpt, tf.zeros_like(inpt, dtype=cfg['datatype']))
+        not_zero = tf.logical_or(greater, less)
+        return not_zero
+
         
     
