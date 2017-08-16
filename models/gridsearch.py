@@ -22,7 +22,7 @@ def gen_cmd(cfg_dict, seed):
         if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
         name += str(val)+"_"+str(key)+"-"
     name = name[:-1]
-    name = += str(seed)+"_seed"
+    name += str(seed)+"_seed"
     seed  = " --seed="+str(seed)
     return string + seed + name
 
@@ -55,7 +55,7 @@ params['num_features'] = [3]
 params['train_fn'] = ["np_mult"]
 params['model'] = ["RNN"]
 params['norm'] = [True]
-params['share_state'] = [False]
+params['share_state'] = [True]
 #cfg which unlinkely is going to be iterated, but still can be configured
 
 #seed
