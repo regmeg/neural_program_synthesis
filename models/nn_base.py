@@ -3,6 +3,9 @@ import numpy as np
 from collections import OrderedDict
 
 class NNbase(object):
+    #define model params as a static dict,so that when grad are computed, all params are used from child op and mem selections rrns
+    
+    params = OrderedDict()
     def __init__(self, cfg, ops):   
         self.ops = ops
         #model constants
@@ -11,9 +14,7 @@ class NNbase(object):
         #model placeholders
         self.batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
         self.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
-  
-        #model params
-        self.params = OrderedDict()
+
     def select_op(self,current_input, softmax, cfg):
             #######################
             #perform op selection #
