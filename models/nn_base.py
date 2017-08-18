@@ -3,19 +3,20 @@ import numpy as np
 from collections import OrderedDict
 
 class NNbase(object):
-    #define model params as a static dict,so that when grad are computed, all params are used from child op and mem selections rrns
-    
+    #define model params as a static dict,so that when grad are computed, all params are used from child op and mem selections rrns    
     params = OrderedDict()
+    
+    #share the inputs and ouputs between the RNNs as well
+    batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
+    batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
+    
     def __init__(self, cfg, ops):   
         self.ops = ops
         #model constants
         self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
 
-        #model placeholders
-        self.batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
-        self.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
 
-    def select_op(self,current_input, softmax, cfg):
+    def select_op(self,current_input,mem_selection, softmax, cfg):
             #######################
             #perform op selection #
             #######################
@@ -25,7 +26,7 @@ class NNbase(object):
             op_res = []
             for op in self.ops.ops:
                 name = op.__name__
-                op_outp = op(current_input)
+                op_outp = op(current_input, mem_selection)
                 op_res.append((name, op_outp))
 
             #slice softmax results for each operation
@@ -48,16 +49,29 @@ class NNbase(object):
             output = tf.add_n(ops_final)
             return output
         
-    def select_mem(self,current_input, softmax, cfg):
+    def select_mem(self, mem_cell, softmax, cfg):
             #######################
             #perform mem selection #
             #######################
 
-            #apply softmax to each memory cell
-            selection = tf.multiply(current_input,softmax, name="multi_mem_softmax")
+            #slice softmax results for each mem cell
+            mem_softmax = []
+            for i, op in enumerate(self.ops.ops):
+                name = "slice_"+op.__name__+"_softmax_val_mem"
+                softmax_slice = tf.slice(softmax, [0,i], [cfg['batch_size'],1], name=name)
+                mem_softmax.append(softmax_slice)
 
-            #reduce results to produce final memory cell selection
-            output = tf.reduce_sum(selection, name="red_mem_select")
+
+            #apply softmax on each mem cell so that operation seletion is performed
+            mems_final = []
+            for i,mem in enumerate(mem_cell):
+                name = "mult_"+op.__name__+"_softmax_mem"
+                mem_selection =  tf.multiply(mem[1], mem_softmax[i], name=name)
+                mems_final.append(mem_selection)
+
+
+            #add results from all operation with applied softmax together
+            output = tf.add_n(mems_final)
             return output
 
     #cost function

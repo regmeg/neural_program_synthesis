@@ -26,16 +26,19 @@ class RNN(NNbase):
         for param, tensor in self.params.items(): self.variable_summaries(tensor)
                                                    
         #create graphs for forward pass to soft and hard selection
-        self.output_train, self.current_state_train, self.softmax_train, self.outputs_train, self.softmaxes_train =                     self.run_forward_pass(cfg, mode = "train")
-        
+        self.train = self.run_forward_pass(cfg, mode = "train")
         self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.output_train)
 
-        self.output_test, self.current_state_test, self.softmax_test, self.outputs_test, self.softmaxes_test =                           self.run_forward_pass(cfg, mode = "test")
-
+        self.test = self.run_forward_pass(cfg, mode = "test")
         self.total_loss_test, self.math_error_test = self.calc_loss(cfg, self.output_test)
     
         #calc grads and hereby the backprop step
         self.grads, self.train_step  = self.calc_backprop(cfg)
+
+    #set mem 
+    def set_mem(self, mem):
+        #init the mem RNN
+        self.mem = mem
 
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):
@@ -44,9 +47,11 @@ class RNN(NNbase):
         output = self.batchX_placeholder
 
         outputs = []
-
+        outputs_mem = []
+        
         softmaxes = []
-
+        softmaxes_mem = []
+        
         #printtf = tf.Print(output, [output], message="Strated cycle")
         #output = tf.reshape( printtf, [batch_size, -1], name = "dummu_rehap")
 
@@ -67,13 +72,28 @@ class RNN(NNbase):
             if mode is "test":
                 argmax  = tf.argmax(softmax, 1, )
                 softmax  = tf.one_hot(argmax, self.ops.num_of_ops, dtype=cfg['datatype'])
-            #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
+            
+            #run the forward pass from the mem module, hence select mem cell
+            output_mem, current_state_mem, softmax_mem = mem.run_forward_pass(current_input, cfg, mode)
+            outputs_mem.append(output_mem)
+            softmaxes_mem.append(softmax_mem)
 
-            output = self.select_op(current_input, softmax, cfg)
+            #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
+            output = self.select_op(current_input, mem_selection, softmax, cfg)
 
             #save the sequance of softmaxes and outputs
             outputs.append(output)
             softmaxes.append(softmax)
-        #printtf = tf.Print(output, [output], message="Finished cycle")
-        #output = tf.reshape( printtf, [batch_size, -1], name = "dummu_rehap")
-        return output, current_state, softmax, outputs, softmaxes
+        
+            #build the response dict
+        return dict(output = output,
+                    current_state = current_state,
+                    softmax = softmax,
+                    outputs = outputs,
+                    softmaxes = softmaxes,
+                    output_mem = output_mem,
+                    current_state_mem = current_state_mem,
+                    softmax_mem = softmax_mem,
+                    outputs_mem = outputs_mem,
+                    softmaxes_mem = softmaxes_mem
+                   )

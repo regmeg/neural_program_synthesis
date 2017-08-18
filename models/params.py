@@ -18,7 +18,7 @@ tf.flags.DEFINE_float("grad_norm", 10e2, "amount of normalisation for the gradie
 tf.flags.DEFINE_integer("max_output_ops", 5, "number of output from RNN")
 
 tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
-tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")
+tf.flags.DEFINE_string("train_fn", "np_avg_val", "the function which model has to learn")
 tf.flags.DEFINE_string("model", "RNN", "what model to use for training")
 tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
 tf.flags.DEFINE_boolean("share_state", True, "weather to share RNN state between training and testing stages")

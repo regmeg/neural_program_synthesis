@@ -10,7 +10,10 @@ class MemRNN(NNbase):
         super(RNN, self).__init__(cfg, ops)
         
         #placeholder for the initial state of the model
-        self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
+        self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state_mem")
+        
+        #create a ROM cell for the raw inputs and applied op on them
+        self.mem_cell = [op(self.batchX_placeholder, self.dummy_matrix) for op in ops.ops]
 
         #set random seed
         tf.set_random_seed(cfg['seed'])
@@ -40,32 +43,23 @@ class MemRNN(NNbase):
         '''
 
     #forward pass
-    def run_forward_pass(self, cfg, mode="train"):
-        current_state = self.init_state
-
-        output = self.batchX_placeholder
-
-        current_input = output
+    def run_forward_pass(self,current_input, cfg, mode="train"):
+        current_state = self.init_state        
 
         input_and_state_concatenated = tf.concat([current_input, current_state], 1, name="concat_input_state_mem")  # Increasing number of columns
         next_state = tf.tanh(tf.add(tf.matmul(input_and_state_concatenated, self.params["W_mem"], name="input-state_mult_W"), self.params["b_mem"], name="add_bias_mem"), name="tanh_next_state_mem")  # Broadcasted addition
-            #next_state = tf.nn.relu(tf.add(tf.matmul(input_and_state_concatenated, W, name="input-state_mult_W"), b, name="add_bias"), name="relu_next-state")  # Broadcasted addition
         current_state = next_state
 
         #calculate softmax and produce the mask of operations
         logits = tf.add(tf.matmul(next_state, self.params["W2_mem"], name="state_mul_W2_mem"), self.params["b2_mem"], name="add_bias2_mem") #Broadcasted addition
-            softmax = tf.nn.softmax(logits, name="get_softmax_mem")
+        softmax = tf.nn.softmax(logits, name="get_softmax_mem")
 
         #in test change to hardmax
         if mode is "test":
             argmax  = tf.argmax(softmax, 1, )
             softmax  = tf.one_hot(argmax, self.ops.num_of_ops, dtype=cfg['datatype'])
         #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
-
-        output = self.select_mem(current_input, softmax, cfg)
-
-        #save the sequance of softmaxes and outputs
-        outputs.append(output)
-        softmaxes.append(softmax)
-
+                
+        output = self.select_mem(self.mem_cell, softmax, cfg)
+        
         return output, current_state, softmax

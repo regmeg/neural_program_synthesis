@@ -78,7 +78,9 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
 
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-
+            _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+            
                 #backprop and test training set for softmax and hardmax loss
             for batch_idx in range(num_batches):
                     start_idx = cfg['batch_size'] * batch_idx
@@ -88,32 +90,78 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                     batchY = y_train[start_idx:end_idx]
 
                     #for non testing cylce, simply do one forward and back prop with 1 batch with train data
-                    if epoch_idx % cfg['test_cycle'] != 0 :
-                        _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([m.total_loss_train, m.train_step, m.current_state_train, m.output_train, m.grads, m.softmaxes_train, m.math_error_train],
-                            feed_dict={
-                                m.init_state:_current_state_train,
-                                m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY
-                            })
-                        loss_list_train_soft.append(_total_loss_train)
-
-                    else :
-                    #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
-                        summary, _total_loss_train, _train_step, _current_state_train, _output_train, _grads, _softmaxes_train, _math_error_train = sess.run([merged, m.total_loss_train, m.train_step, m.current_state_train, m.output_train, m.grads, m.softmaxes_train, m.math_error_train],
+                    if epoch_idx % cfg['test_cycle'] != 0 :                       
+                      
+                        _total_loss_train,\ 
+                        _train_step,\
+                        _current_state_train,\
+                        _current_state_train_mem,\
+                        _output_train,\
+                        _grads,\
+                        _softmaxes_train,\
+                        _math_error_train = sess.run([m.total_loss_train, 
+                                                      m.train_step,
+                                                      m.train["current_state"], 
+                                                      m.train["current_state_mem"], 
+                                                      m.train["output"], 
+                                                      m.grads, 
+                                                      m.train["softmaxes"],
+                                                      m.math_error_train],
                         feed_dict={
                             m.init_state:_current_state_train,
+                            m.mem.init_state:_current_state_train_mem,
                             m.batchX_placeholder:batchX,
                             m.batchY_placeholder:batchY
                         })
                         loss_list_train_soft.append(_total_loss_train)
 
-                        _total_loss_test, _current_state_test, _output_test, _softmaxes_test, _math_error_test = sess.run([m.total_loss_test, m.current_state_test, m.output_test, m.softmaxes_test, m.math_error_test],
+                    else :
+                    #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
+                    
+                        summary,\
+                        _total_loss_train,\
+                        _train_step,\
+                        _current_state_train,\
+                        _current_state_train_mem,\
+                        _output_train,\
+                        _grads,\
+                        _softmaxes_train,\
+                        _math_error_train = sess.run([merged,
+                                                      m.total_loss_train,
+                                                      m.train_step,
+                                                      m.train["current_state"],
+                                                      m.train["current_state_mem"],
+                                                      m.train["output"],
+                                                      m.grads,
+                                                      m.train["softmaxes"],
+                                                      m.math_error_train],
+                        feed_dict={
+                            m.init_state:_current_state_train,
+                            m.mem.init_state:_current_state_train_mem,
+                            m.batchX_placeholder:batchX,
+                            m.batchY_placeholder:batchY
+                        })
+                        loss_list_train_soft.append(_total_loss_train)
+
+                        _total_loss_test,\
+                        _current_state_test,\
+                        _current_state_test_mem,\
+                        _output_test,\
+                        _softmaxes_test,\
+                        _math_error_test = sess.run([m.total_loss_test,
+                                                     m.test["current_state"],
+                                                     m.test["current_state_mem"],
+                                                     m.test["output"],
+                                                     m.test["softmaxes"],
+                                                     m.math_error_test],
                             feed_dict={
                                 m.init_state:_current_state_test,
+                                m.mem.init_state:_current_state_test_mem,
                                 m.batchX_placeholder:batchX,
                                 m.batchY_placeholder:batchY
                             })
                         loss_list_train_hard.append(_total_loss_test)
+
             ##save loss for the convergance chessing        
             reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
             last_train_losses.append(reduced_loss_train_soft)
@@ -122,6 +170,9 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                 if cfg['share_state'] is False:
                     _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
                     _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+                    _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+                    _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+
                 for batch_idx in range(num_test_batches):
                         start_idx = cfg['batch_size'] * batch_idx
                         end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
@@ -129,17 +180,27 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                         batchX = x_test[start_idx:end_idx]
                         batchY = y_test[start_idx:end_idx]
 
-                        _total_loss_train, _current_state_train = sess.run([m.total_loss_train, m.current_state_train],
+                        _total_loss_train,\
+                        _current_state_train,\
+                        _current_state_train_mem = sess.run([m.total_loss_train,
+                                                             m.train["current_state"],
+                                                             m.train["current_state_mem"]],
                             feed_dict={
                                 m.init_state:_current_state_train,
+                                m.mem.init_state:_current_state_train_mem,
                                 m.batchX_placeholder:batchX,
                                 m.batchY_placeholder:batchY
                             })
                         loss_list_test_soft.append(_total_loss_train)
 
-                        _total_loss_test, _current_state_test = sess.run([m.total_loss_test, m.current_state_test],
+                        _total_loss_test,\
+                        _current_state_test,\
+                        _current_state_test_mem = sess.run([m.total_loss_test,
+                                                            m.test["current_state"]
+                                                            m.test["current_state_mem"]],
                             feed_dict={
                                 m.init_state:_current_state_test,
+                                m.mem.init_state:_current_state_test_mem,
                                 m.batchX_placeholder:batchX,
                                 m.batchY_placeholder:batchY
                             })

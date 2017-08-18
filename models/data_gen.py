@@ -13,6 +13,9 @@ def np_mult(vec):
 def np_stall(vec):
     return vec
 
+def np_avg_val(vec):
+    return np.average(vec)
+
 def samples_generator(fn, shape, rng, seed):
     '''
     Generate random samples for the model:
