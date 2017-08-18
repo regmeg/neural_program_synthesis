@@ -92,7 +92,7 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                     #for non testing cylce, simply do one forward and back prop with 1 batch with train data
                     if epoch_idx % cfg['test_cycle'] != 0 :                       
                       
-                        _total_loss_train,\ 
+                        _total_loss_train,\
                         _train_step,\
                         _current_state_train,\
                         _current_state_train_mem,\
@@ -196,7 +196,7 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                         _total_loss_test,\
                         _current_state_test,\
                         _current_state_test_mem = sess.run([m.total_loss_test,
-                                                            m.test["current_state"]
+                                                            m.test["current_state"],
                                                             m.test["current_state_mem"]],
                             feed_dict={
                                 m.init_state:_current_state_test,

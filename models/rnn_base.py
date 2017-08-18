@@ -4,14 +4,16 @@ from nn_base import NNbase
 
 class RNN(NNbase):
     
-    def __init__(self, cfg, ops):
+    def __init__(self, cfg, ops, mem):
 
         #init parent
         super(RNN, self).__init__(cfg, ops)
         
         #placeholder for the initial state of the model
         self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
-
+        
+        #set mem
+        self.mem = mem
         #set random seed
         tf.set_random_seed(cfg['seed'])
     
@@ -27,18 +29,13 @@ class RNN(NNbase):
                                                    
         #create graphs for forward pass to soft and hard selection
         self.train = self.run_forward_pass(cfg, mode = "train")
-        self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.output_train)
+        self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.train["output"])
 
         self.test = self.run_forward_pass(cfg, mode = "test")
-        self.total_loss_test, self.math_error_test = self.calc_loss(cfg, self.output_test)
-    
+        self.total_loss_test, self.math_error_test = self.calc_loss(cfg, self.test["output"])
+
         #calc grads and hereby the backprop step
         self.grads, self.train_step  = self.calc_backprop(cfg)
-
-    #set mem 
-    def set_mem(self, mem):
-        #init the mem RNN
-        self.mem = mem
 
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):
@@ -74,12 +71,12 @@ class RNN(NNbase):
                 softmax  = tf.one_hot(argmax, self.ops.num_of_ops, dtype=cfg['datatype'])
             
             #run the forward pass from the mem module, hence select mem cell
-            output_mem, current_state_mem, softmax_mem = mem.run_forward_pass(current_input, cfg, mode)
+            output_mem, current_state_mem, softmax_mem = self.mem.run_forward_pass(current_input, cfg, mode)
             outputs_mem.append(output_mem)
             softmaxes_mem.append(softmax_mem)
 
             #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
-            output = self.select_op(current_input, mem_selection, softmax, cfg)
+            output = self.select_op(current_input, output_mem, softmax, cfg)
 
             #save the sequance of softmaxes and outputs
             outputs.append(output)

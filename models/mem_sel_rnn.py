@@ -7,13 +7,14 @@ class MemRNN(NNbase):
     def __init__(self, cfg, ops):
 
         #init parent
-        super(RNN, self).__init__(cfg, ops)
+        super(MemRNN, self).__init__(cfg, ops)
         
         #placeholder for the initial state of the model
         self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state_mem")
         
         #create a ROM cell for the raw inputs and applied op on them
-        self.mem_cell = [op(self.batchX_placeholder, self.dummy_matrix) for op in ops.ops]
+        self.current_input = self.batchX_placeholder
+        self.mem_cell = [op(self.current_input, self.dummy_matrix) for op in ops.ops]
 
         #set random seed
         tf.set_random_seed(cfg['seed'])

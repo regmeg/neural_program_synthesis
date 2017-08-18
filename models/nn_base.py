@@ -1,14 +1,15 @@
 import tensorflow as tf
 import numpy as np
 from collections import OrderedDict
+from params import get_cfg
 
 class NNbase(object):
     #define model params as a static dict,so that when grad are computed, all params are used from child op and mem selections rrns    
     params = OrderedDict()
     
     #share the inputs and ouputs between the RNNs as well
-    batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchX")
-    batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], None], name="batchY")
+    batchX_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchX")
+    batchY_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchY")
     
     def __init__(self, cfg, ops):   
         self.ops = ops
@@ -66,7 +67,7 @@ class NNbase(object):
             mems_final = []
             for i,mem in enumerate(mem_cell):
                 name = "mult_"+op.__name__+"_softmax_mem"
-                mem_selection =  tf.multiply(mem[1], mem_softmax[i], name=name)
+                mem_selection =  tf.multiply(mem, mem_softmax[i], name=name)
                 mems_final.append(mem_selection)
 
 
@@ -93,7 +94,10 @@ class NNbase(object):
             self.variable_summaries(norms)
         else:
             grads = grads_raw
-
+        
+        print("grads are")
+        print(grads)
+        
         for grad in grads: self.variable_summaries(grad)
 
         train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), name="min_loss")
