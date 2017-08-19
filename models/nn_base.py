@@ -8,13 +8,15 @@ class NNbase(object):
     params = OrderedDict()
     
     #share the inputs and ouputs between the RNNs as well
-    batchX_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchX")
-    batchY_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchY")
+    with tf.name_scope("Batches"):
+        batchX_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchX")
+        batchY_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchY")
     
     def __init__(self, cfg, ops):   
         self.ops = ops
         #model constants
-        self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
+        with tf.name_scope("Constants"):
+            self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
 
 
     def select_op(self,current_input,mem_selection, softmax, cfg):
@@ -23,7 +25,7 @@ class NNbase(object):
             #######################
 
             #perform all ops in the current timestep intput and save output results together with the op name
-
+        with tf.name_scope("Select_op"):
             op_res = []
             for op in self.ops.ops:
                 name = op.__name__
@@ -54,7 +56,7 @@ class NNbase(object):
             #######################
             #perform mem selection #
             #######################
-
+        with tf.name_scope("Select_mem"):
             #slice softmax results for each mem cell
             mem_softmax = []
             for i, op in enumerate(self.ops.ops):
@@ -78,40 +80,38 @@ class NNbase(object):
     #cost function
     def calc_loss(self,cfg, output):
         #reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
-        math_error = tf.multiply(tf.constant(0.5, dtype=cfg['datatype']), tf.square(tf.subtract(output , self.batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
+        with tf.name_scope("Loss_comp"):        
+            math_error = tf.multiply(tf.constant(0.5, dtype=cfg['datatype']), tf.square(tf.subtract(output , self.batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
 
-        total_loss = tf.reduce_sum(math_error, name="red_total_loss")
+            total_loss = tf.reduce_sum(math_error, name="red_total_loss")
         return total_loss, math_error
 
     def calc_backprop(self, cfg):
         print(list(self.params.values()))
-        grads_raw = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
+        with tf.name_scope("Grads"):
+            grads_raw = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
 
-        #clip gradients by value and add summaries
-        if cfg['norm']:
-            print("norming the grads")
-            grads, norms = tf.clip_by_global_norm(grads_raw, cfg['grad_norm'])
-            self.variable_summaries(norms)
-        else:
-            grads = grads_raw
-        
-        print("grads are")
-        print(grads)
-        
-        for grad in grads: self.variable_summaries(grad)
-
-        train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), name="min_loss")
-        print("grads are")
-        print(grads)
-
-        return grads, train_step
+            #clip gradients by value and add summaries
+            if cfg['norm']:
+                print("norming the grads")
+                grads, norms = tf.clip_by_global_norm(grads_raw, cfg['grad_norm'])
+            else:
+                grads = grads_raw
+                norms = []
+                
+        with tf.name_scope("Train_step"):
+            train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), name="min_loss")
+            print("grads are")
+            print(grads)
+            return grads, train_step, norms
     
-    def variable_summaries(self, var):
-      """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
-      with tf.name_scope(var.name.replace(":","_")):
-        mean = tf.reduce_mean(var)
-        tf.summary.scalar('mean', mean)
-        tf.summary.scalar('stddev', tf.sqrt(tf.reduce_mean(tf.square(var - mean))))
-        tf.summary.scalar('max', tf.reduce_max(var))
-        tf.summary.scalar('min', tf.reduce_min(var))
-        tf.summary.histogram('histogram', var)
+    def variable_summaries(self, var, name=None):
+        """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""        
+        if name is None: name = var.name.replace(":","_")
+        with tf.name_scope(name):
+                mean = tf.reduce_mean(var)
+                tf.summary.scalar('mean', mean)
+                tf.summary.scalar('stddev', tf.sqrt(tf.reduce_mean(tf.square(var - mean))))
+                tf.summary.scalar('max', tf.reduce_max(var))
+                tf.summary.scalar('min', tf.reduce_min(var))
+                tf.summary.histogram('histogram', var)

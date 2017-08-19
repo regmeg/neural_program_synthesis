@@ -31,7 +31,7 @@ def main():
     print("###########CFG dict is###########")
     pprint.pprint(cfg, depth=3)
     print("#############################")
-    sys.stdout = stdout_org
+    #sys.stdout = stdout_org
 
 
     #instantiate containter with the operations avail for the selection
