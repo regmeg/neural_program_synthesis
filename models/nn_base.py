@@ -78,9 +78,9 @@ class NNbase(object):
             return output
 
     #cost function
-    def calc_loss(self,cfg, output):
+    def calc_loss(self,cfg, output, mode="train"):
         #reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
-        with tf.name_scope("Loss_comp"):        
+        with tf.name_scope("Loss_comp_"+mode):        
             math_error = tf.multiply(tf.constant(0.5, dtype=cfg['datatype']), tf.square(tf.subtract(output , self.batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
 
             total_loss = tf.reduce_sum(math_error, name="red_total_loss")

@@ -11,7 +11,7 @@ from collections import OrderedDict
 This module simulates the gridsearch funtionality, in order to tune the hyperparmaters
 '''
 
-tf.flags.DEFINE_integer("seed", int(round(random.random()*100000)), "the global simulation seed for np and tf")
+tf.flags.DEFINE_integer("seed", 0, "the global simulation seed for np and tf")
 FLAGS = tf.flags.FLAGS
 
 def gen_cmd(cfg_dict, seed):
@@ -21,6 +21,7 @@ def gen_cmd(cfg_dict, seed):
         string += " --"+str(key)+"="+str(val)
         if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
         name += str(val)+"_"+str(key)+"-"
+    if seed == 0: seed = int(round(random.random()*100000))
     name += str(seed)+"_seed"
     seed  = " --seed="+str(seed)
     return string + seed + name
@@ -44,13 +45,13 @@ params=OrderedDict(
 '''
 
 params=OrderedDict()
-params['state_size'] = [100, 200]
-params['num_samples'] = [1500]
+params['state_size'] = [100]
+params['num_samples'] = [1500, 3000, 10000]
 params['batch_size']  = [100]
 params['learning_rate'] = [0.005]
 params['grad_norm'] = [10e2, 10e3]
 params['max_output_ops'] = [4]
-params['num_features'] = [5]
+params['num_features'] = [3]
 params['train_fn'] = ["np_avg_val"]
 params['model'] = ["RNN"]
 params['norm'] = [True]

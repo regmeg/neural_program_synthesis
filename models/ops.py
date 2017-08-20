@@ -60,7 +60,7 @@ class Operations:
             #inpt_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="tf_inp_mem_cnt_slice1")
             mem_slice = tf.slice(mem_sel, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
             pad_res = tf.pad(mem_slice, [[0,0],[1,self.cfg['num_features'] - 2]], "CONSTANT", name="pad")
-            return  tf.add(inpt, mem_slice, name="add")
+            return  tf.add(inpt, pad_res, name="add")
     
     ######helper functions######
     def not_zero(self, inpt, mem_sel=None):

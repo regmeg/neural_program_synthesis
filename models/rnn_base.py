@@ -28,10 +28,10 @@ class RNN(NNbase):
 
             #create graphs for forward pass to soft and hard selection
             self.train = self.run_forward_pass(cfg, mode = "train")
-            self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.train["output"])
+            self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.train["output"], mode = "train")
 
             self.test = self.run_forward_pass(cfg, mode = "test")
-            self.total_loss_test, self.math_error_test = self.calc_loss(cfg, self.test["output"])
+            self.total_loss_test, self.math_error_test = self.calc_loss(cfg, self.test["output"], mode = "tests")
 
             #calc grads and hereby the backprop step
             self.grads, self.train_step, self.norms  = self.calc_backprop(cfg)
