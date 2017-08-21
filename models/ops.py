@@ -52,7 +52,6 @@ class Operations:
             intp  = tf.concat([reg_slice, repr_slice],1, name="reg_repr_concat")
             masked_ones = tf.where(tf.is_inf(intp), tf.ones_like(inpt, dtype=self.cfg['datatype']), intp, name="clean_inf")
             return self.tf_multiply(masked_ones)
-
         
     #get value from saved store 
     def tf_input_mem_concat(self, inpt, mem_sel=None):

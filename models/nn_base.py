@@ -64,14 +64,12 @@ class NNbase(object):
                 softmax_slice = tf.slice(softmax, [0,i], [cfg['batch_size'],1], name=name)
                 mem_softmax.append(softmax_slice)
 
-
             #apply softmax on each mem cell so that operation seletion is performed
             mems_final = []
             for i,mem in enumerate(mem_cell):
                 name = "mult_"+op.__name__+"_softmax_mem"
                 mem_selection =  tf.multiply(mem, mem_softmax[i], name=name)
                 mems_final.append(mem_selection)
-
 
             #add results from all operation with applied softmax together
             output = tf.add_n(mems_final)

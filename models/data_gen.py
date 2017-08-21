@@ -34,8 +34,7 @@ def samples_generator(fn, shape, rng, seed):
         
 def split_train_test(x, y , test_ratio):
     
-    if y.shape != x.shape:
-        raise Exception('Model expects x and y shapes to be the same')
+    assert len(x) == len(y), 'Model expects x and y shapes to be the same'
     
     test_len  = int(x.shape[0]*test_ratio)
     train_len = x.shape[0] - test_len
@@ -56,3 +55,9 @@ def split_train_test(x, y , test_ratio):
         raise Exception('One of the conversion test/train shapes gone wrong')
     
     return  x_train, x_test, y_train, y_test
+
+def shuffle_data(x,y):
+    assert len(x) == len(y)
+    randomize = np.arange(len(x))
+    np.random.shuffle(randomize)
+    return x[randomize], y[randomize]

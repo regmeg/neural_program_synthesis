@@ -69,12 +69,15 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
         print(m.params['W2'].eval())
         globalstartTime = time.time()
         for epoch_idx in range(cfg['num_epochs']):
+            # reset variables
             startTime = time.time()
             loss_list_train_soft = [0,0]
             loss_list_train_hard = [0,0]
             loss_list_test_soft = [0,0]
             loss_list_test_hard = [0,0]
             summary = None
+            #shuffle data
+            x_train, y_train = shuffle_data(x_train, y_train)
 
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
@@ -162,7 +165,7 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
                             })
                         loss_list_train_hard.append(_total_loss_test)
 
-            ##save loss for the convergance chessing        
+            ##save loss for the convergance chassing        
             reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
             last_train_losses.append(reduced_loss_train_soft)
             ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
@@ -256,7 +259,6 @@ def run_session(m, cfg, x_train, x_test, y_train, y_test):
 def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
     #create a saver to save the trained model
     saver=tf.train.Saver(var_list=tf.trainable_variables())
-
     #Enable jit
     config = tf.ConfigProto()
     config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
@@ -279,14 +281,27 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
 
         #get soft and hardmaxes out of the model for the last batches
         total_loss_traind_train = []
+        
+        outputs_traind_train = []
+        outputs_traind_train_mem = []
+        
         softmaxes_traind_train = []
+        softmaxes_traind_train_mem = []
+        
         total_loss_traind_test = []
+        
+        outputs_traind_test = []
+        outputs_traind_test_mem = []
+        
         softmaxes_traind_test = []
+        softmaxes_traind_test_mem = []
 
         _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
         _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
 
-            #backprop and test training set for softmax and hardmax loss
+        #FOR THE TRAINING DATA
         for batch_idx in range(num_batches):
                 start_idx = cfg['batch_size'] * batch_idx
                 end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
@@ -294,68 +309,191 @@ def restore_selection_matrixes(m, cfg, x_train, x_test, y_train, y_test, path):
                 batchX = x_train[start_idx:end_idx]
                 batchY = y_train[start_idx:end_idx]
 
-                #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
-                _total_loss_traind_train, _softmaxes_traind_train, _current_state_train = sess.run([m.total_loss_train, m.softmaxes_train, m.current_state_train],
+               
+                
+                #FOR THE SOFTMAX SELECTION
+                _total_loss_traind_train,\
+                _outputs_traind_train,\
+                _outputs_traind_train_mem,\
+                _softmaxes_traind_train,\
+                _softmaxes_traind_train_mem,\
+                _current_state_train,\
+                _current_state_train_mem = sess.run([m.total_loss_train,
+                                                     m.train["outputs"],
+                                                     m.train["outputs_mem"],
+                                                     m.train["softmaxes"],
+                                                     m.train["softmaxes_mem"],
+                                                     m.train["current_state"],
+                                                     m.train["current_state_mem"]],
+                                                
+                                                
                 feed_dict={
                     m.init_state:_current_state_train,
+                    m.mem.init_state:_current_state_train_mem,
                     m.batchX_placeholder:batchX,
                     m.batchY_placeholder:batchY
                 })
                 total_loss_traind_train.append(_total_loss_traind_train)
+                outputs_traind_train.append(_outputs_traind_train)
+                outputs_traind_train_mem.append(_outputs_traind_train_mem)
                 softmaxes_traind_train.append(_softmaxes_traind_train)
+                softmaxes_traind_train_mem.append(_softmaxes_traind_train_mem)
                 
-                _total_loss_traind_test, _softmaxes_traind_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test],
+                #FOR THE HARDMAX SELECTION
+                _total_loss_traind_test,\
+                _outputs_traind_test,\
+                _outputs_traind_test_mem,\
+                _softmaxes_traind_test,\
+                _softmaxes_traind_test_mem,\
+                _current_state_test,\
+                _current_state_test_mem = sess.run([m.total_loss_test,
+                                                     m.test["outputs"],
+                                                     m.test["outputs_mem"],
+                                                     m.test["softmaxes"],
+                                                     m.test["softmaxes_mem"],
+                                                     m.test["current_state"],
+                                                     m.test["current_state_mem"]],
                     feed_dict={
                         m.init_state:_current_state_test,
+                        m.mem.init_state:_current_state_test_mem,
                         m.batchX_placeholder:batchX,
                         m.batchY_placeholder:batchY
                     })
                 total_loss_traind_test.append(_total_loss_traind_test)
+                outputs_traind_test.append(_outputs_traind_test)
+                outputs_traind_test_mem.append(_outputs_traind_test_mem)
                 softmaxes_traind_test.append(_softmaxes_traind_test)
+                softmaxes_traind_test_mem.append(_softmaxes_traind_test_mem)
+                
         
         last_softmax_state_train = _current_state_train
         last_hardmax_state_train = _current_state_test 
+        last_softmax_state_train_mem = _current_state_train
+        last_hardmax_state_train_mem = _current_state_test 
+        
         #produce results ith with the testing data
         total_loss_testd_train = []
+        
+        outputs_testd_train = []
+        outputs_testd_train_mem = []
+        
         softmaxes_testd_train = []
+        softmaxes_testd_train_mem = []
+        
         total_loss_testd_test = []
+        
+        outputs_testd_test =[]
+        outputs_testd_test_mem =[]
+        
         softmaxes_testd_test =[]
+        softmaxes_testd_test_mem =[]
         
         if cfg['share_state'] is False:
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
         
+        #FOR THE TESTING DATA
         for batch_idx in range(num_test_batches):
                 start_idx = cfg['batch_size'] * batch_idx
                 end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
 
                 batchX = x_test[start_idx:end_idx]
                 batchY = y_test[start_idx:end_idx]
-
-                _total_loss_testd_train, _softmaxes_testd_train, _current_state_train = sess.run([m.total_loss_train, m.softmaxes_train, m.current_state_train],
+                
+                #FOR THE SOFTMAX SELECTION
+                _total_loss_testd_train,\
+                _outputs_testd_train,\
+                _outputs_testd_train_mem,\
+                _softmaxes_testd_train,\
+                _softmaxes_testd_train_mem,\
+                _current_state_train,\
+                _current_state_train_mem = sess.run([m.total_loss_train,
+                                                     m.train["outputs"],
+                                                     m.train["outputs_mem"],
+                                                     m.train["softmaxes"],
+                                                     m.train["softmaxes_mem"],
+                                                     m.train["current_state"],
+                                                     m.train["current_state_mem"]],
                 feed_dict={
                     m.init_state:_current_state_train,
+                    m.mem.init_state:_current_state_train_mem,
                     m.batchX_placeholder:batchX,
                     m.batchY_placeholder:batchY
                 })
                 total_loss_testd_train.append(_total_loss_testd_train)
+                outputs_testd_train.append(_outputs_testd_train)
+                outputs_testd_train_mem.append(_outputs_testd_train_mem)
                 softmaxes_testd_train.append(_softmaxes_testd_train)
+                softmaxes_testd_train_mem.append(_softmaxes_testd_train_mem)
                 
-                _total_loss_testd_test, _softmaxes_testd_test, _current_state_test = sess.run([m.total_loss_test, m.softmaxes_test, m.current_state_test],
-                feed_dict={
-                      m.init_state:_current_state_test,
-                      m.batchX_placeholder:batchX,
-                      m.batchY_placeholder:batchY
-                })
+                #FOR THE HARDMAX SELECTION
+                _total_loss_testd_test,\
+                _outputs_testd_test,\
+                _outputs_testd_test_mem,\
+                _softmaxes_testd_test,\
+                _softmaxes_testd_test_mem,\
+                _current_state_test,\
+                _current_state_test_mem = sess.run([m.total_loss_test,
+                                                     m.test["outputs"],
+                                                     m.test["outputs_mem"],
+                                                     m.test["softmaxes"],
+                                                     m.test["softmaxes_mem"],
+                                                     m.test["current_state"],
+                                                     m.test["current_state_mem"]],
+                    feed_dict={
+                        m.init_state:_current_state_test,
+                        m.mem.init_state:_current_state_test_mem,
+                        m.batchX_placeholder:batchX,
+                        m.batchY_placeholder:batchY
+                    })
                 total_loss_testd_test.append(_total_loss_testd_test)
+                outputs_testd_test.append(_outputs_testd_test)
+                outputs_testd_test_mem.append(_outputs_testd_test_mem)
                 softmaxes_testd_test.append(_softmaxes_testd_test)
+                softmaxes_testd_test_mem.append(_softmaxes_testd_test_mem)
                 
         last_softmax_state_test = _current_state_train
-        last_hardmax_state_test = _current_state_test 
+        last_hardmax_state_test = _current_state_test
+        last_softmax_state_test_mem = _current_state_train
+        last_hardmax_state_test_mem = _current_state_test 
         
-        return total_loss_traind_train, softmaxes_traind_train, total_loss_traind_test, softmaxes_traind_test, total_loss_testd_train, softmaxes_testd_train, total_loss_testd_test, softmaxes_testd_test, last_softmax_state_train, last_hardmax_state_train, last_softmax_state_test, last_hardmax_state_test
+        return dict(
+                #outputs for the train data
+                total_loss_traind_train = total_loss_traind_train,
+                outputs_traind_train = outputs_traind_train,
+                outputs_traind_train_mem = outputs_traind_train_mem,
+                softmaxes_traind_train = softmaxes_traind_train,
+                softmaxes_traind_train_mem = softmaxes_traind_train_mem,
+                total_loss_traind_test = total_loss_traind_test,
+                outputs_traind_test = outputs_traind_test,
+                outputs_traind_test_mem = outputs_traind_test_mem,
+                softmaxes_traind_test = softmaxes_traind_test,
+                softmaxes_traind_test_mem = softmaxes_traind_test_mem,
+                last_softmax_state_train = last_softmax_state_train,
+                last_hardmax_state_train = last_hardmax_state_train,
+                last_softmax_state_train_mem = last_softmax_state_train_mem,
+                last_hardmax_state_train_mem = last_hardmax_state_train_mem,
+            
+                #outputs for the testing data
+                total_loss_testd_train = total_loss_testd_train,
+                outputs_testd_train = outputs_testd_train,
+                outputs_testd_train_mem = outputs_testd_train_mem,
+                softmaxes_testd_train = softmaxes_testd_train,
+                softmaxes_testd_train_mem = softmaxes_testd_train_mem,
+                total_loss_testd_test = total_loss_testd_test,
+                outputs_testd_test = outputs_testd_test,
+                outputs_testd_test_mem = outputs_testd_test_mem,
+                softmaxes_testd_test = softmaxes_testd_test,
+                softmaxes_testd_test_mem = softmaxes_testd_test_mem,
+                last_softmax_state_test = last_softmax_state_test,
+                last_hardmax_state_test = last_hardmax_state_test,
+                last_softmax_state_test_mem = last_softmax_state_test_mem,
+                last_hardmax_state_test_mem = last_hardmax_state_test_mem 
+        )
 
-def predict_form_sess(m, cfg, x, state, path, mode="hard"):
+def predict_form_sess(m, cfg, x, state, state_mem, path, mode="hard"):
     #create a saver to restore saved model
     saver=tf.train.Saver(var_list=tf.trainable_variables())
 
@@ -377,6 +515,7 @@ def predict_form_sess(m, cfg, x, state, path, mode="hard"):
             output = sess.run([m.output_train],
                 feed_dict={
                     m.init_state:state,
+                    m.mem.init_state:state_mem,
                     m.batchX_placeholder:batchX,
                     m.batchY_placeholder:batchY
                 })
@@ -384,6 +523,7 @@ def predict_form_sess(m, cfg, x, state, path, mode="hard"):
             output = sess.run([m.output_test],
                 feed_dict={
                     m.init_state:state,
+                    m.mem.init_state:state_mem,
                     m.batchX_placeholder:batchX,
                     m.batchY_placeholder:batchY
                 })
