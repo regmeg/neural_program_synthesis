@@ -45,11 +45,11 @@ params=OrderedDict(
 '''
 
 params=OrderedDict()
-params['state_size'] = [100]
-params['num_samples'] = [1500, 3000, 10000]
+params['state_size'] = [50, 100]
+params['num_samples'] = [1500]
 params['batch_size']  = [100]
 params['learning_rate'] = [0.005]
-params['grad_norm'] = [10e2, 10e3]
+params['grad_norm'] = [10e1, 10e2]
 params['max_output_ops'] = [4]
 params['num_features'] = [3]
 params['train_fn'] = ["np_avg_val"]

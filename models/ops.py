@@ -29,7 +29,7 @@ class Operations:
     def tf_stall(self, inpt, mem_sel=None):
         with tf.name_scope("tf_stall"):
             reshape = tf.reshape(inpt , [self.cfg['batch_size'], self.cfg['num_features']], name = "reshape")
-        return  reshape
+            return  reshape
     
     #get input lenght, asssing all values to ones and then reduce
     def tf_inpt_len(self,inpt, mem_sel=None):
