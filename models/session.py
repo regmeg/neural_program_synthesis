@@ -77,7 +77,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             loss_list_test_hard = [0,0]
             summary = None
             #shuffle data
-            x_train, y_train = shuffle_data(x_train, y_train)
+            #x_train, y_train = shuffle_data(x_train, y_train)
 
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
@@ -608,7 +608,7 @@ def run_session_HistoryRNN(m, cfg, x_train, x_test, y_train, y_test):
             loss_list_test_hard = [0,0]
             summary = None
             #shuffle data
-            x_train, y_train = shuffle_data(x_train, y_train)
+            #x_train, y_train = shuffle_data(x_train, y_train)
 
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
@@ -686,7 +686,7 @@ def run_session_HistoryRNN(m, cfg, x_train, x_test, y_train, y_test):
             ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
             if epoch_idx % cfg['test_cycle'] == 0 :
                 
-                #if sharing state, share state between training and testing data, lese
+                #if sharing state, share state between training and testing data, 
                 #else completely reset the state
                 if cfg['share_state'] is False:
                     _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))

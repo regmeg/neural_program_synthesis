@@ -49,8 +49,8 @@ class Operations:
             repriocal = tf.reciprocal(inpt, name="reciprocal")
             reg_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="regular_slice")
             repr_slice = tf.slice(repriocal, [0,1], [self.cfg['batch_size'], self.cfg['num_features']-1], name="repriocal_slice")
-            intp  = tf.concat([reg_slice, repr_slice],1, name="reg_repr_concat")
-            masked_ones = tf.where(tf.is_inf(intp), tf.ones_like(inpt, dtype=self.cfg['datatype']), intp, name="clean_inf")
+            inpt_conc  = tf.concat([reg_slice, repr_slice],1, name="reg_repr_concat")
+            masked_ones = tf.where(tf.is_inf(inpt_conc), tf.ones_like(inpt_conc, dtype=self.cfg['datatype']), inpt_conc, name="clean_inf")
             return self.tf_multiply(masked_ones)
         
     #get value from saved store 

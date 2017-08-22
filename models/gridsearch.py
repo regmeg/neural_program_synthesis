@@ -49,15 +49,16 @@ params=OrderedDict(
 '''
 
 params=OrderedDict()
-params['state_size'] = [50, 100]
+params['state_size'] = [50]
 params['num_samples'] = [1500]
 params['batch_size']  = [100]
-params['learning_rate'] = [0.005]
+params['learning_rate'] = [0.001]
+params['epsilon'] = [1e-3]
 params['loss_weight'] = [0.5]
 params['max_output_ops'] = [3]
-params['num_features'] = [3]
+params['num_features'] = [4]
 params['train_fn'] = ["np_avg_val"]
-params['model'] = ["HistoryRNN"]
+params['model'] = ["HistoryRNN", "RNN"]
 params['norm'] = [True]
 params['grad_norm'] = [10e2]
 params['clip'] = [False]

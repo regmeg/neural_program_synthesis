@@ -9,11 +9,18 @@ class NNbase(object):
     
     #share the inputs and ouputs between the RNNs as well
     with tf.name_scope("Batches"):
-        batchX_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchX")
-        batchY_placeholder = tf.placeholder(get_cfg()['datatype'], [get_cfg()['batch_size'], get_cfg()['num_features']], name="batchY")
+        batchX_placeholder = None
+        batchY_placeholder = None
     
     def __init__(self, cfg, ops):   
         self.ops = ops
+        
+        #set batches
+        if NNbase.batchX_placeholder is None:
+            NNbase.batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchX")
+        if NNbase.batchY_placeholder is None:
+            NNbase.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchY")
+        
         #model constants
         with tf.name_scope("Constants"):
             self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")

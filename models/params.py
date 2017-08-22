@@ -14,6 +14,7 @@ tf.flags.DEFINE_integer("num_samples", 1500, "num of samples to generate")
 tf.flags.DEFINE_integer("batch_size", 100, "batch size for the input")
 
 tf.flags.DEFINE_float("learning_rate", 0.005, "learnig rate for the model")
+tf.flags.DEFINE_float("epsilon", 1e-6, "learnig rate for the model")
 tf.flags.DEFINE_float("grad_norm", 10e2, "amount of normalisation for the gradient")
 tf.flags.DEFINE_integer("max_output_ops", 5, "number of output from RNN")
 tf.flags.DEFINE_float("loss_weight", 0.5, "number of output from RNN")
@@ -43,7 +44,7 @@ def get_cfg():
         samples_value_rng = (-100, 100),
         test_ratio = 0.33333,
         param_init = 0.1,
-        epsilon=1e-6,
+        epsilon= FLAGS.epsilon,
         test_cycle = 150,
         convergance_check_epochs = 1000,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
