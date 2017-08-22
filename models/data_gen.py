@@ -57,7 +57,7 @@ def split_train_test(x, y , test_ratio):
     return  x_train, x_test, y_train, y_test
 
 def shuffle_data(x,y):
-    assert len(x) == len(y)
+    assert len(x) == len(y), 'Model expects x and y shapes to be the same'
     randomize = np.arange(len(x))
     np.random.shuffle(randomize)
     return x[randomize], y[randomize]

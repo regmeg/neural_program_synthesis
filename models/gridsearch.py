@@ -18,11 +18,15 @@ def gen_cmd(cfg_dict, seed):
     string = "python3 ./model.py"
     name = " --name="
     for key, val in cfg_dict.items():
-        string += " --"+str(key)+"="+str(val)
+        if key == 'grad_clip_val':
+            string += " --"+str(key)+"_min="+str(val[0])
+            string += " --"+str(key)+"_max="+str(val[1])
+        else:
+            string += " --"+str(key)+"="+str(val)
         if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
-        name += str(val)+"_"+str(key)+"-"
+        name += str(key)+"_"+str(val)+"-"
     if seed == 0: seed = int(round(random.random()*100000))
-    name += str(seed)+"_seed"
+    name += "seed_" + str(seed)
     seed  = " --seed="+str(seed)
     return string + seed + name
 
@@ -49,13 +53,18 @@ params['state_size'] = [50, 100]
 params['num_samples'] = [1500]
 params['batch_size']  = [100]
 params['learning_rate'] = [0.005]
-params['grad_norm'] = [10e1, 10e2]
+params['loss_weight'] = [0.5]
 params['max_output_ops'] = [3]
 params['num_features'] = [3]
 params['train_fn'] = ["np_avg_val"]
-params['model'] = ["RNN"]
+params['model'] = ["HistoryRNN"]
 params['norm'] = [True]
+params['grad_norm'] = [10e2]
+params['clip'] = [False]
+#params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
 params['share_state'] = [True]
+params['rnns_same_state'] = [False]
+
 #cfg which unlinkely is going to be iterated, but still can be configured
 
 #seed
