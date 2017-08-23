@@ -39,8 +39,11 @@ class MemSel(NNbase):
                 elif cfg["state_fn"] == "relu":
                     next_state = tf.nn.relu(_add1, name="relu_next_state")
 
+                #apply dropout
+                state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = (mode is 'train'))
+                        
                 #calculate softmax and produce the mask of operations
-                logits = tf.matmul(next_state, self.params["W2_mem"], name="state_mul_W2_mem")
+                logits = tf.matmul(state_dropped, self.params["W2_mem"], name="state_mul_W2_mem")
                 logits_scaled = tf.multiply(logits, self.softmax_sat, name="sat_softmax")
                 softmax = tf.nn.softmax(logits_scaled, name="get_softmax")
 
