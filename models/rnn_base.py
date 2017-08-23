@@ -35,7 +35,11 @@ class RNN(NNbase):
 
             #calc grads and hereby the backprop step
             self.grads, self.train_step, self.norms  = self.calc_backprop(cfg)
-            
+           
+        with tf.name_scope("Summaries_const"):
+            self.variable_summaries(self.dummy_matrix)   
+        
+        '''
         #write model param and grad summaries outside of all scopes
         with tf.name_scope("Summaries_params"):
             for param, tensor in self.params.items(): self.variable_summaries(tensor)               
@@ -47,6 +51,7 @@ class RNN(NNbase):
         if cfg['norm']:
             with tf.name_scope("Summaries_norms"):
                 self.variable_summaries(self.norms)
+        '''
 
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):
@@ -70,13 +75,24 @@ class RNN(NNbase):
 
                     with tf.name_scope("Comp_softmax"):
                         input_and_state_concatenated = tf.concat([current_input, current_state], 1, name="concat_input_state")  # Increasing number of columns
-                        next_state = tf.tanh(tf.add(tf.matmul(input_and_state_concatenated, self.params["W"], name="input-state_mult_W"), self.params["b"], name="add_bias"), name="tanh_next_state")  # Broadcasted addition
-                        #next_state = tf.nn.relu(tf.add(tf.matmul(input_and_state_concatenated, W, name="input-state_mult_W"), b, name="add_bias"), name="relu_next-state")  # Broadcasted addition
+                        _mul1 = tf.matmul(input_and_state_concatenated, self.params["W"], name="input-state_mult_W")
+                        _add1 = tf.add(_mul1, self.params["b"], name="add_bias")
+                        #_add1 =_mul1
+                        if   cfg["state_fn"] == "tanh":
+                            next_state = tf.tanh(_add1, name="tanh_next_state")
+                        elif cfg["state_fn"] == "relu":
+                            next_state = tf.nn.softplus(_add1, name="relu_next_state")
+                            #next_state = tf.nn.relu(_add1) - 0.1*tf.nn.relu(-_add1)
                         current_state = next_state
-
+                        
+                        #apply dropout
+                        state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = (mode is 'train'))
+                        
                         #calculate softmax and produce the mask of operations
-                        logits = tf.add(tf.matmul(next_state, self.params["W2"], name="state_mul_W2"), self.params["b2"], name="add_bias2") #Broadcasted addition
-                        softmax = tf.nn.softmax(logits, name="get_softmax")
+                        #logits = tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2")
+                        logits = tf.add(tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2"), self.params["b2"], name="add_bias2") #Broadcasted addition
+                        logits_scaled = tf.multiply(logits, self.softmax_sat, name="sat_softmax")
+                        softmax = tf.nn.softmax(logits_scaled, name="get_softmax")
 
                         #in test change to hardmax
                         if mode is "test":

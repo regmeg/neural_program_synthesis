@@ -65,8 +65,10 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
         #Init vars:
         _W = sess.run([m.params['W']])
         _W2 = sess.run([m.params['W2']])
+        _softmax_sat = sess.run([m.softmax_sat])
         print(m.params['W'].eval())
         print(m.params['W2'].eval())
+        print(m.softmax_sat.eval())
         globalstartTime = time.time()
         for epoch_idx in range(cfg['num_epochs']):
             # reset variables
@@ -486,6 +488,48 @@ def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, pa
         last_softmax_state_test_mem = _current_state_train
         last_hardmax_state_test_mem = _current_state_test 
         
+        
+        #produce batches for reference        
+        batchesX_train = []
+        batchesY_train = []
+        
+        #FOR THE TRAINING DATA
+        for batch_idx in range(num_batches):
+                #if flag set, make op and mem selection rnn use exaclty the same state
+                if cfg['rnns_same_state'] is True:
+                    _current_state_train_mem = _current_state_train
+                    _current_state_test_mem  = _current_state_test
+            
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_train[start_idx:end_idx]
+                batchY = y_train[start_idx:end_idx]
+                
+                batchesX_train.append(batchX)
+                batchesY_train.append(batchY)
+                
+                
+        batchesX_test = []
+        batchesY_test = []
+        
+        #FOR THE TESTING DATA
+        for batch_idx in range(num_test_batches):
+            
+                #if flag set, make op and mem selection rnn use exaclty the same state
+                if cfg['rnns_same_state'] is True:
+                    _current_state_train_mem = _current_state_train
+                    _current_state_test_mem  = _current_state_test
+                    
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_test[start_idx:end_idx]
+                batchY = y_test[start_idx:end_idx]
+                
+                batchesX_test.append(batchX) 
+                batchesY_test.append(batchY) 
+        
         return dict(
                 #outputs for the train data
                 total_loss_traind_train = total_loss_traind_train,
@@ -517,7 +561,13 @@ def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, pa
                 last_softmax_state_test = last_softmax_state_test,
                 last_hardmax_state_test = last_hardmax_state_test,
                 last_softmax_state_test_mem = last_softmax_state_test_mem,
-                last_hardmax_state_test_mem = last_hardmax_state_test_mem 
+                last_hardmax_state_test_mem = last_hardmax_state_test_mem,
+            
+                #return divided up batches
+                batchesX_train = batchesX_train,
+                batchesY_train = batchesY_train,
+                batchesX_test = batchesX_test,
+                batchesY_test = batchesY_test
         )
 
 def predict_form_sess(m, cfg, x, state, state_mem, path, mode="hard"):
@@ -766,3 +816,277 @@ def run_session_HistoryRNN(m, cfg, x_train, x_test, y_train, y_test):
                 else:
                     print("Reseting the loss conv array")
                     last_train_losses = []
+                    
+def restore_selection_matrixes_HistoryRNNS(m, cfg, x_train, x_test, y_train, y_test, path):
+    #create a saver to save the trained model
+    saver=tf.train.Saver(var_list=tf.trainable_variables())
+    #Enable jit
+    config = tf.ConfigProto()
+    config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+    #def batches num
+    num_batches = x_train.shape[0]//cfg['batch_size']
+    num_test_batches = x_test.shape[0]//cfg['batch_size']
+    print("num batches train:", num_batches)
+    print("num batches test:", num_test_batches)
+    with tf.Session(config=config) as sess:
+        ##enable debugger if necessary
+        if (cfg['debug']):
+            print("Running in a debug mode")
+            sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+            sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
+
+        #init the var
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, tf.train.latest_checkpoint(path))
+        
+
+        #get soft and hardmaxes out of the model for the last batches
+        total_loss_traind_train = []
+        
+        outputs_traind_train_op = []
+        outputs_traind_train_mem = []
+        
+        softmaxes_traind_train_op = []
+        softmaxes_traind_train_mem = []
+        
+        total_loss_traind_test = []
+        
+        outputs_traind_test_op = []
+        outputs_traind_test_mem = []
+        
+        softmaxes_traind_test_op = []
+        softmaxes_traind_test_mem = []
+
+        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+    
+
+        #FOR THE TRAINING DATA
+        for batch_idx in range(num_batches):
+                #if flag set, make op and mem selection rnn use exaclty the same state
+                if cfg['rnns_same_state'] is True:
+                    _current_state_train_mem = _current_state_train
+                    _current_state_test_mem  = _current_state_test
+            
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_train[start_idx:end_idx]
+                batchY = y_train[start_idx:end_idx]
+
+               
+                
+                #FOR THE SOFTMAX SELECTION
+                _total_loss_traind_train,\
+                _outputs_traind_train_op,\
+                _outputs_traind_train_mem,\
+                _softmaxes_traind_train_op,\
+                _softmaxes_traind_train_mem,\
+                _current_state_train     = sess.run([m.total_loss_train,
+                                                     m.train["outputs_op"],
+                                                     m.train["outputs_mem"],
+                                                     m.train["softmaxes_op"],
+                                                     m.train["softmaxes_mem"],
+                                                     m.train["current_state"]],
+                                                
+                                                
+                feed_dict={
+                    m.init_state:_current_state_train,
+                    m.batchX_placeholder:batchX,
+                    m.batchY_placeholder:batchY
+                })
+                total_loss_traind_train.append(_total_loss_traind_train)
+                outputs_traind_train_op.append(_outputs_traind_train_op)
+                outputs_traind_train_mem.append(_outputs_traind_train_mem)
+                softmaxes_traind_train_op.append(_softmaxes_traind_train_op)
+                softmaxes_traind_train_mem.append(_softmaxes_traind_train_mem)
+                
+                #FOR THE HARDMAX SELECTION
+                _total_loss_traind_test,\
+                _outputs_traind_test_op,\
+                _outputs_traind_test_mem,\
+                _softmaxes_traind_test_op,\
+                _softmaxes_traind_test_mem,\
+                _current_state_test      = sess.run([m.total_loss_test,
+                                                     m.test["outputs_op"],
+                                                     m.test["outputs_mem"],
+                                                     m.test["softmaxes_op"],
+                                                     m.test["softmaxes_mem"],
+                                                     m.test["current_state"]],
+                    feed_dict={
+                        m.init_state:_current_state_test,
+                        m.batchX_placeholder:batchX,
+                        m.batchY_placeholder:batchY
+                    })
+                total_loss_traind_test.append(_total_loss_traind_test)
+                outputs_traind_test_op.append(_outputs_traind_test_op)
+                outputs_traind_test_mem.append(_outputs_traind_test_mem)
+                softmaxes_traind_test_op.append(_softmaxes_traind_test_op)
+                softmaxes_traind_test_mem.append(_softmaxes_traind_test_mem)
+                
+        
+        last_softmax_state_train = _current_state_train
+        last_hardmax_state_train = _current_state_test 
+        
+        #produce results ith with the testing data
+        total_loss_testd_train = []
+        
+        outputs_testd_train_op = []
+        outputs_testd_train_mem = []
+        
+        softmaxes_testd_train_op = []
+        softmaxes_testd_train_mem = []
+        
+        total_loss_testd_test = []
+        
+        outputs_testd_test_op =[]
+        outputs_testd_test_mem =[]
+        
+        softmaxes_testd_test_op =[]
+        softmaxes_testd_test_mem =[]
+        
+        if cfg['share_state'] is False:
+            _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+        
+        #FOR THE TESTING DATA
+        for batch_idx in range(num_test_batches):
+            
+                #if flag set, make op and mem selection rnn use exaclty the same state
+                if cfg['rnns_same_state'] is True:
+                    _current_state_train_mem = _current_state_train
+                    _current_state_test_mem  = _current_state_test
+                    
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_test[start_idx:end_idx]
+                batchY = y_test[start_idx:end_idx]
+                
+                #FOR THE SOFTMAX SELECTION
+                _total_loss_testd_train,\
+                _outputs_testd_train_op,\
+                _outputs_testd_train_mem,\
+                _softmaxes_testd_train_op,\
+                _softmaxes_testd_train_mem,\
+                _current_state_train     = sess.run([m.total_loss_train,
+                                                     m.train["outputs_op"],
+                                                     m.train["outputs_mem"],
+                                                     m.train["softmaxes_op"],
+                                                     m.train["softmaxes_mem"],
+                                                     m.train["current_state"]],
+                feed_dict={
+                    m.init_state:_current_state_train,
+                    m.batchX_placeholder:batchX,
+                    m.batchY_placeholder:batchY
+                })
+                total_loss_testd_train.append(_total_loss_testd_train)
+                outputs_testd_train_op.append(_outputs_testd_train_op)
+                outputs_testd_train_mem.append(_outputs_testd_train_mem)
+                softmaxes_testd_train_op.append(_softmaxes_testd_train_op)
+                softmaxes_testd_train_mem.append(_softmaxes_testd_train_mem)
+                
+                #FOR THE HARDMAX SELECTION
+                _total_loss_testd_test,\
+                _outputs_testd_test_op,\
+                _outputs_testd_test_mem,\
+                _softmaxes_testd_test_op,\
+                _softmaxes_testd_test_mem,\
+                _current_state_test      = sess.run([m.total_loss_test,
+                                                     m.test["outputs_op"],
+                                                     m.test["outputs_mem"],
+                                                     m.test["softmaxes_op"],
+                                                     m.test["softmaxes_mem"],
+                                                     m.test["current_state"]],
+                                
+                    feed_dict={
+                        m.init_state:_current_state_test,
+                        m.batchX_placeholder:batchX,
+                        m.batchY_placeholder:batchY
+                    })
+                total_loss_testd_test.append(_total_loss_testd_test)
+                outputs_testd_test_op.append(_outputs_testd_test_op)
+                outputs_testd_test_mem.append(_outputs_testd_test_mem)
+                softmaxes_testd_test_op.append(_softmaxes_testd_test_op)
+                softmaxes_testd_test_mem.append(_softmaxes_testd_test_mem)
+                
+        last_softmax_state_test = _current_state_train
+        last_hardmax_state_test = _current_state_test
+        
+        #produce batches for reference
+        
+        batchesX_train = []
+        batchesY_train = []
+        
+        #FOR THE TRAINING DATA
+        for batch_idx in range(num_batches):
+                #if flag set, make op and mem selection rnn use exaclty the same state
+                if cfg['rnns_same_state'] is True:
+                    _current_state_train_mem = _current_state_train
+                    _current_state_test_mem  = _current_state_test
+            
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_train[start_idx:end_idx]
+                batchY = y_train[start_idx:end_idx]
+                
+                batchesX_train.append(batchX)
+                batchesY_train.append(batchY)
+                
+                
+        batchesX_test = []
+        batchesY_test = []
+        
+        #FOR THE TESTING DATA
+        for batch_idx in range(num_test_batches):
+            
+                #if flag set, make op and mem selection rnn use exaclty the same state
+                if cfg['rnns_same_state'] is True:
+                    _current_state_train_mem = _current_state_train
+                    _current_state_test_mem  = _current_state_test
+                    
+                start_idx = cfg['batch_size'] * batch_idx
+                end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
+
+                batchX = x_test[start_idx:end_idx]
+                batchY = y_test[start_idx:end_idx]
+                
+                batchesX_test.append(batchX) 
+                batchesY_test.append(batchY) 
+                
+        return dict(
+                #outputs for the train data
+                total_loss_traind_train = total_loss_traind_train,
+                outputs_traind_train = outputs_traind_train_op,
+                outputs_traind_train_mem = outputs_traind_train_mem,
+                softmaxes_traind_train = softmaxes_traind_train_op,
+                softmaxes_traind_train_mem = softmaxes_traind_train_mem,
+                total_loss_traind_test = total_loss_traind_test,
+                outputs_traind_test = outputs_traind_test_op,
+                outputs_traind_test_mem = outputs_traind_test_mem,
+                softmaxes_traind_test = softmaxes_traind_test_op,
+                softmaxes_traind_test_mem = softmaxes_traind_test_mem,
+                last_softmax_state_train = last_softmax_state_train,
+                last_hardmax_state_train = last_hardmax_state_train,
+            
+                #outputs for the testing data
+                total_loss_testd_train = total_loss_testd_train,
+                outputs_testd_train = outputs_testd_train_op,
+                outputs_testd_train_mem = outputs_testd_train_mem,
+                softmaxes_testd_train = softmaxes_testd_train_op,
+                softmaxes_testd_train_mem = softmaxes_testd_train_mem,
+                total_loss_testd_test = total_loss_testd_test,
+                outputs_testd_test = outputs_testd_test_op,
+                outputs_testd_test_mem = outputs_testd_test_mem,
+                softmaxes_testd_test = softmaxes_testd_test_op,
+                softmaxes_testd_test_mem = softmaxes_testd_test_mem,
+                last_softmax_state_test = last_softmax_state_test,
+                last_hardmax_state_test = last_hardmax_state_test,
+            
+                #return divided up batches
+                batchesX_train = batchesX_train,
+                batchesY_train = batchesY_train,
+                batchesX_test = batchesX_test,
+                batchesY_test = batchesY_test
+        )

@@ -16,6 +16,8 @@ class OpSel(NNbase):
             #model parameters
             with tf.name_scope("Params"):
                 self.params["W_op"] = tf.Variable(tf.truncated_normal([cfg['state_size']+cfg['num_features'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W_op")
+                self.params["b_op"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_op")
+                
                 self.params["W2_op"] = tf.Variable(tf.truncated_normal([cfg['state_size'], self.ops.num_of_ops], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2_op")
 
 
@@ -24,11 +26,17 @@ class OpSel(NNbase):
         with tf.name_scope("Op_Sel_"+mode):
                     with tf.name_scope("Comp_softmax"):
                         input_and_state_concatenated = tf.concat([batchX, state], 1, name="concat_input_state")  # Increasing number of columns
-                        next_state = tf.tanh(tf.matmul(input_and_state_concatenated, self.params["W_op"], name="input-state_mult_W"), name="tanh_next_state_op")
+                        _mul1 = tf.matmul(input_and_state_concatenated, self.params["W_op"], name="input-state_mult_W")
+                        _add1 = tf.add(_mul1, self.params["b_op"], name="add_bias")
+                        if   cfg["state_fn"] == "tanh":
+                            next_state = tf.tanh(_add1, name="tanh_next_state")
+                        elif cfg["state_fn"] == "relu":
+                            next_state = tf.nn.relu(_add1, name="relu_next_state")
 
                         #calculate softmax and produce the mask of operations
                         logits = tf.matmul(next_state, self.params["W2_op"], name="state_mul_W2") #Broadcasted addition
-                        softmax = tf.nn.softmax(logits, name="get_softmax")
+                        logits_scaled = tf.multiply(logits, self.softmax_sat, name="sat_softmax")
+                        softmax = tf.nn.softmax(logits_scaled, name="get_softmax")
 
                         #in test change to hardmax
                         if mode is "test":

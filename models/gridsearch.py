@@ -21,10 +21,11 @@ def gen_cmd(cfg_dict, seed):
         if key == 'grad_clip_val':
             string += " --"+str(key)+"_min="+str(val[0])
             string += " --"+str(key)+"_max="+str(val[1])
+            name += str(key)+"_"+str(val[0])+"_"+str(val[1])+"-"
         else:
             string += " --"+str(key)+"="+str(val)
-        if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
-        name += str(key)+"_"+str(val)+"-"
+            if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
+            name += str(key)+"_"+str(val)+"-"
     if seed == 0: seed = int(round(random.random()*100000))
     name += "seed_" + str(seed)
     seed  = " --seed="+str(seed)
@@ -50,21 +51,24 @@ params=OrderedDict(
 
 params=OrderedDict()
 params['state_size'] = [50]
-params['num_samples'] = [1500]
-params['batch_size']  = [100]
+params['num_samples'] = [2500]
+params['batch_size']  = [100, 500]
 params['learning_rate'] = [0.001]
 params['epsilon'] = [1e-3]
 params['loss_weight'] = [0.5]
 params['max_output_ops'] = [3]
-params['num_features'] = [4]
+params['num_features'] = [10]
 params['train_fn'] = ["np_avg_val"]
 params['model'] = ["HistoryRNN", "RNN"]
 params['norm'] = [True]
 params['grad_norm'] = [10e2]
+#params['softmax_sat'] = [1.0, 100.0, 1000.0]
+params['softmax_sat'] = [1] #cant go more than 10, gradients start to overflow
 params['clip'] = [False]
 #params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
 params['share_state'] = [True]
 params['rnns_same_state'] = [False]
+params['state_fn'] = ["relu", "tanh"]
 
 #cfg which unlinkely is going to be iterated, but still can be configured
 

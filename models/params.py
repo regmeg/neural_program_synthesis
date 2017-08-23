@@ -18,10 +18,13 @@ tf.flags.DEFINE_float("epsilon", 1e-6, "learnig rate for the model")
 tf.flags.DEFINE_float("grad_norm", 10e2, "amount of normalisation for the gradient")
 tf.flags.DEFINE_integer("max_output_ops", 5, "number of output from RNN")
 tf.flags.DEFINE_float("loss_weight", 0.5, "number of output from RNN")
+tf.flags.DEFINE_float("softmax_sat", 1, "number of output from RNN")
+tf.flags.DEFINE_float("drop_rate", 0.15, "dropout rate")
 
 tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
 tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")
 tf.flags.DEFINE_string("model", "RNN", "what model to use for training")
+tf.flags.DEFINE_string("state_fn", "tanh", "what state activation func to use")
 tf.flags.DEFINE_boolean("share_state", True, "weather to share RNN state between training and testing stages")
 tf.flags.DEFINE_boolean("rnns_same_state", False, "weather op and Mem RNNs are set to the same state before back and forward prop")
 
@@ -55,11 +58,13 @@ def get_cfg():
         num_samples = FLAGS.num_samples,
         batch_size  = FLAGS.batch_size,
 
+        drop_rate = FLAGS.drop_rate,
         learning_rate = FLAGS.learning_rate,
         grad_norm = FLAGS.grad_norm,
         max_output_ops = FLAGS.max_output_ops,
         loss_weight = FLAGS.loss_weight,
         rnns_same_state = FLAGS.rnns_same_state,
+        softmax_sat = FLAGS.softmax_sat,
         
         num_features = FLAGS.num_features,
         train_fn = eval("data_gen."+FLAGS.train_fn),
@@ -70,6 +75,8 @@ def get_cfg():
         grad_clip_val_max = FLAGS.grad_clip_val_max,
         grad_clip_val_min = FLAGS.grad_clip_val_min,
         
+        state_fn = FLAGS.state_fn,
+        
         seed = FLAGS.seed,
         name = FLAGS.name,
         debug = FLAGS.debug
@@ -78,7 +85,8 @@ def get_cfg():
     global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']
     
     #couple of quick cfg checks
-    assert global_cfg['norm'] is not global_cfg['clip'], 'cant norm and clip at the same time'
+    if global_cfg['norm'] is True or global_cfg['norm'] is True:
+        assert global_cfg['norm'] is not global_cfg['clip'], 'cant norm and clip at the same time'
     if global_cfg['clip']:
         assert global_cfg['grad_clip_val_max'] >= global_cfg['grad_clip_val_min'], 'max clip val cannot be smaller than min'
     

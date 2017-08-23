@@ -23,7 +23,7 @@ class HistoryRNN(NNbase):
             #model parameters
             with tf.name_scope("Params"):
                 self.params["W_hist"] = tf.Variable(tf.truncated_normal([3*cfg['state_size'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W_hist")
-
+                self.params["b_hist"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_hist")
 
             #create graphs for forward pass to soft and hard selection
             self.train = self.run_forward_pass(cfg, mode = "train")
@@ -78,8 +78,14 @@ class HistoryRNN(NNbase):
                     
                     with tf.name_scope("Comp_state"):
                         input_and_state_concatenated = tf.concat([c_op_mem, current_state], 1, name="concat_input_state")
-                        # Increasing number of columns
-                        next_state = tf.tanh(tf.matmul(input_and_state_concatenated, self.params["W_hist"], name="input-state_mult_W"), name="tanh_next_state") 
+                        
+                        _mul1 = tf.matmul(input_and_state_concatenated, self.params["W_hist"], name="input-state_mult_W")
+                        _add1 = tf.add(_mul1, self.params["b_hist"], name="add_bias")
+                        if   cfg["state_fn"] == "tanh":
+                            next_state = tf.tanh(_add1, name="tanh_next_state")
+                        elif cfg["state_fn"] == "relu":
+                            next_state = tf.nn.relu(_add1, name="relu_next_state")
+  
                         states_h.append(next_state)
                         current_state = next_state
                         output = op_sel

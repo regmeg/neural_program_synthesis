@@ -18,6 +18,12 @@ def main():
     #get the global configuration
     cfg = get_cfg()
     
+    #instantiate containter with the operations avail for the selection
+    ops = Operations(cfg)
+    
+    #save ops as obj
+    cfg["used_ops_obj"] = ops.ops
+    
     #craete log and dumpl globals
     try:
         os.makedirs('./summaries/' + cfg['dst'])
@@ -37,9 +43,6 @@ def main():
     print("#############################")
     #sys.stdout = stdout_org
 
-
-    #instantiate containter with the operations avail for the selection
-    ops = Operations(cfg)
     #generate data 
     x,y = samples_generator(cfg['train_fn'], (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])
     x_train, x_test, y_train, y_test = split_train_test (x, y , cfg['test_ratio'])

@@ -23,8 +23,8 @@ class NNbase(object):
         
         #model constants
         with tf.name_scope("Constants"):
-            self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")
-
+            self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")            
+            self.softmax_sat = tf.constant(np.full((cfg['batch_size'], 1), cfg['softmax_sat']), dtype=cfg['datatype'], name="softmax_sat") 
 
     def select_op(self,current_input,mem_selection, softmax, cfg):
             #######################
@@ -112,6 +112,8 @@ class NNbase(object):
             train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), name="min_loss")
             print("grads are")
             print(grads)
+            print("norm is ")
+            print(norms)
             return grads, train_step, norms
     
     def variable_summaries(self, var, name=None):
