@@ -35,11 +35,7 @@ class RNN(NNbase):
 
             #calc grads and hereby the backprop step
             self.grads, self.train_step, self.norms  = self.calc_backprop(cfg)
-           
-        with tf.name_scope("Summaries_const"):
-            self.variable_summaries(self.dummy_matrix)   
-        
-        '''
+
         #write model param and grad summaries outside of all scopes
         with tf.name_scope("Summaries_params"):
             for param, tensor in self.params.items(): self.variable_summaries(tensor)               
@@ -51,7 +47,6 @@ class RNN(NNbase):
         if cfg['norm']:
             with tf.name_scope("Summaries_norms"):
                 self.variable_summaries(self.norms)
-        '''
 
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):

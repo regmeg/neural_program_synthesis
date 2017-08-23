@@ -5,8 +5,8 @@ class Operations:
 
     def __init__(self, cfg):
         self.cfg = cfg
-        self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_input_mem_concat, self.tf_add]
-        #self.ops = [self.tf_add, self.tf_multiply, self.tf_stall, self.tf_input_mem_concat]
+        self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add]
+        #self.ops = [self.tf_add, self.tf_multiply, self.tf_stall, self.tf_inpt_len, self.tf_divide]
         self.num_of_ops = len(self.ops)
 
     #model operations
@@ -16,14 +16,16 @@ class Operations:
             result = tf.reduce_sum(inpt, axis = 1, name = "add")
             reshape = tf.reshape(result, [self.cfg['batch_size'], -1], name = "reshape")
             pad_res = tf.pad(reshape, [[0,0],[0,self.cfg['num_features'] - 1]], "CONSTANT", name="pad")
-            return  pad_res
+            masked_ones = self.clean_infs(pad_res)
+            return  masked_ones
     
     def tf_multiply(self ,inpt, mem_sel=None):
         with tf.name_scope("tf_multiply"):
             result = tf.reduce_prod(inpt, axis = 1, name = "mult")
             reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
             pad_res = tf.pad(reshape, [[0,0],[0,self.cfg['num_features'] - 1]], "CONSTANT", name="pad")
-            return pad_res
+            masked_ones = self.clean_infs(pad_res)
+            return masked_ones
 
     #stall operation is simply simulated as returning the input back
     def tf_stall(self, inpt, mem_sel=None):
@@ -32,6 +34,7 @@ class Operations:
             return  reshape
     
     #get input lenght, asssing all values to ones and then reduce
+    '''
     def tf_inpt_len(self,inpt, mem_sel=None):
             with tf.name_scope("tf_inpt_len"):
                 masked_zeros = tf.where( tf.equal(inpt,tf.zeros_like(inpt, dtype=self.cfg['datatype'])), tf.ones_like(inpt, dtype=self.cfg['datatype']), inpt, name="clean_zeros")
@@ -40,28 +43,36 @@ class Operations:
                 reshape = tf.reshape(result, [self.cfg['batch_size'], -1], name = "reshape")
                 pad_res = tf.pad(reshape, [[0,0],[0,self.cfg['num_features'] - 1]], "CONSTANT", name="pad")
                 return  pad_res
-    
+    '''
+    def tf_inpt_len(self,inpt, mem_sel=None):
+        with tf.name_scope("tf_inpt_len"):
+            feat = tf.constant(np.full((self.cfg['batch_size'], 1), self.cfg['num_features']), dtype=self.cfg['datatype'], name="num_fe_const")
+            pad_res = tf.pad(feat, [[0,0],[0,self.cfg['num_features'] - 1]], "CONSTANT", name="pad")
+            return  pad_res
     #divide selected delected numbers in the row, convetion is:
     # only the first elem can be 0, other zeros are replaced with ones, so that no infs are produced
     #the division is achieved by keeping the first elem as it is and then producing repriocals for all the rest, hence the reductions produces division
+    '''
     def tf_divide(self, inpt, mem_sel=None):
         with tf.name_scope("tf_divide"):
             repriocal = tf.reciprocal(inpt, name="reciprocal")
             reg_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="regular_slice")
             repr_slice = tf.slice(repriocal, [0,1], [self.cfg['batch_size'], self.cfg['num_features']-1], name="repriocal_slice")
             inpt_conc  = tf.concat([reg_slice, repr_slice],1, name="reg_repr_concat")
-            masked_ones = tf.where(tf.is_inf(inpt_conc), tf.ones_like(inpt_conc, dtype=self.cfg['datatype']), inpt_conc, name="clean_inf")
+            masked_ones = self.clean_infs(inpt_conc)
             return self.tf_multiply(masked_ones)
-        
-    #get value from saved store 
-    def tf_input_mem_concat(self, inpt, mem_sel=None):
-        with tf.name_scope("tf_input_mem_concat"):
-            #inpt_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="tf_inp_mem_cnt_slice1")
+    ''' 
+    def tf_divide(self, inpt, mem_sel=None):
+        with tf.name_scope("tf_divide"):
+            inpt_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="inpt_slice")
             mem_slice = tf.slice(mem_sel, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
-            pad_res = tf.pad(mem_slice, [[0,0],[1,self.cfg['num_features'] - 2]], "CONSTANT", name="pad")
-            return  tf.add(inpt, pad_res, name="add")
+            result = tf.divide(inpt_slice, mem_slice)
+            reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
+            pad_res = tf.pad(reshape, [[0,0],[0,self.cfg['num_features'] - 1]], "CONSTANT", name="pad")
+            masked_ones = self.clean_infs(pad_res)
+            return masked_ones
     
-    ######helper functions######
+    ######helper functions., which are private######
     def not_zero(self, inpt, mem_sel=None):
         with tf.name_scope("not_zero"):
             greater = tf.greater(inpt,tf.zeros_like(inpt, dtype=self.cfg['datatype']))
@@ -74,5 +85,15 @@ class Operations:
         with tf.name_scope("Select_mem"):
              return tf.add(inpt, mem_sel)
 
-
+    def clean_infs(self,inpt, mem_sel=None):
+        with tf.name_scope("clean_infs"):
+            clean = tf.where(tf.is_inf(inpt), tf.ones_like(inpt, dtype=self.cfg['datatype']), inpt, name="clean")
+            return clean
+        
+    def tf_input_mem_concat(self, inpt, mem_sel=None):
+        with tf.name_scope("tf_input_mem_concat"):
+            #inpt_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="tf_inp_mem_cnt_slice1")
+            mem_slice = tf.slice(mem_sel, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
+            pad_res = tf.pad(mem_slice, [[0,0],[1,self.cfg['num_features'] - 2]], "CONSTANT", name="pad")
+            return  tf.add(inpt, pad_res, name="add")
     
