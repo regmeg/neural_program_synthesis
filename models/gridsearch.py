@@ -50,24 +50,26 @@ params=OrderedDict(
 '''
 
 params=OrderedDict()
-params['state_size'] = [50, 100]
-params['num_samples'] = [2500]
-params['batch_size']  = [100]
+params['state_size'] = [500]
+params['num_samples'] = [3500]
+params['batch_size']  = [500]
 params['learning_rate'] = [0.001]
 params['epsilon'] = [1e-3]
 params['loss_weight'] = [0.5]
-params['max_output_ops'] = [2]
+params['max_output_ops'] = [5]
 params['num_features'] = [10]
 params['train_fn'] = ["np_avg_val"]
-params['model'] = ["HistoryRNN", "RNN"]
+#params['model'] = ["HistoryRNN", "RNN"]
+params['model'] = ["RNN"]
 params['norm'] = [True]
 params['grad_norm'] = [10e2]
 #params['softmax_sat'] = [1.0, 100.0, 1000.0]
-params['softmax_sat'] = [1] #cant go more than 10, gradients start to overflow
+params['softmax_sat'] = [10, 50, 100] #cant go more than 10, gradients start to overflow
 params['clip'] = [False]
 #params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
 params['share_state'] = [True]
 params['rnns_same_state'] = [False]
+#params['state_fn'] = ["relu", "tanh"]
 params['state_fn'] = ["relu", "tanh"]
 
 #cfg which unlinkely is going to be iterated, but still can be configured
