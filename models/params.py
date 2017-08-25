@@ -20,7 +20,7 @@ tf.flags.DEFINE_integer("max_output_ops", 5, "number of output from RNN")
 tf.flags.DEFINE_float("loss_weight", 0.5, "number of output from RNN")
 tf.flags.DEFINE_float("softmax_sat", 1, "number of output from RNN")
 tf.flags.DEFINE_float("drop_rate", 0.15, "dropout rate")
-tf.flags.DEFINE_float("smax_pen_r", 0.6, "sofmax penalty rate")
+tf.flags.DEFINE_float("smax_pen_r", 0.1, "sofmax penalty rate")
 
 tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
 tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")

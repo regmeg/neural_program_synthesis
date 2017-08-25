@@ -98,7 +98,10 @@ class NNbase(object):
                 sofmax_penalty = 0
             #calc total error
             with tf.name_scope("Total_loss_comp"):
-                total_loss = tf.reduce_sum(math_error, name="red_math_loss") + cfg["smax_pen_r"]*sofmax_penalty
+                max_error_tot = tf.reduce_sum(math_error, name="red_math_loss")
+                #make it propotionate to the math error, if math error is small, penelise it less
+                sofmax_pen_r = tf.sigmoid( (max_error_tot/2000) - 10) * cfg["smax_pen_r"]
+                total_loss =  max_error_tot + sofmax_pen_r*sofmax_penalty
         return total_loss, math_error
 
     def calc_backprop(self, cfg):

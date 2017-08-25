@@ -51,7 +51,7 @@ params=OrderedDict(
 
 params=OrderedDict()
 params['state_size'] = [400, 400]
-params['num_samples'] = [3500]
+params['num_samples'] = [2500]
 params['batch_size']  = [100]
 params['learning_rate'] = [0.001]
 params['epsilon'] = [1e-3]
@@ -72,7 +72,7 @@ params['rnns_same_state'] = [False]
 #params['state_fn'] = ["relu", "tanh"]
 params['state_fn'] = ["relu"]
 params['pen_sofmax'] = [True]
-params['smax_pen_r'] = [0.05, 0.2, 0.6]
+params['smax_pen_r'] = [10, 40]
 #cfg which unlinkely is going to be iterated, but still can be configured
 
 #seed
