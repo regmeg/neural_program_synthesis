@@ -5,6 +5,7 @@ class Operations:
 
     def __init__(self, cfg):
         self.cfg = cfg
+        #self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add]
         self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall]
         #self.ops = [self.tf_add, self.tf_multiply, self.tf_stall, self.tf_inpt_len, self.tf_divide]
         self.num_of_ops = len(self.ops)

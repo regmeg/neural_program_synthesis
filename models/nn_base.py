@@ -84,11 +84,21 @@ class NNbase(object):
 
     #cost function
     def calc_loss(self,cfg, output, mode="train"):
-        #reduced_output = tf.reshape( tf.reduce_sum(output, axis = 1, name="red_output"), [batch_size, -1], name="resh_red_output")
+        
         with tf.name_scope("Loss_comp_"+mode):        
-            math_error = tf.multiply(tf.constant(cfg['loss_weight'], dtype=cfg['datatype']), tf.square(tf.subtract(output , self.batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
-
-            total_loss = tf.reduce_sum(math_error, name="red_total_loss")
+            #calc math error
+            with tf.name_scope("math_error"):
+                math_error = tf.multiply(tf.constant(cfg['loss_weight'], dtype=cfg['datatype']), tf.square(tf.subtract(output , self.batchY_placeholder, name="sub_otput_batchY"), name="squar_error"), name="mult_with_0.5")
+            #calc sofmax penalties
+            if mode == "train" and cfg["pen_sofmax"]:
+                sofmax_op_pen = [self.skewed_sig_dev(smax, num_ops = self.ops.num_of_ops) for smax in self.train['softmaxes']]
+                sofmax_mem_pen = [self.skewed_sig_dev(smax, num_ops = self.ops.num_of_ops) for smax in self.train['softmaxes_mem']]
+                sofmax_penalty = tf.reduce_sum(sofmax_op_pen, name="red_sofmax_op_pen") + tf.reduce_sum(sofmax_mem_pen, name="red_sofmax_mem_pen")
+            else :
+                sofmax_penalty = 0
+            #calc total error
+            with tf.name_scope("Total_loss_comp"):
+                total_loss = tf.reduce_sum(math_error, name="red_math_loss") + cfg["smax_pen_r"]*sofmax_penalty
         return total_loss, math_error
 
     def calc_backprop(self, cfg):
@@ -115,6 +125,17 @@ class NNbase(object):
             print("norm is ")
             print(norms)
             return grads, train_step, norms
+        
+    #funciton for calculating sofmax loss - idea there is to penelise the most if all sofmaxes are the same, that if they are all 1/nump of ops, and have the least penelty for sofmaxes that are 1 or 0
+    def skewed_sig_dev(self, x, num_ops = 3, scale = 10):
+        with tf.name_scope("softmax_pen"):
+            worst_case = 1 / num_ops
+            shifted_x = x - worst_case + 0.02
+            scaled_x = scale*shifted_x
+            nom = scale*tf.exp(-scaled_x)+scale*num_ops*tf.exp(-num_ops*scaled_x)
+            denom = tf.square(tf.exp(-scaled_x) + 1)*tf.square(tf.exp(-(num_ops-1)*scaled_x) + 1)
+            res = nom/denom
+            return worst_case*((res)*scale**3)
     
     def variable_summaries(self, var, name=None):
         """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""        

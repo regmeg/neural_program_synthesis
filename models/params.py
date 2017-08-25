@@ -20,18 +20,21 @@ tf.flags.DEFINE_integer("max_output_ops", 5, "number of output from RNN")
 tf.flags.DEFINE_float("loss_weight", 0.5, "number of output from RNN")
 tf.flags.DEFINE_float("softmax_sat", 1, "number of output from RNN")
 tf.flags.DEFINE_float("drop_rate", 0.15, "dropout rate")
+tf.flags.DEFINE_float("smax_pen_r", 0.6, "sofmax penalty rate")
 
 tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
 tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")
 tf.flags.DEFINE_string("model", "RNN", "what model to use for training")
 tf.flags.DEFINE_string("state_fn", "tanh", "what state activation func to use")
-tf.flags.DEFINE_boolean("share_state", True, "weather to share RNN state between training and testing stages")
+tf.flags.DEFINE_boolean("share_state", True, "whether to share RNN state between training and testing stages")
 tf.flags.DEFINE_boolean("rnns_same_state", False, "weather op and Mem RNNs are set to the same state before back and forward prop")
 
 tf.flags.DEFINE_boolean("norm", True, "weather to norm grads")
 tf.flags.DEFINE_boolean("clip", False, "weather to clip grads")
 tf.flags.DEFINE_float("grad_clip_val_max", 10e3, "grad_clip_val_max")
 tf.flags.DEFINE_float("grad_clip_val_min", -10e3, "grad_clip_val_min")
+
+tf.flags.DEFINE_boolean("pen_sofmax", True, "whether to compute sofmax penalties")
 
 
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
@@ -65,6 +68,9 @@ def get_cfg():
         loss_weight = FLAGS.loss_weight,
         rnns_same_state = FLAGS.rnns_same_state,
         softmax_sat = FLAGS.softmax_sat,
+        
+        pen_sofmax = FLAGS.pen_sofmax,
+        smax_pen_r = FLAGS.smax_pen_r,
         
         num_features = FLAGS.num_features,
         train_fn = eval("data_gen."+FLAGS.train_fn),
