@@ -16,8 +16,8 @@ def np_stall(vec):
 def np_avg_val(vec):
     return np.average(vec)
 
-def np_scale_by_avg(vec):
-    return numpy.divide(vec, np.average(vec))
+def np_center(vec):
+    return np.subtract(vec, np.average(vec))
 
 def samples_generator(fn, shape, rng, seed):
     '''

@@ -72,7 +72,14 @@ class Operations:
             pad_res = tf.pad(reshape, [[0,0],[0,self.cfg['num_features'] - 1]], "CONSTANT", name="pad")
             masked_ones = self.clean_infs(pad_res)
             return masked_ones
-    
+        
+    #elemntwise broadcasted substractions of inputs with mem selection
+    def tf_sub(self, inpt, mem_sel=None):
+        with tf.name_scope("tf_sub"):
+            mem_slice = tf.slice(mem_sel, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
+            result = tf.subtract(inpt,  mem_slice,  name="sub_inpt_mem_slice")
+            reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
+            return reshape
     ######helper functions., which are private######
     def not_zero(self, inpt, mem_sel=None):
         with tf.name_scope("not_zero"):

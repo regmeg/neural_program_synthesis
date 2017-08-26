@@ -21,6 +21,8 @@ tf.flags.DEFINE_float("loss_weight", 0.5, "number of output from RNN")
 tf.flags.DEFINE_float("softmax_sat", 1, "number of output from RNN")
 tf.flags.DEFINE_float("drop_rate", 0.15, "dropout rate")
 tf.flags.DEFINE_float("smax_pen_r", 0.1, "sofmax penalty rate")
+tf.flags.DEFINE_float("test_ratio", 0.33333, "test train data split ratio")
+tf.flags.DEFINE_integer("loss_swap_per", 50, "periodicity of using just softmax penallty or math_error+softmax_r*smax_pen")
 
 tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
 tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")
@@ -48,10 +50,11 @@ def get_cfg():
         total_num_epochs = 10000000,
         iters_per_epoch = 1,
         samples_value_rng = (-100, 100),
-        test_ratio = 0.33333,
+        test_ratio = FLAGS.test_ratio,
         param_init = 0.1,
         epsilon= FLAGS.epsilon,
-        test_cycle = 150,
+        test_cycle = 2,
+        #test_cycle = 150,
         convergance_check_epochs = 1000,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
         datatype = tf.float64,
@@ -82,6 +85,7 @@ def get_cfg():
         grad_clip_val_min = FLAGS.grad_clip_val_min,
         
         state_fn = FLAGS.state_fn,
+        loss_swap_per = FLAGS.loss_swap_per,
         
         seed = FLAGS.seed,
         name = FLAGS.name,

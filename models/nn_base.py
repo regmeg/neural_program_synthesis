@@ -11,6 +11,7 @@ class NNbase(object):
     with tf.name_scope("Batches"):
         batchX_placeholder = None
         batchY_placeholder = None
+        use_both_losses = None
     
     def __init__(self, cfg, ops):   
         self.ops = ops
@@ -20,6 +21,8 @@ class NNbase(object):
             NNbase.batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchX")
         if NNbase.batchY_placeholder is None:
             NNbase.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchY")
+        if NNbase.use_both_losses is None:
+            NNbase.use_both_losses = tf.placeholder(dtype=tf.bool, name='use_both_penalty_and_math_loss')
         
         #model constants
         with tf.name_scope("Constants"):
@@ -100,9 +103,16 @@ class NNbase(object):
             with tf.name_scope("Total_loss_comp"):
                 max_error_tot = tf.reduce_sum(math_error, name="red_math_loss")
                 #make it propotionate to the math error, if math error is small, penelise it less
-                sofmax_pen_r = tf.sigmoid( (max_error_tot/2000) - 10) * cfg["smax_pen_r"]
-                total_loss =  max_error_tot + sofmax_pen_r*sofmax_penalty
-        return total_loss, math_error
+                #sofmax_pen_r = tf.sigmoid( (max_error_tot/2000) - 10) * cfg["smax_pen_r"]
+                #sofmax_pen_r = tf.divide( tf.cast(cfg["smax_pen_r"], cfg['datatype']) ,
+                #                          tf.sqrt(max_error_tot + tf.cast(cfg['epsilon'], cfg['datatype'])) ,
+                #               name = "cal_smax_pen")
+                sofmax_pen_r = cfg["smax_pen_r"]
+                total_loss = tf.cond(self.use_both_losses, 
+                                     lambda : tf.cast(max_error_tot + sofmax_pen_r*sofmax_penalty, cfg['datatype']),
+                                     lambda : tf.cast(sofmax_penalty, cfg['datatype'])
+                                    )
+        return total_loss, max_error_tot
 
     def calc_backprop(self, cfg):
         print(list(self.params.values()))

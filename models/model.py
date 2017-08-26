@@ -5,10 +5,11 @@ import pickle
 from params import get_cfg
 from rnn_base import RNN
 from mem_sel_rnn import MemRNN
-from rnn_base import RNN
-from history_rnn import HistoryRNN
-from op_selector import OpSel
-from mem_selector import MemSel
+from NoEmbedRNN import OpSel
+from NoEmbedRNN import MemSel
+from NoEmbedRNN import RNN as oldRNN
+from NoEmbedRNN import MemRNN  as oldMemRNN
+from NoEmbedRNN import HistoryRNN
 from ops import Operations
 from session import run_session_2RNNS, run_session_HistoryRNN
 from data_gen import samples_generator, split_train_test

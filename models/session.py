@@ -27,6 +27,12 @@ def get_time_hhmmss(dif):
     time_str = "%02d:%02d:%02d" % (h, m, s)
     return time_str
 
+def determine_loss(epoch, cfg):
+    period = cfg["loss_swap_per"]
+    mod = epoch % (period*2)
+    if mod < period: return True
+    else :           return False
+
 def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
     #pre training setting
     np.set_printoptions(precision=3, suppress=True)
@@ -77,10 +83,20 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             loss_list_train_hard = [0,0]
             loss_list_test_soft = [0,0]
             loss_list_test_hard = [0,0]
+            
+            math_error_train_soft = [0,0]
+            math_error_train_hard = [0,0]
+            math_error_test_soft = [0,0]
+            math_error_test_hard = [0,0]
+            
             summary = None
             #shuffle data
             #x_train, y_train = shuffle_data(x_train, y_train)
-
+            
+            #determine if use both losses to train during current traiing
+            use_both_losses = determine_loss(epoch_idx, cfg) 
+            
+            #set states
             _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
             _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
@@ -122,9 +138,11 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                             m.init_state:_current_state_train,
                             m.mem.init_state:_current_state_train_mem,
                             m.batchX_placeholder:batchX,
-                            m.batchY_placeholder:batchY
+                            m.batchY_placeholder:batchY,
+                            m.use_both_losses: use_both_losses
                         })
                         loss_list_train_soft.append(_total_loss_train)
+                        math_error_train_soft.append(_math_error_train)
 
                     else :
                     #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
@@ -150,10 +168,12 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                             m.init_state:_current_state_train,
                             m.mem.init_state:_current_state_train_mem,
                             m.batchX_placeholder:batchX,
-                            m.batchY_placeholder:batchY
+                            m.batchY_placeholder:batchY,
+                            m.use_both_losses: use_both_losses
                         })
                         loss_list_train_soft.append(_total_loss_train)
-
+                        math_error_train_soft.append(_math_error_train)
+                        
                         _total_loss_test,\
                         _current_state_test,\
                         _current_state_test_mem,\
@@ -169,10 +189,12 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                                 m.init_state:_current_state_test,
                                 m.mem.init_state:_current_state_test_mem,
                                 m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY
+                                m.batchY_placeholder:batchY,
+                                m.use_both_losses: use_both_losses
                             })
                         loss_list_train_hard.append(_total_loss_test)
-
+                        math_error_train_hard.append(_math_error_test)
+                        
             ##save loss for the convergance chassing        
             reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
             last_train_losses.append(reduced_loss_train_soft)
@@ -203,38 +225,72 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
 
                         _total_loss_train,\
                         _current_state_train,\
-                        _current_state_train_mem = sess.run([m.total_loss_train,
+                        _current_state_train_mem,\
+                        _math_error_train        = sess.run([m.total_loss_train,
                                                              m.train["current_state"],
-                                                             m.train["current_state_mem"]],
+                                                             m.train["current_state_mem"],
+                                                             m.math_error_train],
                             feed_dict={
                                 m.init_state:_current_state_train,
                                 m.mem.init_state:_current_state_train_mem,
                                 m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY
+                                m.batchY_placeholder:batchY,
+                                m.use_both_losses: use_both_losses
                             })
                         loss_list_test_soft.append(_total_loss_train)
+                        math_error_test_soft.append(_math_error_train)
 
                         _total_loss_test,\
                         _current_state_test,\
-                        _current_state_test_mem = sess.run([m.total_loss_test,
+                        _current_state_test_mem,\
+                        _math_error_test        = sess.run([m.total_loss_test,
                                                             m.test["current_state"],
-                                                            m.test["current_state_mem"]],
+                                                            m.test["current_state_mem"],
+                                                            m.math_error_test],
                             feed_dict={
                                 m.init_state:_current_state_test,
                                 m.mem.init_state:_current_state_test_mem,
                                 m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY
+                                m.batchY_placeholder:batchY,
+                                m.use_both_losses: use_both_losses
                             })
                         loss_list_test_hard.append(_total_loss_test)
-
+                        math_error_test_hard.append(_math_error_test)
+                            
                 #save model            
                 saver.save(sess, './summaries/' + cfg['dst'] + '/model/',global_step=epoch_idx)
                 #write variables/loss summaries after all training/testing done
+                reduced_math_error_train_soft = reduce(lambda x, y: x+y, math_error_train_soft)
+                pen_loss_train_soft = reduced_loss_train_soft - reduced_math_error_train_soft
+
+                reduced_loss_train_hard = reduce(lambda x, y: x+y, loss_list_train_hard)
+                reduced_math_error_train_hard = reduce(lambda x, y: x+y, math_error_train_hard)
+                pen_loss_train_hard = reduced_loss_train_hard - reduced_math_error_train_hard
+                
+                reduced_loss_test_soft = reduce(lambda x, y: x+y, loss_list_test_soft)
+                reduced_math_error_test_soft = reduce(lambda x, y: x+y, math_error_test_soft)
+                pen_loss_test_soft = reduced_loss_test_soft - reduced_math_error_test_soft
+                
+                reduced_loss_test_hard = reduce(lambda x, y: x+y, loss_list_test_hard)
+                reduced_math_error_test_hard = reduce(lambda x, y: x+y, math_error_test_hard)
+                pen_loss_test_hard = reduced_loss_test_hard - reduced_math_error_test_hard
+                
                 train_writer.add_summary(summary, epoch_idx)
-                write_no_tf_summary(train_writer, "Softmax_train_loss", reduced_loss_train_soft, epoch_idx)
-                write_no_tf_summary(train_writer, "Hardmax_train_loss", reduce(lambda x, y: x+y, loss_list_train_hard), epoch_idx)
-                write_no_tf_summary(train_writer, "Sotfmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_soft), epoch_idx)
-                write_no_tf_summary(train_writer, "Hardmax_test_loss", reduce(lambda x, y: x+y, loss_list_test_hard), epoch_idx)
+                write_no_tf_summary(train_writer, "Softmax_train_loss",      reduced_loss_train_soft, epoch_idx)
+                write_no_tf_summary(train_writer, "Softmax_math_train_loss", reduced_math_error_train_soft , epoch_idx)
+                write_no_tf_summary(train_writer, "Softmax_pen_train_loss",  pen_loss_train_soft, epoch_idx)
+                
+                write_no_tf_summary(train_writer, "Hardmax_train_loss",      reduced_loss_train_hard, epoch_idx)
+                write_no_tf_summary(train_writer, "Hardmax_math_train_loss", reduced_math_error_train_hard, epoch_idx)
+                write_no_tf_summary(train_writer, "Hardmax_pen_train_loss",  pen_loss_train_hard, epoch_idx)
+                
+                write_no_tf_summary(train_writer, "Sotfmax_test_loss",      reduced_loss_test_soft, epoch_idx)
+                write_no_tf_summary(train_writer, "Sotfmax_math_test_loss", reduced_math_error_test_soft, epoch_idx)
+                write_no_tf_summary(train_writer, "Sotfmax_pen_test_loss",  pen_loss_test_soft, epoch_idx)
+                
+                write_no_tf_summary(train_writer, "Hardmax_test_loss",      reduced_loss_test_hard, epoch_idx)
+                write_no_tf_summary(train_writer, "Hardmax_math_test_loss", reduced_math_error_test_hard, epoch_idx)
+                write_no_tf_summary(train_writer, "Hardmax_pen_test_loss",  pen_loss_test_hard, epoch_idx)
 
             print("")
             #harmax test
@@ -249,11 +305,11 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             print("mat_error_train\t\t\t\t\math_error_test")
             print(np.column_stack((_math_error, _math_error_test)))
             '''
-            print("Epoch",epoch_idx)
-            print("Softmax train loss\t", reduced_loss_train_soft)
-            print("Hardmax train loss\t", reduce(lambda x, y: x+y, loss_list_train_hard))
-            print("Sotfmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_soft))
-            print("Hardmax test loss\t", reduce(lambda x, y: x+y, loss_list_test_hard))
+            print("Epoch",epoch_idx, "use_both_losses", use_both_losses)
+            print("Softmax train loss\t", reduced_loss_train_soft, "(m:",reduced_math_error_train_soft ,"p:",pen_loss_train_soft,")")
+            print("Hardmax train loss\t", reduced_loss_train_hard, "(m:",reduced_math_error_train_hard ,"p:",pen_loss_train_hard,")")
+            print("Sotfmax test loss\t", reduced_loss_test_soft, "(m:",reduced_math_error_test_soft ,"p:",pen_loss_test_soft,")")
+            print("Hardmax test loss\t", reduced_loss_test_hard, "(m:",reduced_math_error_test_hard ,"p:",pen_loss_test_hard,")")
             print("Epoch time: ", ((time.time() - startTime) % 60), " Global Time: ",  get_time_hhmmss(time.time() - globalstartTime))
             print("func: ", cfg['train_fn'].__name__, "max_ops: ", cfg['max_output_ops'], "sim_seed", cfg['seed'], "tf seed", tf_ops.get_default_graph().seed)
             #print("grads[0] - W", _grads[0][0])
