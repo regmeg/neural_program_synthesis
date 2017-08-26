@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from collections import OrderedDict
 from params import get_cfg
+from tensorflow.python.ops import random_ops
 
 class NNbase(object):
     #define model params as a static dict,so that when grad are computed, all params are used from child op and mem selections rrns    
@@ -23,7 +24,9 @@ class NNbase(object):
             NNbase.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchY")
         if NNbase.use_both_losses is None:
             NNbase.use_both_losses = tf.placeholder(dtype=tf.bool, name='use_both_penalty_and_math_loss')
-        
+        if "global_step" not in NNbase.params:
+            self.params["global_step"] = tf.Variable(0, name='global_step', trainable=False)
+
         #model constants
         with tf.name_scope("Constants"):
             self.dummy_matrix = tf.zeros([cfg['batch_size'], cfg['num_features']], dtype=cfg['datatype'], name="dummy_constant")            
@@ -104,14 +107,17 @@ class NNbase(object):
                 max_error_tot = tf.reduce_sum(math_error, name="red_math_loss")
                 #make it propotionate to the math error, if math error is small, penelise it less
                 #sofmax_pen_r = tf.sigmoid( (max_error_tot/2000) - 10) * cfg["smax_pen_r"]
-                #sofmax_pen_r = tf.divide( tf.cast(cfg["smax_pen_r"], cfg['datatype']) ,
-                #                          tf.sqrt(max_error_tot + tf.cast(cfg['epsilon'], cfg['datatype'])) ,
-                #               name = "cal_smax_pen")
+                sofmax_pen_r = tf.divide( tf.cast(50*cfg["smax_pen_r"], cfg['datatype']) ,
+                                          tf.sqrt(max_error_tot + tf.cast(cfg['epsilon'], cfg['datatype'])) ,
+                               name = "cal_smax_pen")
+                '''
                 sofmax_pen_r = cfg["smax_pen_r"]
                 total_loss = tf.cond(self.use_both_losses, 
                                      lambda : tf.cast(max_error_tot + sofmax_pen_r*sofmax_penalty, cfg['datatype']),
                                      lambda : tf.cast(sofmax_penalty, cfg['datatype'])
                                     )
+                '''
+                total_loss = max_error_tot + (cfg["smax_pen_r"] + sofmax_pen_r)*sofmax_penalty
         return total_loss, max_error_tot
 
     def calc_backprop(self, cfg):
@@ -130,9 +136,19 @@ class NNbase(object):
             else:
                 grads = grads_raw
                 norms = []
-                
+            
+            if cfg['add_noise']:
+                noisy_gradients = []
+                for grad in grads
+                    denom = tf.pow( (1+self.params["global_step"]), 0.55)
+                    variance =  tf.cast(1/denom, cfg['datatype'])
+                    gradient_shape = grad.get_shape()
+                    noise = random_ops.truncated_normal(gradient_shape, stddev=tf.sqrt(variance), dtype=cfg['datatype'])
+                    noisy_gradients.append(grad + noise)
+                grads = noisy_gradients
+
         with tf.name_scope("Train_step"):
-            train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), name="min_loss")
+            train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), global_step=self.params["global_step"], name="min_loss")
             print("grads are")
             print(grads)
             print("norm is ")

@@ -23,6 +23,7 @@ tf.flags.DEFINE_float("drop_rate", 0.15, "dropout rate")
 tf.flags.DEFINE_float("smax_pen_r", 0.1, "sofmax penalty rate")
 tf.flags.DEFINE_float("test_ratio", 0.33333, "test train data split ratio")
 tf.flags.DEFINE_integer("loss_swap_per", 50, "periodicity of using just softmax penallty or math_error+softmax_r*smax_pen")
+tf.flags.DEFINE_boolean("add_noise", True, "whether to add grads to add random gausian decaying noise to the grads")
 
 tf.flags.DEFINE_integer("num_features", 3, "number of features per generated sample")
 tf.flags.DEFINE_string("train_fn", "np_add", "the function which model has to learn")
@@ -86,6 +87,7 @@ def get_cfg():
         
         state_fn = FLAGS.state_fn,
         loss_swap_per = FLAGS.loss_swap_per,
+        add_noise = FLAGS.add_noise,
         
         seed = FLAGS.seed,
         name = FLAGS.name,
