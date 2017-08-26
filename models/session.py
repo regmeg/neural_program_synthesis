@@ -89,6 +89,21 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             math_error_test_soft = [0,0]
             math_error_test_hard = [0,0]
             
+            '''
+            reduced_loss_train_soft = 0
+            reduced_math_error_train_soft = 0
+            pen_loss_train_soft = 0
+            reduced_loss_train_hard = 0
+            reduced_math_error_train_hard = 0
+            pen_loss_train_hard = 0
+            reduced_loss_test_soft = 0
+            reduced_math_error_test_soft = 0
+            pen_loss_test_soft = 0
+            reduced_loss_test_hard = 0
+            reduced_math_error_test_hard = 0
+            pen_loss_test_hard = 0
+            '''
+
             summary = None
             #shuffle data
             #x_train, y_train = shuffle_data(x_train, y_train)
@@ -260,21 +275,22 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                 #save model            
                 saver.save(sess, './summaries/' + cfg['dst'] + '/model/',global_step=epoch_idx)
                 #write variables/loss summaries after all training/testing done
-                reduced_math_error_train_soft = reduce(lambda x, y: x+y, math_error_train_soft)
-                pen_loss_train_soft = reduced_loss_train_soft - reduced_math_error_train_soft
+            reduced_math_error_train_soft = reduce(lambda x, y: x+y, math_error_train_soft)
+            pen_loss_train_soft = reduced_loss_train_soft - reduced_math_error_train_soft
 
-                reduced_loss_train_hard = reduce(lambda x, y: x+y, loss_list_train_hard)
-                reduced_math_error_train_hard = reduce(lambda x, y: x+y, math_error_train_hard)
-                pen_loss_train_hard = reduced_loss_train_hard - reduced_math_error_train_hard
+            reduced_loss_train_hard = reduce(lambda x, y: x+y, loss_list_train_hard)
+            reduced_math_error_train_hard = reduce(lambda x, y: x+y, math_error_train_hard)
+            pen_loss_train_hard = reduced_loss_train_hard - reduced_math_error_train_hard
+             
+            reduced_loss_test_soft = reduce(lambda x, y: x+y, loss_list_test_soft)
+            reduced_math_error_test_soft = reduce(lambda x, y: x+y, math_error_test_soft)
+            pen_loss_test_soft = reduced_loss_test_soft - reduced_math_error_test_soft
                 
-                reduced_loss_test_soft = reduce(lambda x, y: x+y, loss_list_test_soft)
-                reduced_math_error_test_soft = reduce(lambda x, y: x+y, math_error_test_soft)
-                pen_loss_test_soft = reduced_loss_test_soft - reduced_math_error_test_soft
+            reduced_loss_test_hard = reduce(lambda x, y: x+y, loss_list_test_hard)
+            reduced_math_error_test_hard = reduce(lambda x, y: x+y, math_error_test_hard)
+            pen_loss_test_hard = reduced_loss_test_hard - reduced_math_error_test_hard
                 
-                reduced_loss_test_hard = reduce(lambda x, y: x+y, loss_list_test_hard)
-                reduced_math_error_test_hard = reduce(lambda x, y: x+y, math_error_test_hard)
-                pen_loss_test_hard = reduced_loss_test_hard - reduced_math_error_test_hard
-                
+            if epoch_idx % cfg['test_cycle'] == 0 :
                 train_writer.add_summary(summary, epoch_idx)
                 write_no_tf_summary(train_writer, "Softmax_train_loss",      reduced_loss_train_soft, epoch_idx)
                 write_no_tf_summary(train_writer, "Softmax_math_train_loss", reduced_math_error_train_soft , epoch_idx)
@@ -284,9 +300,9 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                 write_no_tf_summary(train_writer, "Hardmax_math_train_loss", reduced_math_error_train_hard, epoch_idx)
                 write_no_tf_summary(train_writer, "Hardmax_pen_train_loss",  pen_loss_train_hard, epoch_idx)
                 
-                write_no_tf_summary(train_writer, "Sotfmax_test_loss",      reduced_loss_test_soft, epoch_idx)
-                write_no_tf_summary(train_writer, "Sotfmax_math_test_loss", reduced_math_error_test_soft, epoch_idx)
-                write_no_tf_summary(train_writer, "Sotfmax_pen_test_loss",  pen_loss_test_soft, epoch_idx)
+                write_no_tf_summary(train_writer, "Softmax_test_loss",      reduced_loss_test_soft, epoch_idx)
+                write_no_tf_summary(train_writer, "Softmax_math_test_loss", reduced_math_error_test_soft, epoch_idx)
+                write_no_tf_summary(train_writer, "Softmax_pen_test_loss",  pen_loss_test_soft, epoch_idx)
                 
                 write_no_tf_summary(train_writer, "Hardmax_test_loss",      reduced_loss_test_hard, epoch_idx)
                 write_no_tf_summary(train_writer, "Hardmax_math_test_loss", reduced_math_error_test_hard, epoch_idx)
@@ -329,7 +345,16 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                 else:
                     print("Reseting the loss conv array")
                     last_train_losses = []
-                    
+
+
+            #as well check early stopping options, once hardmax train error is small enough - there is not point to check softmax, as its combinations of math error and penalties
+            if (epoch_idx % cfg['test_cycle'] == 0) and ((reduced_loss_train_hard < 10) or (reduced_loss_test_hard < 10)):
+                    print("#################################")
+                    print("Model reached hardmax, breaking ...")
+                    print("#################################")
+                    break
+
+
 def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, path):
     #create a saver to save the trained model
     saver=tf.train.Saver(var_list=tf.trainable_variables())

@@ -6,8 +6,8 @@ class Operations:
     def __init__(self, cfg):
         self.cfg = cfg
         #self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add]
-        self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall]
-        #self.ops = [self.tf_add, self.tf_multiply, self.tf_stall, self.tf_inpt_len, self.tf_divide]
+        #self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall]
+        self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall, self.tf_sub]
         self.num_of_ops = len(self.ops)
 
     #model operations
@@ -80,6 +80,8 @@ class Operations:
             result = tf.subtract(inpt,  mem_slice,  name="sub_inpt_mem_slice")
             reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
             return reshape
+        
+
     ######helper functions., which are private######
     def not_zero(self, inpt, mem_sel=None):
         with tf.name_scope("not_zero"):
