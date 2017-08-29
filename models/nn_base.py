@@ -17,7 +17,7 @@ class NNbase(object):
     
     def __init__(self, cfg, ops):   
         self.ops = ops
-        
+        self.dropout_cntr = 0
         #set batches
         if NNbase.batchX_placeholder is None:
             NNbase.batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchX")
@@ -106,8 +106,11 @@ class NNbase(object):
             #calc total error
             with tf.name_scope("Total_loss_comp"):
                 max_error_tot = tf.reduce_sum(math_error, name="red_math_loss")
-                #make it propotionate to the math error, if math error is small, penelise it less
-                #sofmax_pen_r = tf.sigmoid( (max_error_tot/2000) - 10) * cfg["smax_pen_r"]
+                #make it inversly propotionate to the math error, if math error is big, penelise it less
+                #it depends on  error for a batch not for the whole error - hence it should kickoff at a smaller threshhold -
+                #num_samples/batch_size
+                #num_batches = (cfg["num_samples"]/cfg["batch_size"])*cfg["test_ratio"]
+                #sofmax_pen_r = tf.cast((1 - tf.sigmoid( (num_batches*max_error_tot/50) - 10 ) ) * cfg["smax_pen_r"], cfg['datatype'])
                 '''
                 sofmax_pen_r = tf.divide( tf.cast(20*cfg["smax_pen_r"], cfg['datatype']) ,
                                           tf.sqrt(max_error_tot + tf.cast(cfg['epsilon'], cfg['datatype'])) ,
@@ -121,26 +124,15 @@ class NNbase(object):
                                     )
                 '''
                 sofmax_pen_r = cfg["smax_pen_r"]
-                total_loss = max_error_tot + sofmax_pen_r*sofmax_penalty
+                total_loss = max_error_tot + (sofmax_pen_r*sofmax_penalty)
         return total_loss, max_error_tot
 
     def calc_backprop(self, cfg):
         print(list(self.params.values()))
         with tf.name_scope("Grads"):
-            grads_raw = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
+            grads = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
 
-            #clip gradients by norm and add summaries
-            if cfg['norm']:
-                print("norming the grads")
-                grads, norms = tf.clip_by_global_norm(grads_raw, cfg['grad_norm'])
-            elif cfg['clip']:
-                print("clipping the grads")
-                grads = [tf.clip_by_value(grad, cfg['grad_clip_val_min'], cfg['grad_clip_val_max']) for grad in grads_raw]
-                norms = []
-            else:
-                grads = grads_raw
-                norms = []
-            
+           
             if cfg['add_noise']:
                 noisy_gradients = []
                 for grad in grads:
@@ -150,7 +142,30 @@ class NNbase(object):
                     noise = random_ops.truncated_normal(gradient_shape, stddev=tf.sqrt(variance), dtype=cfg['datatype'])
                     noisy_gradients.append(grad + noise)
                 grads = noisy_gradients
-
+            
+            if cfg['augument_grad']:
+                augumented_grads = []
+                param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
+                for i, grad in enumerate(grads): 
+                        if "W3" or "b3" in param_names[i]: 
+                            augumented_grads.append(grad)
+                        else:
+                            aug_ratio = tf.log1p(self.math_error_train)* tf.cast(cfg['softmax_sat'], cfg['datatype'])
+                            augumented_grads.append(aug_ratio*grad)
+                grads = augumented_grads
+                
+                        #clip gradients by norm and add summaries
+            if cfg['norm']:
+                print("norming the grads")
+                grads, norms = tf.clip_by_global_norm(grads, cfg['grad_norm'])
+            elif cfg['clip']:
+                print("clipping the grads")
+                grads = [tf.clip_by_value(grad, cfg['grad_clip_val_min'], cfg['grad_clip_val_max']) for grad in grads]
+                norms = []
+            else:
+                grads = grads
+                norms = []
+                
         with tf.name_scope("Train_step"):
             train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
             print("grads are")
@@ -169,6 +184,33 @@ class NNbase(object):
             denom = tf.square(tf.exp(-scaled_x) + 1)*tf.square(tf.exp(-(num_ops-1)*scaled_x) + 1)
             res = nom/denom
             return worst_case*((res)*scale**3)
+    '''
+    def custom_softmax(self, x, cfg, base = 180):
+        maxx = tf.reduce_max(x, axis=1, keep_dims=True)
+        powx = tf.pow(tf.cast(base, cfg['datatype']), x-maxx)
+        reduced  = tf.reduce_sum(powx, axis=1, keep_dims=True)
+        maxg = powx/ reduced
+        return maxg
+
+    '''
+    '''
+    def custom_softmax(self, x, cfg, base = 1):
+        maxx = tf.reduce_max(x, axis=1, keep_dims=True)
+        maxg = x/ (maxx + 0.1)
+        #powx = tf.pow(maxg, tf.cast(base, cfg['datatype']))
+        powx = maxg
+        #reduced  = tf.reduce_sum(powx, axis=1, keep_dims=True)
+        return powx
+    '''
+    def custom_softmax(self, x, cfg, base = 10):
+        maxx = tf.reduce_max(x, axis=1, keep_dims=True)
+        maxg = x - maxx
+        #maxg =tf.nn.relu(maxg)
+        #powx = maxg
+        #for i in range(base):
+        #    powx = tf.sqrt(powx)
+        powx = maxg
+        return powx
     
     def variable_summaries(self, var, name=None):
         """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""        

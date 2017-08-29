@@ -74,13 +74,20 @@ class Operations:
             return masked_ones
         
     #elemntwise broadcasted substractions of inputs with mem selection
+    '''
+    def tf_sub(self, inpt, mem_sel=None):
+        with tf.name_scope("tf_sub"):
+            inpt_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
+            result = tf.subtract(mem_sel,  inpt_slice,  name="sub_inpt_mem_slice")
+            reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
+            return reshape
+    '''
     def tf_sub(self, inpt, mem_sel=None):
         with tf.name_scope("tf_sub"):
             mem_slice = tf.slice(mem_sel, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
             result = tf.subtract(inpt,  mem_slice,  name="sub_inpt_mem_slice")
             reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
             return reshape
-        
 
     ######helper functions., which are private######
     def not_zero(self, inpt, mem_sel=None):
@@ -98,6 +105,11 @@ class Operations:
     def clean_infs(self,inpt, mem_sel=None):
         with tf.name_scope("clean_infs"):
             clean = tf.where(tf.is_inf(inpt), tf.ones_like(inpt, dtype=self.cfg['datatype']), inpt, name="clean")
+            return clean
+        
+    def clean_nans(self,inpt, mem_sel=None):
+        with tf.name_scope("clean_nans"):
+            clean = tf.where(tf.is_nan(inpt), tf.zeros_like(inpt, dtype=self.cfg['datatype']), inpt, name="clean")
             return clean
         
     def tf_input_mem_concat(self, inpt, mem_sel=None):

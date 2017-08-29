@@ -71,10 +71,26 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
         #Init vars:
         _W = sess.run([m.params['W']])
         _W2 = sess.run([m.params['W2']])
-        _softmax_sat = sess.run([m.softmax_sat])
+        _W3 = sess.run([m.params['W3']])
+        
+        _W_mem = sess.run([m.params['W_mem']])
+        _W2_mem = sess.run([m.params['W2_mem']])
+        _W3_mem = sess.run([m.params['W3_mem']])
+        
+        print("W1")
         print(m.params['W'].eval())
+        print("W2")
         print(m.params['W2'].eval())
-        print(m.softmax_sat.eval())
+        print("W3")
+        print(m.params['W3'].eval())
+        
+        print("W1_mem")
+        print(m.params['W_mem'].eval())
+        print("W2_mem")
+        print(m.params['W2_mem'].eval())
+        print("W3_mem")
+        print(m.params['W3_mem'].eval())
+        
         globalstartTime = time.time()
         for epoch_idx in range(cfg['num_epochs']):
             # reset variables
@@ -346,13 +362,14 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                     print("Reseting the loss conv array")
                     last_train_losses = []
 
-
             #as well check early stopping options, once hardmax train error is small enough - there is not point to check softmax, as its combinations of math error and penalties
-            if (epoch_idx % cfg['test_cycle'] == 0) and ((reduced_loss_train_hard < 10) or (reduced_loss_test_hard < 10)):
-                    print("#################################")
-                    print("Model reached hardmax, breaking ...")
-                    print("#################################")
-                    break
+            if cfg['hardmax_break']:
+                if (epoch_idx % cfg['test_cycle'] == 0) and ((reduced_loss_train_hard < 10) or (reduced_loss_test_hard < 10)):
+                        print("#################################")
+                        print("Model reached hardmax, breaking ...")
+                        print("#################################")
+                        break
+
 
 
 def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, path):

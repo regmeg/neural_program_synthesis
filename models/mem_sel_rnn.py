@@ -49,6 +49,11 @@ class MemRNN(NNbase):
                 current_state = next_state
                 
                 #apply dropout
+                '''
+                self.dropout_cntr =  1 + self.dropout_cntr
+                droupout_seed = cfg['seed'] + self.dropout_cntr
+                state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], seed=droupout_seed, training = (mode is 'train'))
+                '''
                 state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = (mode is 'train'))
                 
                 #calculate softmax and produce the mask of operations
@@ -56,6 +61,7 @@ class MemRNN(NNbase):
                 #logits = tf.matmul(state_dropped, self.params["W2_mem"], name="state_mul_W2_mem")
                 logits_scaled = tf.multiply(logits, self.softmax_sat, name="sat_softmax")
                 softmax = tf.nn.softmax(logits_scaled, name="get_softmax")
+                #softmax = self.custom_softmax(logits_scaled, cfg)
 
                 #in test change to hardmax
                 if mode is "test":

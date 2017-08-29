@@ -19,6 +19,13 @@ def main():
     #get the global configuration
     cfg = get_cfg()
     
+    if cfg['rerun_cfg'] != "":
+        init_cfg = cfg
+        cfg_path = cfg['rerun_cfg']+'cfg.p'
+        cfg = pickle.load(open(cfg_path, 'rb')) 
+        cfg['name'] = init_cfg['name']
+        cfg['logoff'] = init_cfg['logoff']
+        cfg['dst'] = cfg['model'] + "/" + cfg['train_fn'].__name__ + "-" + str(cfg['max_output_ops']) +"ops/" + cfg['name']
     #instantiate containter with the operations avail for the selection
     ops = Operations(cfg)
     
@@ -42,7 +49,8 @@ def main():
     print("###########CFG dict is###########")
     pprint.pprint(cfg, depth=3)
     print("#############################")
-    #sys.stdout = stdout_org
+    if cfg['logoff']:
+        sys.stdout = stdout_org
 
     #generate data 
     x,y = samples_generator(cfg['train_fn'], (cfg['num_samples'], cfg['num_features']) , cfg['samples_value_rng'], cfg['seed'])

@@ -38,10 +38,13 @@ tf.flags.DEFINE_float("grad_clip_val_max", 10e3, "grad_clip_val_max")
 tf.flags.DEFINE_float("grad_clip_val_min", -10e3, "grad_clip_val_min")
 
 tf.flags.DEFINE_boolean("pen_sofmax", True, "whether to compute sofmax penalties")
-
+tf.flags.DEFINE_boolean("augument_grad", True, "whether to augument grads involved in sofmax with sfotmax_sat val")
 
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
 tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
+tf.flags.DEFINE_boolean("logoff", False , "stitch of loggin")
+tf.flags.DEFINE_string("rerun_cfg", "", "rerun simulation with cfg path")
+tf.flags.DEFINE_boolean("hardmax_break", True , "if to finish on small hardmax error")
 
 FLAGS = tf.flags.FLAGS
 
@@ -88,9 +91,13 @@ def get_cfg():
         state_fn = FLAGS.state_fn,
         loss_swap_per = FLAGS.loss_swap_per,
         add_noise = FLAGS.add_noise,
+        augument_grad = FLAGS.augument_grad,
         
         seed = FLAGS.seed,
         name = FLAGS.name,
+        logoff = FLAGS.logoff,
+        hardmax_break = FLAGS.hardmax_break,
+        rerun_cfg = FLAGS.rerun_cfg,
         debug = FLAGS.debug
     )
     global_cfg['dst'] = global_cfg['model'] + "/" + global_cfg['train_fn'].__name__ + "-" + str(global_cfg['max_output_ops']) +"ops/" + global_cfg['name']
