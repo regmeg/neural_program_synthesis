@@ -1,7 +1,7 @@
 import numpy as np
 from functools import reduce
 from numpy.random import RandomState
-from numpy.random import RandomState
+from collections import OrderedDict
 
 #sample gen functions
 def np_add(vec):
@@ -9,6 +9,7 @@ def np_add(vec):
 
 def np_mult(vec):
     return reduce((lambda x, y: x * y),vec)
+
 
 def np_stall(vec):
     return vec
@@ -64,3 +65,63 @@ def shuffle_data(x,y):
     randomize = np.arange(len(x))
     np.random.shuffle(randomize)
     return x[randomize], y[randomize]
+
+def wrap_for_env(vec, val):
+    res = np.array([val])
+    return np.lib.pad(res, ( 0, vec.shape[0] - 1 ), 'constant', constant_values=(0))
+    
+
+def np_add_env(vec):
+    return wrap_for_env(vec, np_add(vec))
+
+def np_mult_env(vec):
+    return wrap_for_env(vec, np_mult(vec))
+
+def np_stall_env(vec):
+    return vec
+
+class OpsEnv(object):
+        
+    def __init__(self, cfg):   
+        self.cfg = cfg
+        self.ops = [np_add_env, np_mult_env ,np_stall_env]
+        self.num_of_ops = len(self.ops)
+    '''
+    def apply_op(self, selections, inptX, batchY):
+            output = []
+            for i, sel in enumerate(selections):
+                print(i)
+                fn = self.ops[int(sel)]
+                output.append(fn(inptX[i]))
+            output = np.vstack(output)
+            error = batchY - output
+            error = np.vstack(0.5*np.square(error.sum(axis=1)))
+            return output, error
+    '''
+    
+    def apply_op(self, selections, inptX, batchY):
+            output = []
+            for i, sel in enumerate(selections):
+                fn = self.ops[int(sel)]
+                #print("i",i,"sel",sel,"fn", fn.__name__)
+                inp = inptX[i]
+                out = fn(inp)
+                #print("inp", inp, "out", out)
+                output.append(out)
+            output = np.vstack(output)
+            #print("output")
+            #print(output)
+            error = batchY - output
+            #print("error")
+            #print(error)
+            #print("error_ab")
+            error_ab = abs(error)
+            #print(error_ab)
+            #print("error_flat")
+            error_flat = np.vstack(error_ab.sum(axis=1))
+            error_flat[error_flat>0] = 2*self.cfg['max_reward']
+            #print(error_flat)
+            
+            #print("erro_")
+            #print(error_sum)
+            return output, error_flat

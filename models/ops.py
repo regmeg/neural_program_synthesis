@@ -74,21 +74,23 @@ class Operations:
             return masked_ones
         
     #elemntwise broadcasted substractions of inputs with mem selection
-    '''
+
     def tf_sub(self, inpt, mem_sel=None):
         with tf.name_scope("tf_sub"):
             inpt_slice = tf.slice(inpt, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
             result = tf.subtract(mem_sel,  inpt_slice,  name="sub_inpt_mem_slice")
             reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
             return reshape
+        
     '''
+    #faulty inmplemetnation - it divides input with mem seleciton ,which assumes that passed input one form stall, which cannot happen
     def tf_sub(self, inpt, mem_sel=None):
         with tf.name_scope("tf_sub"):
             mem_slice = tf.slice(mem_sel, [0,0], [self.cfg['batch_size'],1], name="mem_slice")
             result = tf.subtract(inpt,  mem_slice,  name="sub_inpt_mem_slice")
             reshape = tf.reshape(result , [self.cfg['batch_size'], -1], name = "reshape")
             return reshape
-
+     '''
     ######helper functions., which are private######
     def not_zero(self, inpt, mem_sel=None):
         with tf.name_scope("not_zero"):

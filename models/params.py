@@ -45,6 +45,7 @@ tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
 tf.flags.DEFINE_boolean("logoff", False , "stitch of loggin")
 tf.flags.DEFINE_string("rerun_cfg", "", "rerun simulation with cfg path")
 tf.flags.DEFINE_boolean("hardmax_break", True , "if to finish on small hardmax error")
+tf.flags.DEFINE_float("max_reward", 3000, "max reward for RL env")
 
 FLAGS = tf.flags.FLAGS
 
@@ -57,7 +58,7 @@ def get_cfg():
         test_ratio = FLAGS.test_ratio,
         param_init = 0.1,
         epsilon= FLAGS.epsilon,
-        test_cycle = 15,
+        test_cycle = 5,
         #test_cycle = 150,
         convergance_check_epochs = 300,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
@@ -92,6 +93,7 @@ def get_cfg():
         loss_swap_per = FLAGS.loss_swap_per,
         add_noise = FLAGS.add_noise,
         augument_grad = FLAGS.augument_grad,
+        max_reward = FLAGS.max_reward,
         
         seed = FLAGS.seed,
         name = FLAGS.name,

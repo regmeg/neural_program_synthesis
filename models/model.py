@@ -11,27 +11,35 @@ from NoEmbedRNN import RNN as oldRNN
 from NoEmbedRNN import MemRNN  as oldMemRNN
 from NoEmbedRNN import HistoryRNN
 from ops import Operations
-from session import run_session_2RNNS, run_session_HistoryRNN
-from data_gen import samples_generator, split_train_test
-
+from session import run_session_2RNNS, run_session_HistoryRNN, run_session_RL_RNN
+from data_gen import samples_generator, split_train_test, OpsEnv
+from rl_rnn import RLRNN
 
 def main():
     #get the global configuration
     cfg = get_cfg()
-    
-    if cfg['rerun_cfg'] != "":
-        init_cfg = cfg
+    init_cfg = cfg
+
+    if init_cfg['rerun_cfg'] != "":
         cfg_path = cfg['rerun_cfg']+'cfg.p'
         cfg = pickle.load(open(cfg_path, 'rb')) 
         cfg['name'] = init_cfg['name']
         cfg['logoff'] = init_cfg['logoff']
         cfg['dst'] = cfg['model'] + "/" + cfg['train_fn'].__name__ + "-" + str(cfg['max_output_ops']) +"ops/" + cfg['name']
+
     #instantiate containter with the operations avail for the selection
     ops = Operations(cfg)
     
     #save ops as obj
-    cfg["used_ops_obj"] = ops.ops
+    if init_cfg['rerun_cfg'] != "":
+        ops.ops = cfg["used_ops_obj"]
+        ops.num_of_ops = len(ops.ops)
     
+    cfg["used_ops_obj"] = ops.ops
+    if cfg['model'] == "RLRNN":
+        ops_env = OpsEnv(cfg)
+        cfg["used_ops_env"] = ops_env
+
     #craete log and dumpl globals
     try:
         os.makedirs('./summaries/' + cfg['dst'])
@@ -68,6 +76,9 @@ def main():
         # instanitae the model graph with the main OP selection RNN
         model = eval(cfg['model']+"(cfg, ops, mem_sel, op_sel)")
         run_session_HistoryRNN(model, cfg, x_train, x_test, y_train, y_test)
+    elif cfg['model'] == "RLRNN":
+        model = eval(cfg['model']+"(cfg, ops_env)")
+        run_session_RL_RNN(model, cfg, x_train, x_test, y_train, y_test)
     else:
         raise Exception('Wrong model specified to be run')
 

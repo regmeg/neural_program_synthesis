@@ -48,23 +48,24 @@ params=OrderedDict(
     norm = [True]
 )
 '''
-
+#gridsearch for supervised models
+'''
 params=OrderedDict()
-params['state_size'] = [300, 300, 300]
+params['state_size'] = [400, 400, 400]
 params['num_samples'] = [3500]
 params['batch_size']  = [100]
 params['learning_rate'] = [0.001]
 params['epsilon'] = [1e-3]
 #params['loss_weight'] = [0.5]
-params['max_output_ops'] = [5]
+params['max_output_ops'] = [3, 5]
 params['num_features'] = [4]
-params['train_fn'] = ["np_avg_val"]
+params['train_fn'] = ["np_center"]
 #params['model'] = ["HistoryRNN", "RNN"]
 params['model'] = ["RNN"]
 params['norm'] = [True]
 #params['grad_norm'] = [10e2]
 #params['softmax_sat'] = [30, 100]
-params['softmax_sat'] = [800, 1200]
+params['softmax_sat'] = [500, 800]
 params['clip'] = [False]
 #params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
 params['share_state'] = [True]
@@ -75,6 +76,32 @@ params['pen_sofmax'] = [True]
 params['smax_pen_r'] = [0.0]
 #params['loss_swap_per'] = [30, 50, 80]
 #params['test_ratio'] = [0.5]
+'''
+#cfg for RL models
+params=OrderedDict()
+params['state_size'] = [100]
+params['num_samples'] = [1500]
+params['batch_size']  = [100]
+params['drop_rate'] = [0]
+params['learning_rate'] = [0.001]
+params['epsilon'] = [1e-3]
+params['max_output_ops'] = [5]
+params['num_features'] = [4]
+params['train_fn'] = ["np_add"]
+params['model'] = ["RLRNN"]
+params['norm'] = [True]
+params['clip'] = [False]
+#params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
+params['share_state'] = [True]
+#params['state_fn'] = ["relu", "tanh"]
+params['state_fn'] = ["relu"]
+params['pen_sofmax'] = [False]
+params['smax_pen_r'] = [0.0]
+params['augument_grad'] = [False]
+params['logoff'] = [True]
+params['max_reward'] = [3000]
+
+
 #cfg which unlinkely is going to be iterated, but still can be configured
 
 #seed
