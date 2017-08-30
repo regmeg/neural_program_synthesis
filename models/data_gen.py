@@ -102,6 +102,7 @@ class OpsEnv(object):
     def apply_op(self, selections, inptX, batchY):
             output = []
             for i, sel in enumerate(selections):
+                #print(i,sel)
                 fn = self.ops[int(sel)]
                 #print("i",i,"sel",sel,"fn", fn.__name__)
                 inp = inptX[i]
@@ -119,9 +120,11 @@ class OpsEnv(object):
             #print(error_ab)
             #print("error_flat")
             error_flat = np.vstack(error_ab.sum(axis=1))
+            math_error = np.vstack(error_ab.sum(axis=1))
             error_flat[error_flat>0] = 2*self.cfg['max_reward']
             #print(error_flat)
-            
+            #print("math_error")
+            #print(math_error)
             #print("erro_")
             #print(error_sum)
-            return output, error_flat
+            return output, error_flat, math_error

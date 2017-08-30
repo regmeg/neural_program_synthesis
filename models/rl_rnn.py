@@ -11,7 +11,7 @@ class RLRNN(NNbase):
         
         #placeholder for the initial state of the model
         with tf.name_scope("RNN_op"):
-            self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
+            self.init_state = tf.placeholder(cfg['datatype'], [None, cfg['state_size']], name="init_state")
             self.selections_placeholder = tf.placeholder(cfg['datatype'], name="selections_placeholder")
             self.rewards_placeholder = tf.placeholder(cfg['datatype'], name="rewards_placeholder")
             
@@ -42,11 +42,11 @@ class RLRNN(NNbase):
             #self.grads, self.train_step, self.norms  = self.calc_backprop(cfg)
             self.train_step  = self.calc_backprop(self.total_loss_train, cfg)
         
-        '''
+
         #write model param and grad summaries outside of all scopes
         with tf.name_scope("Summaries_params"):
             for param, tensor in self.params.items(): self.variable_summaries(tensor)               
-        
+        '''       
         with tf.name_scope("Summaries_grads"):
             param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
             for i, grad in enumerate(self.grads): self.variable_summaries(grad, name=param_names[i]+"_grad")
@@ -88,9 +88,10 @@ class RLRNN(NNbase):
                         #logits = tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2")
                         logits = tf.add(tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2"), self.params["b2"], name="add_bias2") #Broadcasted addition
                         softmax = tf.nn.softmax(logits, name="get_softmax")
-                        # log probabilities
-                        log_probs = tf.log(tf.nn.softmax(logits))
-                        
+                        # log probabilities - might be untsable, use softmax instead
+                        log_probs = tf.log(softmax)
+                        #log_probs = softmax
+
                     with tf.name_scope("Comp_next_x"):
                         next_x = tf.add(tf.matmul(logits, self.params["W3"], name="state_mul_W3"), self.params["b3"], name="add_bias3")
                         current_x = next_x
@@ -121,36 +122,16 @@ class RLRNN(NNbase):
         selections = []
         states = []
         current_exes = []
-        outputs = []
-        
-        rewards_ord = None
-        selections_ord = None
-        states_ord = None
-        current_exes_ord = None
-        outputs_ord = None
-        
+        outputs = []        
+ 
         for timestep in range(cfg['max_output_ops']):
-            print("timestep", timestep)
+            #print("timestep", timestep)
             
                         
             #track states produced by the policy RNN
-            if states_ord is None: 
-                states_ord = []
-                for elem in _current_state_train:
-                    states_ord.append([list(elem)])
-            else: 
-                for i, elem in enumerate(_current_state_train):
-                    states_ord[i].append(list(elem))
             states.append(_current_state_train)
             
             #track actual inputs/outputs from the RNN net
-            if current_exes_ord is None: 
-                current_exes_ord = []
-                for elem in _current_x:
-                    current_exes_ord.append([list(elem)])
-            else: 
-                for i, elem in enumerate(_current_x):
-                    current_exes_ord[i].append(list(elem))
             current_exes.append(_current_x)
             
             
@@ -165,53 +146,36 @@ class RLRNN(NNbase):
                                 self.batchX_placeholder: _current_x
                             })
         
-            output, error = self.ops_env.apply_op(_selection, output, batchY)
+            output, error, math_error = self.ops_env.apply_op(_selection, output, batchY)
             reward = cfg['max_reward'] - error
             
             #track rewards
-            if rewards_ord is None: rewards_ord = reward
-            else: rewards_ord = np.concatenate((rewards_ord, reward), axis=1)
             rewards.append(reward)
             
             #trakc op selection indeces
-            if selections_ord is None: selections_ord = _selection
-            else: selections_ord = np.concatenate((selections_ord, _selection), axis=1)
             selections.append(_selection)           
 
             #track outputs from the ops
-            if outputs_ord is None: 
-                outputs_ord = []
-                for elem in output:
-                    outputs_ord.append([list(elem)])
-            else: 
-                for i, elem in enumerate(output):
-                    outputs_ord[i].append(list(elem))
             outputs.append(output)
 
             
             if abs(error.sum()) < 1:
-                print("erro sum", abs(error.sum()))
-                print("breaking")
+                #print("erro sum", abs(error.sum()))
+                #print("breaking")
                 break
         
-        print("finished_loops")
+        #print("finished_loops")
         #print("rewards before discounting")
         #print(rewards_ord)
-        discount_rewards = np.apply_along_axis( self.discount_rewards, 0, rewards).reshape((cfg['batch_size'],-1))
-        discount_rewards_ord = np.apply_along_axis( self.discount_rewards, 1, rewards_ord).reshape((cfg['batch_size'],-1))
+        _discount_rewards = np.apply_along_axis( self.discount_rewards, 1, np.hstack(rewards)).reshape((cfg['batch_size'],-1))
         #return np.float64(discount_rewards), np.float64(selections), np.float64(states), np.float64(current_exes)
-        return  np.vstack(np.hstack(_discount_rewards)),\
-                np.vstack(rewards),\
+        return  _discount_rewards,\
+                rewards,\
                 selections,\
                 states,\
                 current_exes,\
                 outputs,\
-                discount_rewards_ord,\
-                rewards_ord,\
-                selections_ord,\
-                states_ord,\
-                current_exes_ord,\
-                outputs_ord
+                math_error
     
     #calculate loss function based on selected policies and the achieved rewards
     def calc_RL_loss(self, log_prob, cfg):
@@ -226,23 +190,29 @@ class RLRNN(NNbase):
     #dicount rewards for the first selection and make the later selection more important - which is contrary to https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5#file-pg-pong-py-L130
     def discount_rewards(self, rewards):
         """ take 1D float array of rewards and compute discounted reward """
-        print("discounting")
-        print(rewards)
+        #print("discounting")
+        #print(rewards)
         discounted_r = np.zeros_like(rewards)
         running_add = 0
         for t in range(0, len(rewards)):
-            running_add = running_add * 0.9 + rewards[t] #for all negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
+            running_add = running_add * 0.9 + rewards[t] #for all pos/negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
             discounted_r[t] = running_add
         #normalise rewards
-        print("discounted_r")
-        print(discounted_r)
-        print("np.mean(discounted_r)")
-        print(np.mean(discounted_r))
-        print("np.std(discounted_r)")
-        print(np.std(discounted_r))
-        discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-10)
-        print("normalised r")
-        print(discounted_r)
+        #print("discounted_r")
+        #print(discounted_r)
+        #print("np.mean(discounted_r)")
+        #print(np.mean(discounted_r))
+        #print("np.std(discounted_r)")
+        #print(np.std(discounted_r))
+        #print("np.linalg.norm(discounted_r, 1)")
+        #print(np.linalg.norm(discounted_r, 1))
+        #print("np.linalg.norm(discounted_r, 2)")
+        #print(np.linalg.norm(discounted_r, 2))
+        #dont scale but norm, as scaling might result into inversion of signs
+        #discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-10)
+        discounted_r = discounted_r/ np.linalg.norm(discounted_r, 2)
+        #print("normalised r")
+        #print(discounted_r)
         return discounted_r
 
     def calc_backprop(self, loss, cfg):

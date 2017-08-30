@@ -20,9 +20,9 @@ class NNbase(object):
         self.dropout_cntr = 0
         #set batches
         if NNbase.batchX_placeholder is None:
-            NNbase.batchX_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchX")
+            NNbase.batchX_placeholder = tf.placeholder(cfg['datatype'], [None, cfg['num_features']], name="batchX")
         if NNbase.batchY_placeholder is None:
-            NNbase.batchY_placeholder = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['num_features']], name="batchY")
+            NNbase.batchY_placeholder = tf.placeholder(cfg['datatype'], [None, cfg['num_features']], name="batchY")
         if NNbase.use_both_losses is None:
             NNbase.use_both_losses = tf.placeholder(dtype=tf.bool, name='use_both_penalty_and_math_loss')
         if "global_step" not in NNbase.model_vars:
