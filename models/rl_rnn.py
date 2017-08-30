@@ -89,8 +89,8 @@ class RLRNN(NNbase):
                         logits = tf.add(tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2"), self.params["b2"], name="add_bias2") #Broadcasted addition
                         softmax = tf.nn.softmax(logits, name="get_softmax")
                         # log probabilities - might be untsable, use softmax instead
-                        log_probs = tf.log(softmax)
-                        #log_probs = softmax
+                        log_probs = tf.log(softmax + 1e-10)
+                        #log_probs = tf.log(logits)
 
                     with tf.name_scope("Comp_next_x"):
                         next_x = tf.add(tf.matmul(logits, self.params["W3"], name="state_mul_W3"), self.params["b3"], name="add_bias3")
@@ -101,6 +101,7 @@ class RLRNN(NNbase):
                     #outputs main, op seleciton RNN
                     current_state = current_state,
                     log_probs = log_probs,
+                    logits = logits,
                     current_x = current_x,
                    )
     
@@ -138,14 +139,20 @@ class RLRNN(NNbase):
             
             _current_state_train,\
             _current_x,\
+            _logits,\
+            _log_probs,\
             _selection  = sess.run([self.train["current_state"],
-                                      self.train["current_x"], 
+                                      self.train["current_x"],
+                                      self.train["logits"],
+                                      self.train["log_probs"],
                                       self.selection],
                             feed_dict={
                                 self.init_state:_current_state_train,
                                 self.batchX_placeholder: _current_x
                             })
-        
+            
+            #print(np.hstack([_selection, _logits, _log_probs]))
+
             output, error, math_error = self.ops_env.apply_op(_selection, output, batchY)
             reward = cfg['max_reward'] - error
             

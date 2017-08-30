@@ -80,8 +80,8 @@ params['smax_pen_r'] = [0.0]
 #cfg for RL models
 params=OrderedDict()
 params['state_size'] = [100]
-params['num_samples'] = [1500]
-params['batch_size']  = [100]
+params['num_samples'] = [150]
+params['batch_size']  = [10]
 params['drop_rate'] = [0]
 params['learning_rate'] = [0.001]
 params['epsilon'] = [1e-3]

@@ -1250,9 +1250,13 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
         for epoch_idx in range(cfg['num_epochs']):
             # reset variables
             startTime = time.time()
-            loss_list_train_soft = [0,0]
-            loss_list_test_soft = [0,0]
-
+            loss_list_train_log = [0,0]
+            loss_list_train_rewards = [0,0]
+            loss_list_train_math_error = [0,0]
+            
+            loss_list_test_rewards = [0,0]
+            loss_list_test_math_error = [0,0]
+            
             summary = None
             #shuffle data
             #x_train, y_train = shuffle_data(x_train, y_train)
@@ -1268,11 +1272,6 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
             
                 #backprop and test training set for softmax and hardmax loss
             for batch_idx in range(num_batches):
-                
-                    #if flag set, make op and mem selection rnn use exaclty the same state
-                    if cfg['rnns_same_state'] is True:
-                        _current_state_train_mem = _current_state_train
-                        _current_state_test_mem  = _current_state_test
                             
                     start_idx = cfg['batch_size'] * batch_idx
                     end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
@@ -1281,116 +1280,70 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                     batchY = y_train[start_idx:end_idx]
 
                     #for non testing cylce, simply do one forward and back prop with 1 batch with train data       
-                    
-                    print("computing rollout")
-                    #rollout policites to get rewards
-                    _discount_rewards, _selections, _states, _current_exes = m.policy_rollout(sess, _current_state_train, batchX, batchY, cfg)
-                    print("_discount_rewards")
-                    print(_discount_rewards)
-                    print("_selections")
-                    print(_selections)
-                    #compute the back prop
-                    print(" m.train_step")
-                    print( m.train_step)
-                    print("computing back prop")
-                    #summary,\
-                    _total_loss_train,\
-                    _train_step            = sess.run([
-                                                      #merged,
-                                                      m.total_loss_train,
-                                                      m.train_step],
-                    feed_dict={
-                            m.init_state:_current_state_train,
-                            m.batchX_placeholder:batchX,
-                            m.batchY_placeholder:batchY,
-                            m.selections_placeholder:_selections,
-                            m.rewards_placeholder:_discount_rewards
-    
-                    })
 
-                    loss_list_train_soft.append(_total_loss_train)
-                    '''
                     if epoch_idx % cfg['test_cycle'] != 0 :                       
                       
+                        #print("computing rollout")
+                        #rollout policites to get rewards
+                        _discount_rewards,\
+                        _rewards,\
+                        _selections,\
+                        _states,\
+                        _current_exes,\
+                        _outputs,\
+                        _math_error = m.policy_rollout(sess, _current_state_train, batchX, batchY, cfg)
+
+                        #summary,\
                         _total_loss_train,\
-                        _train_step,\
-                        _current_state_train,\
-                        _current_state_train_mem,\
-                        _output_train,\
-                        _grads,\
-                        _softmaxes_train,\
-                        _math_error_train = sess.run([m.total_loss_train, 
-                                                      m.train_step,
-                                                      m.train["current_state"], 
-                                                      m.train["current_state_mem"], 
-                                                      m.train["output"], 
-                                                      m.grads, 
-                                                      m.train["softmaxes"],
-                                                      m.math_error_train],
+                        _train_step            = sess.run([
+                                                          #merged,
+                                                          m.total_loss_train,
+                                                          m.train_step],
                         feed_dict={
-                            m.init_state:_current_state_train,
-                            m.mem.init_state:_current_state_train_mem,
-                            m.batchX_placeholder:batchX,
-                            m.batchY_placeholder:batchY,
-                            m.use_both_losses: use_both_losses
+                                m.init_state:np.vstack(_states),
+                                m.batchX_placeholder:np.vstack(_current_exes),
+                                m.selections_placeholder:np.vstack(_selections),
+                                m.rewards_placeholder:np.vstack(np.hstack(np.stack(_discount_rewards, axis=1)))
+
                         })
-                        loss_list_train_soft.append(_total_loss_train)
-                        math_error_train_soft.append(_math_error_train)
+
+                        loss_list_train_log.append(_total_loss_train)
+                        loss_list_train_rewards.append( np.vstack(_rewards).sum() )
+                        loss_list_train_math_error.append(_math_error.sum())
 
                     else :
-                    #for testing cylce, do one forward and back prop with 1 batch with training data, plus produce summary and hardmax result
-                    
+
+                        #rollout policites to get rewards
+                        _discount_rewards,\
+                        _rewards,\
+                        _selections,\
+                        _states,\
+                        _current_exes,\
+                        _outputs,\
+                        _math_error = m.policy_rollout(sess, _current_state_train, batchX, batchY, cfg)
+
                         summary,\
                         _total_loss_train,\
-                        _train_step,\
-                        _current_state_train,\
-                        _current_state_train_mem,\
-                        _output_train,\
-                        _grads,\
-                        _softmaxes_train,\
-                        _math_error_train = sess.run([merged,
-                                                      m.total_loss_train,
-                                                      m.train_step,
-                                                      m.train["current_state"],
-                                                      m.train["current_state_mem"],
-                                                      m.train["output"],
-                                                      m.grads,
-                                                      m.train["softmaxes"],
-                                                      m.math_error_train],
+                        _train_step            = sess.run([
+                                                          merged,
+                                                          m.total_loss_train,
+                                                          m.train_step],
                         feed_dict={
-                            m.init_state:_current_state_train,
-                            m.mem.init_state:_current_state_train_mem,
-                            m.batchX_placeholder:batchX,
-                            m.batchY_placeholder:batchY,
-                            m.use_both_losses: use_both_losses
+                                m.init_state:np.vstack(_states),
+                                m.batchX_placeholder:np.vstack(_current_exes),
+                                m.selections_placeholder:np.vstack(_selections),
+                                m.rewards_placeholder:np.vstack(np.hstack(np.stack(_discount_rewards, axis=1)))
+
                         })
-                        loss_list_train_soft.append(_total_loss_train)
-                        math_error_train_soft.append(_math_error_train)
-                        
-                        _total_loss_test,\
-                        _current_state_test,\
-                        _current_state_test_mem,\
-                        _output_test,\
-                        _softmaxes_test,\
-                        _math_error_test = sess.run([m.total_loss_test,
-                                                     m.test["current_state"],
-                                                     m.test["current_state_mem"],
-                                                     m.test["output"],
-                                                     m.test["softmaxes"],
-                                                     m.math_error_test],
-                            feed_dict={
-                                m.init_state:_current_state_test,
-                                m.mem.init_state:_current_state_test_mem,
-                                m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY,
-                                m.use_both_losses: use_both_losses
-                            })
-                        loss_list_train_hard.append(_total_loss_test)
-                        math_error_train_hard.append(_math_error_test)
-                        
-            ##save loss for the convergance chassing        
-            reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
-            last_train_losses.append(reduced_loss_train_soft)
+
+                        loss_list_train_log.append(_total_loss_train)
+                        loss_list_train_rewards.append( np.vstack(_rewards).sum() )
+                        loss_list_train_math_error.append(_math_error.sum())
+
+            ##save loss for the convergance chassing 
+            reduced_loss_train_log = reduce(lambda x, y: x+y, loss_list_train_log)
+            last_train_losses.append(reduced_loss_train_log)
+            
             ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
             if epoch_idx % cfg['test_cycle'] == 0 :
                 
@@ -1403,12 +1356,7 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                     _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
  
             
-                for batch_idx in range(num_test_batches):
-            
-                        #if flag set, make op and mem selection rnn use exaclty the same state
-                        if cfg['rnns_same_state'] is True:
-                            _current_state_train_mem = _current_state_train
-                            _current_state_test_mem  = _current_state_test
+                for batch_idx in range(num_test_batches):            
                             
                         start_idx = cfg['batch_size'] * batch_idx
                         end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
@@ -1416,105 +1364,54 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                         batchX = x_test[start_idx:end_idx]
                         batchY = y_test[start_idx:end_idx]
 
-                        _total_loss_train,\
-                        _current_state_train,\
-                        _current_state_train_mem,\
-                        _math_error_train        = sess.run([m.total_loss_train,
-                                                             m.train["current_state"],
-                                                             m.train["current_state_mem"],
-                                                             m.math_error_train],
-                            feed_dict={
-                                m.init_state:_current_state_train,
-                                m.mem.init_state:_current_state_train_mem,
-                                m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY,
-                                m.use_both_losses: use_both_losses
-                            })
-                        loss_list_test_soft.append(_total_loss_train)
-                        math_error_test_soft.append(_math_error_train)
+                      
+                        #print("computing rollout")
+                        #rollout policites to get rewards
+                        _discount_rewards,\
+                        _rewards,\
+                        _selections,\
+                        _states,\
+                        _current_exes,\
+                        _outputs,\
+                        _math_error = m.policy_rollout(sess, _current_state_test, batchX, batchY, cfg)
 
-                        _total_loss_test,\
-                        _current_state_test,\
-                        _current_state_test_mem,\
-                        _math_error_test        = sess.run([m.total_loss_test,
-                                                            m.test["current_state"],
-                                                            m.test["current_state_mem"],
-                                                            m.math_error_test],
-                            feed_dict={
-                                m.init_state:_current_state_test,
-                                m.mem.init_state:_current_state_test_mem,
-                                m.batchX_placeholder:batchX,
-                                m.batchY_placeholder:batchY,
-                                m.use_both_losses: use_both_losses
-                            })
-                        loss_list_test_hard.append(_total_loss_test)
-                        math_error_test_hard.append(_math_error_test)
+                        loss_list_test_rewards.append( np.vstack(_rewards).sum() )
+                        loss_list_test_math_error.append(_math_error.sum())
+
+
+
                 #save model            
                 saver.save(sess, './summaries/' + cfg['dst'] + '/model/',global_step=epoch_idx)
                 #write variables/loss summaries after all training/testing done
-            '''
-            reduced_math_error_train_soft = reduce(lambda x, y: x+y, math_error_train_soft)
-            pen_loss_train_soft = reduced_loss_train_soft - reduced_math_error_train_soft
 
-            reduced_loss_train_hard = reduce(lambda x, y: x+y, loss_list_train_hard)
-            reduced_math_error_train_hard = reduce(lambda x, y: x+y, math_error_train_hard)
-            pen_loss_train_hard = reduced_loss_train_hard - reduced_math_error_train_hard
-             
-            reduced_loss_test_soft = reduce(lambda x, y: x+y, loss_list_test_soft)
-            reduced_math_error_test_soft = reduce(lambda x, y: x+y, math_error_test_soft)
-            pen_loss_test_soft = reduced_loss_test_soft - reduced_math_error_test_soft
-                
-            reduced_loss_test_hard = reduce(lambda x, y: x+y, loss_list_test_hard)
-            reduced_math_error_test_hard = reduce(lambda x, y: x+y, math_error_test_hard)
-            pen_loss_test_hard = reduced_loss_test_hard - reduced_math_error_test_hard
+            reduced_loss_train_log = reduced_loss_train_log
+            reduced_loss_train_rewards = reduce(lambda x, y: x+y, loss_list_train_rewards)
+            reduced_loss_train_math_error = reduce(lambda x, y: x+y, loss_list_train_math_error)
+
+            reduced_loss_test_rewards = reduce(lambda x, y: x+y, loss_list_test_rewards)
+            reduced_loss_test_soft = reduce(lambda x, y: x+y, loss_list_test_math_error)
                 
             if epoch_idx % cfg['test_cycle'] == 0 :
-                train_writer.add_summary(summary, epoch_idx)
-                write_no_tf_summary(train_writer, "Softmax_train_loss",      reduced_loss_train_soft, epoch_idx)
-                write_no_tf_summary(train_writer, "Softmax_math_train_loss", reduced_math_error_train_soft , epoch_idx)
-                write_no_tf_summary(train_writer, "Softmax_pen_train_loss",  pen_loss_train_soft, epoch_idx)
+                #train_writer.add_summary(summary, epoch_idx)
+                write_no_tf_summary(train_writer, "Log_train_loss",      reduced_loss_train_log, epoch_idx)               
+                write_no_tf_summary(train_writer, "Rewards_train",      reduced_loss_train_rewards, epoch_idx)               
+                write_no_tf_summary(train_writer, "Math_train_error",      reduced_loss_train_math_error, epoch_idx)               
+                write_no_tf_summary(train_writer, "Rewards_test",      reduced_loss_test_rewards, epoch_idx)               
+                write_no_tf_summary(train_writer, "Math_test_error",      reduced_loss_test_soft, epoch_idx)               
                 
-                write_no_tf_summary(train_writer, "Hardmax_train_loss",      reduced_loss_train_hard, epoch_idx)
-                write_no_tf_summary(train_writer, "Hardmax_math_train_loss", reduced_math_error_train_hard, epoch_idx)
-                write_no_tf_summary(train_writer, "Hardmax_pen_train_loss",  pen_loss_train_hard, epoch_idx)
-                
-                write_no_tf_summary(train_writer, "Softmax_test_loss",      reduced_loss_test_soft, epoch_idx)
-                write_no_tf_summary(train_writer, "Softmax_math_test_loss", reduced_math_error_test_soft, epoch_idx)
-                write_no_tf_summary(train_writer, "Softmax_pen_test_loss",  pen_loss_test_soft, epoch_idx)
-                
-                write_no_tf_summary(train_writer, "Hardmax_test_loss",      reduced_loss_test_hard, epoch_idx)
-                write_no_tf_summary(train_writer, "Hardmax_math_test_loss", reduced_math_error_test_hard, epoch_idx)
-                write_no_tf_summary(train_writer, "Hardmax_pen_test_loss",  pen_loss_test_hard, epoch_idx)
-
             print("")
             #harmax test
-            '''
-            print(" ")
-            print("output_train\t\t\t\t\toutput_test")
-            print(np.column_stack((_output, _output_test)))
-            print("x\t\t\\t\t\t\t\y")
-            print(np.column_stack((batchX, batchY)))
-            print("softmaxes_train\t\t\t\t\softmaxes_test")
-            print(np.column_stack((_softmaxes, _softmaxes_test)))
-            print("mat_error_train\t\t\t\t\math_error_test")
-            print(np.column_stack((_math_error, _math_error_test)))
-            '''
-            print("Epoch",epoch_idx, "use_both_losses", use_both_losses)
-            print("Softmax train loss\t", reduced_loss_train_soft, "(m:",reduced_math_error_train_soft ,"p:",pen_loss_train_soft,")")
-            print("Hardmax train loss\t", reduced_loss_train_hard, "(m:",reduced_math_error_train_hard ,"p:",pen_loss_train_hard,")")
-            print("Sotfmax test loss\t", reduced_loss_test_soft, "(m:",reduced_math_error_test_soft ,"p:",pen_loss_test_soft,")")
-            print("Hardmax test loss\t", reduced_loss_test_hard, "(m:",reduced_math_error_test_hard ,"p:",pen_loss_test_hard,")")
+
+            print("Epoch",epoch_idx)
+            print("Log_train_loss\t", reduced_loss_train_log)
+            print("Rewards_train\t", reduced_loss_train_rewards)
+            print("Math_train_er\t", reduced_loss_train_math_error)
+            print("Rewards_test\t", reduced_loss_test_rewards)
+            print("Math_test_er\t", reduced_loss_test_soft)
+
             print("Epoch time: ", ((time.time() - startTime) % 60), " Global Time: ",  get_time_hhmmss(time.time() - globalstartTime))
             print("func: ", cfg['train_fn'].__name__, "max_ops: ", cfg['max_output_ops'], "sim_seed", cfg['seed'], "tf seed", tf_ops.get_default_graph().seed)
-            #print("grads[0] - W", _grads[0][0])
-            #print("grads[1] - b", _grads[1][0])
-            #print("grads[2] - W2", _grads[2][0])
-            #print("grads[3] - b2", _grads[3][0])
-            #print("W", W.eval())
-            #print("w2" , W2.eval())
-            #record execution timeline
-            ##check convergance over last 5000 epochs
-            '''
+
             if epoch_idx % cfg['convergance_check_epochs'] == 0 and epoch_idx >= cfg['convergance_check_epochs']: 
                 if np.allclose(last_train_losses, last_train_losses[0], equal_nan=True, rtol=1e-05, atol=1e-02):
                     print("#################################")
@@ -1524,12 +1421,3 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                 else:
                     print("Reseting the loss conv array")
                     last_train_losses = []
-
-            #as well check early stopping options, once hardmax train error is small enough - there is not point to check softmax, as its combinations of math error and penalties
-            if cfg['hardmax_break']:
-                if (epoch_idx % cfg['test_cycle'] == 0) and ((reduced_loss_train_hard < 10) or (reduced_loss_test_hard < 10)):
-                        print("#################################")
-                        print("Model reached hardmax, breaking ...")
-                        print("#################################")
-                        break
-            '''
