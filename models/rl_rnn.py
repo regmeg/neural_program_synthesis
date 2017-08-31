@@ -166,8 +166,8 @@ class RLRNN(NNbase):
             outputs.append(output)
 
             
-            if abs(error.sum()) < 1:
-                #print("erro sum", abs(error.sum()))
+            if math_error.sum() < 1:
+                #print("erro sum", math_error.sum())
                 #print("breaking")
                 break
         
@@ -201,7 +201,7 @@ class RLRNN(NNbase):
         #print(rewards)
         discounted_r = np.zeros_like(rewards)
         running_add = 0
-        for t in range(0, len(rewards)):
+        for t in reversed(range(0, len(rewards))):
             running_add = running_add * 0.9 + rewards[t] #for all pos/negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
             discounted_r[t] = running_add
         #normalise rewards

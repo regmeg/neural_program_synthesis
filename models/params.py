@@ -60,7 +60,7 @@ def get_cfg():
         epsilon= FLAGS.epsilon,
         test_cycle = 5,
         #test_cycle = 150,
-        convergance_check_epochs = 300,
+        convergance_check_epochs = 500,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
         datatype = tf.float64,
 
