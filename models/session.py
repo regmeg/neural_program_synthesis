@@ -687,7 +687,7 @@ def predict_form_sess(m, cfg, x, state, state_mem, path, mode="hard"):
         batchX = np.concatenate((x, batchX), axis=0)
 
         if mode == "soft":
-            output = sess.run([m.output_train],
+            output = sess.run([m.train['output']],
                 feed_dict={
                     m.init_state:state,
                     m.mem.init_state:state_mem,
@@ -695,7 +695,7 @@ def predict_form_sess(m, cfg, x, state, state_mem, path, mode="hard"):
                     m.batchY_placeholder:batchY
                 })
         elif mode == "hard":
-            output = sess.run([m.output_test],
+            output = sess.run([m.test['output']],
                 feed_dict={
                     m.init_state:state,
                     m.mem.init_state:state_mem,
