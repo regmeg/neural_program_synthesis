@@ -4,3 +4,5 @@
 4. sample starvation
 5. Binary trees might be better for suiting solving such problem
 6. Neural nets are 
+7. latent represenatiton most likely is less powerfull to generating code, which is more of a NLP problem. differentiablity of all operations, lots of logic can be missed out
+	7.1 very error prone, hard to debug, due to required flowing tesors in the model to have consistent 
