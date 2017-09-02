@@ -84,12 +84,12 @@ elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
     params['state_size'] = [100]
-    params['num_samples'] = [150]
-    params['batch_size']  = [1]
+    params['num_samples'] = [1500]
+    params['batch_size']  = [100]
     params['drop_rate'] = [0]
     params['learning_rate'] = [0.001]
     params['epsilon'] = [1e-3]
-    params['max_output_ops'] = [2]
+    params['max_output_ops'] = [3, 5]
     params['num_features'] = [4]
     params['train_fn'] = ["np_add", "np_mult", "np_stall"]
     params['model'] = ["RLRNN"]
