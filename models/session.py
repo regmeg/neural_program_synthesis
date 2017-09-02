@@ -9,10 +9,12 @@ import time
 import os
 import sys
 import datetime
+import subprocess
 from data_gen import *
 from params import get_cfg
 from rnn_base import RNN
 from ops import Operations
+
 
 def write_no_tf_summary(writer, tag, val, step):
    summary=tf.Summary()
@@ -369,7 +371,10 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                         print("Model reached hardmax, breaking ...")
                         print("#################################")
                         break
-
+    if cfg['relaunch']:
+            cmd = "python3 ./gridsearch.py --type=RNN"
+            print("ReLnch: " + cmd)
+            subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
 
 
 def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, path):

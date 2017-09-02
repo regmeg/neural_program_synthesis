@@ -9,6 +9,7 @@ import data_gen
 #model flags
 tf.flags.DEFINE_boolean("debug", False, "weather run in a dubg mode")
 
+tf.flags.DEFINE_integer("total_num_epochs", 10000000, "num_of_epochs")    
 tf.flags.DEFINE_integer("state_size", 50, "the state size of RNN")    
 tf.flags.DEFINE_integer("num_samples", 1500, "num of samples to generate")
 tf.flags.DEFINE_integer("batch_size", 100, "batch size for the input")
@@ -45,6 +46,7 @@ tf.flags.DEFINE_string("name", "predef_sim_name" , "name of the simulation")
 tf.flags.DEFINE_boolean("logoff", False , "stitch of loggin")
 tf.flags.DEFINE_string("rerun_cfg", "", "rerun simulation with cfg path")
 tf.flags.DEFINE_boolean("hardmax_break", True , "if to finish on small hardmax error")
+tf.flags.DEFINE_boolean("relaunch", False, "whether to relaunch after instance of learning when model has not converged")
 tf.flags.DEFINE_float("max_reward", 3000, "max reward for RL env")
 
 FLAGS = tf.flags.FLAGS
@@ -52,7 +54,7 @@ FLAGS = tf.flags.FLAGS
 def get_cfg():
     #configuraion constants
     global_cfg = dict(
-        total_num_epochs = 10000000,
+        total_num_epochs = FLAGS.total_num_epochs,
         iters_per_epoch = 1,
         samples_value_rng = (-100, 100),
         test_ratio = FLAGS.test_ratio,
@@ -100,7 +102,8 @@ def get_cfg():
         logoff = FLAGS.logoff,
         hardmax_break = FLAGS.hardmax_break,
         rerun_cfg = FLAGS.rerun_cfg,
-        debug = FLAGS.debug
+        debug = FLAGS.debug,
+        relaunch = FLAGS.relaunch
     )
     global_cfg['dst'] = global_cfg['model'] + "/" + global_cfg['train_fn'].__name__ + "-" + str(global_cfg['max_output_ops']) +"ops/" + global_cfg['name']
     global_cfg['num_epochs'] = global_cfg['total_num_epochs'] // global_cfg['iters_per_epoch']

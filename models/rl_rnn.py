@@ -174,6 +174,12 @@ class RLRNN(NNbase):
         #print("finished_loops")
         #print("rewards before discounting")
         #print(rewards_ord)
+        #if the last eaciton resulted into zero math sum, reward all actions positivley, otherwise make them all neg
+        if math_error.sum() < 1:
+            rewards = np.ones_like(rewards)*cfg['max_reward']
+        else :
+            rewards = -cfg['max_reward']*np.ones_like(rewards)
+        
         _discount_rewards = np.apply_along_axis( self.discount_rewards, 1, np.hstack(rewards)).reshape((cfg['batch_size'],-1))
         #return np.float64(discount_rewards), np.float64(selections), np.float64(states), np.float64(current_exes)
         return  _discount_rewards,\
@@ -197,24 +203,98 @@ class RLRNN(NNbase):
     #dicount rewards for the first selection and make the later selection more important - which is contrary to https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5#file-pg-pong-py-L130
     def discount_rewards(self, rewards):
         """ take 1D float array of rewards and compute discounted reward """
-        #print("discounting")
-        #print(rewards)
+        rewards = list(rewards)
+        last_n_slice = len(rewards)
+        checked_rewards = rewards
+        #swap the rewards signs if all previous rewards let to either change to positive and negative reward
+        '''
+        Rewards cases - idea is: penelise only sequances which are fully negative, otherwise find the postive, make rewards prior positive which led to the pos reward and then make rest zeros, as they are irrelevant after that.
+            1.all neg: leave as it is
+            [-3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
+            [-3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
+            2. all pos: Leave first, make rest zeros
+            [3000.0, 3000.0, 3000.0, 3000.0, 3000.0]
+            [3000.0,    0.0,    0.0,    0.0,    0.0]
+            3. Middle switch from neg to pos, make all pos, leave rest zero
+            [-3000.0, -3000.0, -3000.0, 3000.0, 3000.0]
+            [ 3000.0, 3000.0,  3000.0, 3000.0,    0.0]
+            4. Middle switch from pos to neg - leave only the first one, then make rest zeros
+            [3000.0, 3000.0, 3000.0, -3000.0, -3000.0]
+            [3000.0,    0.0,    0.0,     0.0,     0.0]
+            5. First op neg rest pos: - make first and second pos, rest zeros, same as #3
+            [-3000.0, 3000.0, 3000.0, 3000.0, 3000.0]
+            [ 3000.0, 3000.0,    0.0,    0.0,    0.0]
+            6. First op pos rest neg - leave first - make rest zeros, make rest zero, as as #4
+            [3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
+            [3000.0,     0.0,     0.0,     0.0,     0.0]
+            7. last op pos, rest neg - same as #3 - make all post
+            [-3000.0, -3000.0, -3000.0, -3000.0, 3000.0]
+            [ 3000.0,  3000.0,  3000.0,  3000.0, 3000.0]
+            8. last op neg, rest pos - same as #4            
+            [3000.0, 3000.0, 3000.0, 3000.0, -3000.0]
+            [3000.0, 3000.0, 3000.0, 3000.0, -3000.0]
+        '''        
+        for t in range(0, len(rewards)):          
+            #if there is sign inversion
+            try:
+                if (rewards[t] > rewards[t+1]) or (rewards[t] < rewards[t+1]):
+                     #if neg -> pos, make all previous positive rewards and all next ones zeros             
+                    if   rewards[t] < 0 :
+                        #slicing - [a:b] a is inclusive, b is exclusive boundary
+                        first = list(map(abs, rewards[0:t+2]))
+                        #second = list(map(lambda x : -1*abs(x), rewards[t+2:last_n_slice]))
+                        second = list(np.zeros_like(rewards[t+2:last_n_slice]))
+                        print("rewards[t] < 0")
+                        print("first")
+                        print(first)
+                        print("second")
+                        print(second)
+                        
+                        checked_rewards = first + second
+                        break
+                    #if pos -> neg, make make rest of the rewards zeros
+                    elif rewards[t] > 0 :
+                        first = rewards[0:t+1]
+                        #second = list(map(lambda x : -1*abs(x), rewards[t+1:last_n_slice]))
+                        second = list(np.zeros_like(rewards[t+1:last_n_slice]))
+                        
+                        print("rewards[t] > 0")
+                        print("first")
+                        print(first)
+                        print("second")
+                        print(second)
+                        
+                        checked_rewards = first + second
+                        break
+            except IndexError:
+                 break 
+    
+        #discount the rewards
         discounted_r = np.zeros_like(rewards)
         running_add = 0
-        for t in reversed(range(0, len(rewards))):
-            running_add = running_add * 0.9 + rewards[t] #for all pos/negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
+        
+        #if rewards did not swith, penelise the frst selection first
+        #ng = range(0, len(checked_rewards)) if rewards == checked_rewards else reversed(range(0, len(checked_rewards)))
+        for t in reversed(range(0, len(checked_rewards))):          
+            running_add = running_add * 0.5 + checked_rewards[t] #for all pos/negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
             discounted_r[t] = running_add
         #normalise rewards
-        #print("discounted_r")
-        #print(discounted_r)
-        #print("np.mean(discounted_r)")
-        #print(np.mean(discounted_r))
-        #print("np.std(discounted_r)")
-        #print(np.std(discounted_r))
-        #print("np.linalg.norm(discounted_r, 1)")
-        #print(np.linalg.norm(discounted_r, 1))
-        #print("np.linalg.norm(discounted_r, 2)")
-        #print(np.linalg.norm(discounted_r, 2))
+        
+        print("discounting")
+        print(rewards)
+        print("checked_rewards")
+        print(checked_rewards)
+        print("discounted_r")
+        print(discounted_r)
+        print("np.mean(discounted_r)")
+        print(np.mean(discounted_r))
+        print("np.std(discounted_r)")
+        print(np.std(discounted_r))
+        print("np.linalg.norm(discounted_r, 1)")
+        print(np.linalg.norm(discounted_r, 1))
+        print("np.linalg.norm(discounted_r, 2)")
+        print(np.linalg.norm(discounted_r, 2))
+        
         #dont scale but norm, as scaling might result into inversion of signs
         #discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-10)
         discounted_r = discounted_r/ np.linalg.norm(discounted_r, 2)
