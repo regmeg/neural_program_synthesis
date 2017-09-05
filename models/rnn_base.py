@@ -20,6 +20,18 @@ class RNN(NNbase):
 
             #model parameters
             with tf.name_scope("Params"):
+                
+                self.params["W"] = tf.get_variable("W", shape=[ cfg['state_size']+cfg['num_features'], cfg['state_size'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b")
+
+                self.params["W2"] = tf.get_variable("W2", shape=[ cfg['state_size'], ops.num_of_ops ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b2"] = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2")
+                
+                self.params["W3"] = tf.get_variable("W3", shape=[ ops.num_of_ops, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b3"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3")
+                
+                
+                '''
                 self.params["W"] = tf.Variable(tf.truncated_normal([cfg['state_size']+cfg['num_features'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W")
                 self.params["b"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b")
 
@@ -28,7 +40,8 @@ class RNN(NNbase):
                 
                 self.params["W3"] = tf.Variable(tf.truncated_normal([self.ops.num_of_ops, cfg['num_features']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W3")
                 self.params["b3"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3")
-
+                '''
+                
             #create graphs for forward pass to soft and hard selection
             self.train = self.run_forward_pass(cfg, mode = "train")
             self.total_loss_train, self.math_error_train = self.calc_loss(cfg, self.train["output"], mode = "train")

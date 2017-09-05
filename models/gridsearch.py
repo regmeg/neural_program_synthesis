@@ -54,10 +54,10 @@ params=OrderedDict(
 
 if FLAGS.type == "RNN":
     params=OrderedDict()
-    params['state_size'] = [250]
+    params['state_size'] = [600]
     params['num_samples'] = [3500]
     params['batch_size']  = [100]
-    params['learning_rate'] = [0.001]
+    params['learning_rate'] = [0.01]
     params['epsilon'] = [1e-3]
     #params['loss_weight'] = [0.5]
     params['max_output_ops'] = [5]
@@ -83,15 +83,15 @@ if FLAGS.type == "RNN":
 elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
-    params['state_size'] = [100]
-    params['num_samples'] = [1500]
-    params['batch_size']  = [100]
-    params['drop_rate'] = [0]
-    params['learning_rate'] = [0.001]
+    params['state_size'] = [200]
+    params['num_samples'] = [15]
+    params['batch_size']  = [2]
+    params['drop_rate'] = [0.15]
+    params['learning_rate'] = [0.005]
     params['epsilon'] = [1e-3]
-    params['max_output_ops'] = [3, 5]
+    params['max_output_ops'] = [5]
     params['num_features'] = [4]
-    params['train_fn'] = ["np_add", "np_mult", "np_stall"]
+    params['train_fn'] = ["np_avg_val"]
     params['model'] = ["RLRNN"]
     params['norm'] = [True]
     params['clip'] = [False]
@@ -100,9 +100,8 @@ elif FLAGS.type == "RL":
     #params['state_fn'] = ["relu", "tanh"]
     params['state_fn'] = ["relu"]
     params['pen_sofmax'] = [False]
-    params['smax_pen_r'] = [0.0]
     params['augument_grad'] = [False]
-    params['max_reward'] = [3000]
+    params['max_reward'] = [1000]
 else:
     raise Exception('Wrong model specified to be run')
 

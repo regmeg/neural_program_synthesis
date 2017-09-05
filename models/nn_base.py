@@ -129,8 +129,8 @@ class NNbase(object):
 
     def calc_backprop(self, cfg):
         print(list(self.params.values()))
-        with tf.name_scope("Grads"):
-            grads = tf.gradients(self.total_loss_train, list(self.params.values()), name="comp_gradients")
+        with tf.name_scope("Grads"):            
+            grads = optimizer.compute_gradients(self.total_loss_train, var_list=list(self.params.values()) )
 
            
             if cfg['add_noise']:
@@ -138,36 +138,42 @@ class NNbase(object):
                 for grad in grads:
                     denom = tf.pow( (1+self.model_vars["global_step"]), tf.cast(0.55, cfg['datatype']))
                     variance =  tf.cast(1/denom, cfg['datatype'])
-                    gradient_shape = grad.get_shape()
+                    gradient_shape = grad[0].get_shape()
                     noise = random_ops.truncated_normal(gradient_shape, stddev=tf.sqrt(variance), dtype=cfg['datatype'])
-                    noisy_gradients.append(grad + noise)
+                    noisy_gradients.append((grad[0] + noise, grad[1]))
                 grads = noisy_gradients
             
             if cfg['augument_grad']:
                 augumented_grads = []
-                param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
-                for i, grad in enumerate(grads): 
-                        if "W3" or "b3" in param_names[i]: 
-                            augumented_grads.append(grad)
+                #param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
+                for grad in enumerate(grads): 
+                        if "W3" or "b3" in grads[1].name.replace(":","_"): 
+                            augumented_grads.append((grad[0], grad[1]))
                         else:
                             aug_ratio = tf.log1p(self.math_error_train)* tf.cast(cfg['softmax_sat'], cfg['datatype'])
-                            augumented_grads.append(aug_ratio*grad)
+                            augumented_grads.append((aug_ratio*grad[0], grad[1]))
                 grads = augumented_grads
                 
                         #clip gradients by norm and add summaries
             if cfg['norm']:
                 print("norming the grads")
-                grads, norms = tf.clip_by_global_norm(grads, cfg['grad_norm'])
+                gradients, variables = zip(*grads)
+                grads_normed, norms = tf.clip_by_global_norm(gradients, cfg['grad_norm'])
+                grads = list(zip(grads_normed, variables))
             elif cfg['clip']:
                 print("clipping the grads")
-                grads = [tf.clip_by_value(grad, cfg['grad_clip_val_min'], cfg['grad_clip_val_max']) for grad in grads]
+                gradients, variables = zip(*grads)
+                grads_clipped = [tf.clip_by_value(grad, cfg['grad_clip_val_min'], cfg['grad_clip_val_max']) for grad in gradients]
+                grads = list(zip(grads_clipped, variables))
                 norms = []
             else:
                 grads = grads
                 norms = []
                 
         with tf.name_scope("Train_step"):
-            train_step = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt").apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
+            train_step = optimizer.apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
+            #train_step = train_step = tf.train.RMSPropOptimizer(cfg['learning_rate'], name="RMSPropOpt").apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
+            
             print("grads are")
             print(grads)
             print("norm is ")
@@ -222,3 +228,224 @@ class NNbase(object):
                 tf.summary.scalar('max', tf.reduce_max(var))
                 tf.summary.scalar('min', tf.reduce_min(var))
                 tf.summary.histogram('histogram', var)
+                
+    ##################
+    ####RL methods
+    ##################
+        #perform selection from the distribution for RL model
+    def perform_selection_RL(self, logits, cfg):
+            with tf.name_scope("perform_selection"):
+                #selection = tf.multinomial(logits, 1, name="draw_from_logits")
+                selection  = tf.argmax(logits, 1, )
+                labels = tf.one_hot(selection, self.num_of_ops, dtype=cfg['datatype'])
+                reshape_s = tf.reshape(selection , [cfg['batch_size'], -1], name = "reshape_s")
+                reshape_l = tf.reshape(labels , [cfg['batch_size'], -1], name = "reshape_l")
+                return dict(selection = reshape_s,
+                            labels = reshape_l)                 
+    
+    
+    
+    #perform policy rollout - select up to five ops max
+    def policy_rollout_no_mem(self, sess, _current_state_train, batchX, batchY, cfg):
+        
+        _current_x = batchX
+        output = batchX
+        
+        #produce two types of arrays - ones step based and others - batch based
+        rewards = []
+        selections = []
+        states = []
+        current_exes = []
+        outputs = []        
+ 
+        for timestep in range(cfg['max_output_ops']):
+            #print("timestep", timestep)
+            
+                        
+            #track states produced by the policy RNN
+            states.append(_current_state_train)
+            
+            #track actual inputs/outputs from the RNN net
+            current_exes.append(_current_x)
+            
+            
+            
+            _current_state_train,\
+            _current_x,\
+            _logits,\
+            _log_probs,\
+            _selection  = sess.run([self.train["current_state"],
+                                      self.train["current_x"],
+                                      self.train["logits"],
+                                      self.train["log_probs"],
+                                      self.selection],
+                            feed_dict={
+                                self.init_state:_current_state_train,
+                                self.batchX_placeholder: _current_x
+                            })
+            
+            #print(np.hstack([_selection, _logits, _log_probs]))
+            
+            output, error, math_error = self.ops_env.apply_op(_selection, output, batchY)
+            reward = cfg['max_reward'] - error
+            
+            #track rewards
+            rewards.append(reward)
+            
+            #trakc op selection indeces
+            selections.append(_selection)           
+
+            #track outputs from the ops
+            outputs.append(output)
+
+            
+            if math_error.sum() < 1:
+                #print("erro sum", math_error.sum())
+                #print("breaking")
+                break
+        
+        #print("finished_loops")
+        #print("rewards before discounting")
+        #print(rewards_ord)
+
+        reeval_rewards = np.apply_along_axis( self.reeval_rewards, 1, np.hstack(rewards)).reshape((cfg['batch_size'],-1))
+        discount_rewards = np.apply_along_axis( self.discount_rewards, 1, reeval_rewards).reshape((cfg['batch_size'],-1))
+        #return np.float64(discount_rewards), np.float64(selections), np.float64(states), np.float64(current_exes)
+        return  discount_rewards,\
+                reeval_rewards,\
+                selections,\
+                states,\
+                current_exes,\
+                outputs,\
+                math_error
+
+    
+    #dicount rewards for later selections https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5#file-pg-pong-py-L130
+    def discount_rewards(self, rewards):
+        """ take 1D float array of rewards and compute discounted reward """
+    
+        #discount the rewards
+        discounted_r = np.zeros_like(rewards)
+        running_add = 0
+        
+        #if rewards did not swith, penelise the frst selection first
+        #ng = range(0, len(checked_rewards)) if rewards == checked_rewards else reversed(range(0, len(checked_rewards)))
+        for t in reversed(range(0, len(rewards))):          
+            running_add = running_add * 0.09 + rewards[t] #for all pos/negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
+            discounted_r[t] = running_add
+        #normalise rewards
+        
+        #dont scale but norm, as scaling might result into inversion of signs
+        #discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-10)
+        normalised_r = discounted_r/ np.linalg.norm(discounted_r, 2)
+        #normalised_r = discounted_r
+        '''
+        print("discounting")
+        print(rewards)
+        print("discounted_r")
+        print(discounted_r)
+        print("np.mean(discounted_r)")
+        print(np.mean(discounted_r))
+        print("np.std(discounted_r)")
+        print(np.std(discounted_r))
+        print("np.linalg.norm(discounted_r, 1)")
+        print(np.linalg.norm(discounted_r, 1))
+        print("np.linalg.norm(discounted_r, 2)")
+        print(np.linalg.norm(discounted_r, 2))
+        print("normalised_r")
+        print(normalised_r)
+        '''
+        
+        return normalised_r
+
+    def reeval_rewards(self,rewards):
+        '''
+            Reevaluate cases - idea is: penelise only sequances which are fully negative, otherwise find the postive, make rewards prior positive which led to the pos reward and then make rest zeros, as they are irrelevant after that.
+                1.all neg: leave as it is
+                [-3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
+                [-3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
+                2. all pos: Leave first, make rest zeros
+                [3000.0, 3000.0, 3000.0, 3000.0, 3000.0]
+                [3000.0,    0.0,    0.0,    0.0,    0.0]
+                3. Middle switch from neg to pos, make all pos, leave rest zero
+                [-3000.0, -3000.0, -3000.0, 3000.0, 3000.0]
+                [ 3000.0, 3000.0,  3000.0, 3000.0,    0.0]
+                4. Middle switch from pos to neg - leave only the first one, then make rest zeros
+                [3000.0, 3000.0, 3000.0, -3000.0, -3000.0]
+                [3000.0,    0.0,    0.0,     0.0,     0.0]
+                5. First op neg rest pos: - make first and second pos, rest zeros, same as #3
+                [-3000.0, 3000.0, 3000.0, 3000.0, 3000.0]
+                [ 3000.0, 3000.0,    0.0,    0.0,    0.0]
+                6. First op pos rest neg - leave first - make rest zeros, make rest zero, as as #4
+                [3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
+                [3000.0,     0.0,     0.0,     0.0,     0.0]
+                7. last op pos, rest neg - same as #3 - make all pos
+                [-3000.0, -3000.0, -3000.0, -3000.0, 3000.0]
+                [ 3000.0,  3000.0,  3000.0,  3000.0, 3000.0]
+                8. last op neg, rest pos - same as #4         
+                [3000.0, 3000.0, 3000.0, 3000.0, -3000.0]
+                [3000.0,    0.0,    0.0,    0.0,     0.0]
+        ''' 
+        rewards = list(rewards)
+        last_n_slice = len(rewards)
+        for t in range(last_n_slice):
+            #find the first positive reward
+            if rewards[t] > 0:
+                first = []
+                second = []
+                #slicing - [a:b] a is inclusive, b is exclusive boundary
+                #make all before postive
+                try:
+                    first = list(map(abs, rewards[0:t+1]))
+                except IndexError:
+                    pass
+                #make all rest zeros
+                try:
+                    second = list(np.zeros_like(rewards[t+1:last_n_slice]))
+                except IndexError:
+                    pass            
+                reeval_rewards = first + second
+                break
+            reeval_rewards = rewards
+        return reeval_rewards
+    
+        
+    #calculate loss function based on selected policies and the achieved rewards
+    def calc_RL_loss(self, log_prob, cfg):
+        indices = tf.cast(tf.range(0, tf.shape(log_prob)[0]) * tf.shape(log_prob)[1], cfg['datatype']) + self.selections_placeholder
+        op_prob = tf.gather(tf.reshape(log_prob, [-1]), tf.cast(indices, tf.int64))
+
+        #comp loss
+        loss = -tf.reduce_sum(tf.multiply(op_prob, self.rewards_placeholder))
+        #loss = tf.nn.l2_loss(-op_prob)
+        
+        return loss
+    
+    def calc_backprop_RL(self, loss, cfg):
+        optimizer = tf.train.RMSPropOptimizer(cfg['learning_rate'])
+        #grads = optimizer.compute_gradients(loss, var_list= list(self.params.values()), grad_loss=self.rewards_placeholder)
+        grads = optimizer.compute_gradients(loss, var_list= list(self.params.values()))
+        #clear none grads
+        clean_grads = [(grad, var) for grad, var in grads if grad is not None]
+        grads = clean_grads
+        if cfg['add_noise']:
+            noisy_gradients = []
+            for grad in grads:
+                denom = tf.pow( (1+self.model_vars["global_step"]), tf.cast(0.55, cfg['datatype']))
+                variance =  tf.cast(1/denom, cfg['datatype'])
+                gradient_shape = grad[0].get_shape()
+                noise = random_ops.truncated_normal(gradient_shape, stddev=tf.sqrt(variance), dtype=cfg['datatype'])
+                noisy_gradients.append((grad[0] + noise, grad[1]))
+            grads = noisy_gradients
+            
+        if cfg['norm']:
+            print("norming the grads")
+            gradients, variables = zip(*grads)
+            grads_normed, norms = tf.clip_by_global_norm(gradients, cfg['grad_norm'])
+            grads = list(zip(grads_normed, variables))
+        else:
+            norms = []
+        train_step = optimizer.apply_gradients(grads, global_step=self.model_vars["global_step"])
+        print("grads are")
+        print(grads)
+        return grads, train_step, norms

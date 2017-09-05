@@ -4,7 +4,7 @@ from nn_base import NNbase
 
 class RLRNN(NNbase):
     
-    def __init__(self, cfg, ops_env):
+    def __init__(self, cfg, ops_env, mem):
 
         #init parent
         super(RLRNN, self).__init__(cfg, ops_env)
@@ -12,11 +12,15 @@ class RLRNN(NNbase):
         #placeholder for the initial state of the model
         with tf.name_scope("RNN_op"):
             self.init_state = tf.placeholder(cfg['datatype'], [None, cfg['state_size']], name="init_state")
+            self.batchY_placeholder = tf.placeholder(cfg['datatype'], [None, ops_env.num_of_ops], name="batchY")
             self.selections_placeholder = tf.placeholder(cfg['datatype'], name="selections_placeholder")
             self.rewards_placeholder = tf.placeholder(cfg['datatype'], name="rewards_placeholder")
             
             #set ops_env
             self.ops_env = ops_env
+            self.num_of_ops = ops_env.num_of_ops
+            #set the mem
+            self.mem = mem
             #set random seed
             tf.set_random_seed(cfg['seed'])
 
@@ -29,32 +33,33 @@ class RLRNN(NNbase):
                 self.params["W2"] = tf.get_variable("W2", shape=[ cfg['state_size'], ops_env.num_of_ops ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
                 self.params["b2"] = tf.Variable(np.zeros((ops_env.num_of_ops)), dtype=cfg['datatype'], name="b2")
                 
-                self.params["W3"] = tf.get_variable("W3", shape=[ ops_env.num_of_ops, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["W3"] = tf.get_variable("W3", shape=[ cfg['num_features'], cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
                 self.params["b3"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3")
 
                 
             #create graphs for forward pass to soft and hard selection
             self.train = self.run_forward_pass(cfg, mode = "train")
-            self.selection = self.perform_selection(self.train['log_probs'], cfg)
+            self.selected = self.perform_selection_RL(self.train['log_probs'], cfg)
             self.total_loss_train = self.calc_RL_loss(self.train['log_probs'], cfg)
             
             #calc grads and hereby the backprop step
-            #self.grads, self.train_step, self.norms  = self.calc_backprop(cfg)
-            self.train_step  = self.calc_backprop(self.total_loss_train, cfg)
-        
+            self.grads, self.train_step, self.norms = self.calc_backprop_RL(self.total_loss_train, cfg)
+            #self.train_step  = self.calc_backprop_RL(self.total_loss_train + self.mem.total_loss_train, cfg)
+            
 
         #write model param and grad summaries outside of all scopes
         with tf.name_scope("Summaries_params"):
             for param, tensor in self.params.items(): self.variable_summaries(tensor)               
-        '''       
+               
         with tf.name_scope("Summaries_grads"):
-            param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
-            for i, grad in enumerate(self.grads): self.variable_summaries(grad, name=param_names[i]+"_grad")
+            for grad, var in self.grads: 
+                print("writing grad", var.name.replace(":","_")+"_grad")
+                self.variable_summaries(grad, name=var.name.replace(":","_")+"_grad")
         
         if cfg['norm']:
             with tf.name_scope("Summaries_norms"):
                 self.variable_summaries(self.norms)
-        '''
+        
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):
         current_state = self.init_state
@@ -63,8 +68,14 @@ class RLRNN(NNbase):
                         
         #define policy network
         with tf.name_scope("Forward_pass_"+mode):
-           
+                    
+                    with tf.name_scope("Comp_next_x"):
+                        next_x = tf.add(tf.matmul(current_x, self.params["W3"], name="state_mul_W3"), self.params["b3"], name="add_bias3")
+                        current_x = next_x
+                
+                
                     with tf.name_scope("Comp_softmax"):
+                
                         input_and_state_concatenated = tf.concat([current_x, current_state], 1, name="concat_input_state")  # Increasing number of columns
                         _mul1 = tf.matmul(input_and_state_concatenated, self.params["W"], name="input-state_mult_W")
                         _add1 = tf.add(_mul1, self.params["b"], name="add_bias")
@@ -90,11 +101,7 @@ class RLRNN(NNbase):
                         softmax = tf.nn.softmax(logits, name="get_softmax")
                         # log probabilities - might be untsable, use softmax instead
                         log_probs = tf.log(softmax + 1e-10)
-                        #log_probs = tf.log(logits)
-
-                    with tf.name_scope("Comp_next_x"):
-                        next_x = tf.add(tf.matmul(logits, self.params["W3"], name="state_mul_W3"), self.params["b3"], name="add_bias3")
-                        current_x = next_x
+                        #log_probs = softmax
 
             #build the response dict
         return dict(
@@ -105,25 +112,28 @@ class RLRNN(NNbase):
                     current_x = current_x,
                    )
     
-    #perform selection from the distribution
-    def perform_selection(self, logits, cfg):
-            with tf.name_scope("perform_selection"):
-                selection = tf.multinomial(logits, 1, name="draw_from_logits")
-                reshape = tf.reshape(selection , [cfg['batch_size'], -1], name = "reshape")
-                return reshape
-    
-    #perform policy rollout - select up to five ops max
-    def policy_rollout(self, sess, _current_state_train, batchX, batchY, cfg):
+        #perform policy rollout - select up to five ops max
+    def policy_rollout(self, sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg):
         
         _current_x = batchX
+        _current_x_mem = batchX
         output = batchX
         
-        #produce two types of arrays - ones step based and others - batch based
+        #produce two types of arrays - one for op another for mem selection
         rewards = []
         selections = []
+        selections_mem = []
+        labels = []
+        labels_mem = []
+        mem_masks = []
+        log_probs = []
+        log_probs_mem = []
         states = []
+        states_mem = []
         current_exes = []
-        outputs = []        
+        current_exes_mem = []
+        outputs = []
+        outputs_mem = []
  
         for timestep in range(cfg['max_output_ops']):
             #print("timestep", timestep)
@@ -131,46 +141,73 @@ class RLRNN(NNbase):
                         
             #track states produced by the policy RNN
             states.append(_current_state_train)
+            states_mem.append(_current_state_train_mem)
             
             #track actual inputs/outputs from the RNN net
             current_exes.append(_current_x)
-            
-            
-            
+            current_exes_mem.append(_current_x_mem)
+          
             _current_state_train,\
+            _current_state_train_mem,\
             _current_x,\
-            _logits,\
+            _current_x_mem,\
+            _labels,\
+            _labels_mem,\
+            _selection,\
+            _selection_mem,\
             _log_probs,\
-            _selection  = sess.run([self.train["current_state"],
-                                      self.train["current_x"],
-                                      self.train["logits"],
-                                      self.train["log_probs"],
-                                      self.selection],
+            _log_probs_mem = sess.run([  self.train["current_state"],
+                                         self.mem.train["current_state"],
+                                         self.train["current_x"],
+                                         self.mem.train["current_x"],
+                                         self.selected["labels"],
+                                         self.mem.selected["labels"],
+                                         self.selected["selection"],
+                                         self.mem.selected["selection"],
+                                         self.train["log_probs"],
+                                         self.mem.train["log_probs"]],
                             feed_dict={
                                 self.init_state:_current_state_train,
-                                self.batchX_placeholder: _current_x
+                                self.mem.init_state:_current_state_train_mem,
+                                self.batchX_placeholder: _current_x,
+                                #self.mem.batchX_placeholder: _current_x_mem
+                                #feed the same exes to the mem network
+                                self.mem.batchX_placeholder: _current_x
                             })
-            
-            #print(np.hstack([_selection, _logits, _log_probs]))
 
-            output, error, math_error = self.ops_env.apply_op(_selection, output, batchY)
+            #print(np.hstack([_selection, _logits, _log_probs]))
+            #def apply_op(self, selections, selections_mem, prev_sel, prev_sel_mem, inptX, batchX, batchY):
+            output, output_mem, error, math_error, mem_mask = self.ops_env.apply_op(_selection, _selection_mem, selections[-1:], selections_mem[-1:], output, batchX, batchY)
             reward = cfg['max_reward'] - error
             
             #track rewards
             rewards.append(reward)
             
             #trakc op selection indeces
-            selections.append(_selection)           
+            selections.append(_selection)
+            selections_mem.append(_selection_mem)
+            
+            #trakc op selection labels
+            labels.append(_labels)
+            labels_mem.append(_labels_mem)
+            
+            #track mem mask
+            mem_masks.append(mem_mask)
+            
+            #track probs
+            log_probs.append(_log_probs)
+            log_probs_mem.append(_log_probs_mem)
 
             #track outputs from the ops
             outputs.append(output)
+            outputs_mem.append(output_mem)
 
             
             if math_error.sum() < 1:
                 #print("erro sum", math_error.sum())
                 #print("breaking")
                 break
-        
+
         #print("finished_loops")
         #print("rewards before discounting")
         #print(rewards_ord)
@@ -178,113 +215,21 @@ class RLRNN(NNbase):
         reeval_rewards = np.apply_along_axis( self.reeval_rewards, 1, np.hstack(rewards)).reshape((cfg['batch_size'],-1))
         discount_rewards = np.apply_along_axis( self.discount_rewards, 1, reeval_rewards).reshape((cfg['batch_size'],-1))
         #return np.float64(discount_rewards), np.float64(selections), np.float64(states), np.float64(current_exes)
-        return  discount_rewards,\
-                reeval_rewards,\
-                selections,\
-                states,\
-                current_exes,\
-                outputs,\
-                math_error
-    
-    #calculate loss function based on selected policies and the achieved rewards
-    def calc_RL_loss(self, log_prob, cfg):
-        indices = tf.cast(tf.range(0, tf.shape(log_prob)[0]) * tf.shape(log_prob)[1], cfg['datatype']) + self.selections_placeholder
-        op_prob = tf.gather(tf.reshape(log_prob, [-1]), tf.cast(indices, tf.int64))
-
-        #comp loss
-        loss = -tf.reduce_sum(tf.multiply(op_prob, self.rewards_placeholder))
-        
-        return loss
-    
-    #dicount rewards for later selections https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5#file-pg-pong-py-L130
-    def discount_rewards(self, rewards):
-        """ take 1D float array of rewards and compute discounted reward """
-    
-        #discount the rewards
-        discounted_r = np.zeros_like(rewards)
-        running_add = 0
-        
-        #if rewards did not swith, penelise the frst selection first
-        #ng = range(0, len(checked_rewards)) if rewards == checked_rewards else reversed(range(0, len(checked_rewards)))
-        for t in reversed(range(0, len(rewards))):          
-            running_add = running_add * 0.5 + rewards[t] #for all pos/negative rewards mean is always going to be bigger than the first reward, hence it will become positive when centered
-            discounted_r[t] = running_add
-        #normalise rewards
-        
-        #dont scale but norm, as scaling might result into inversion of signs
-        #discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-10)
-        normalised_r = discounted_r/ np.linalg.norm(discounted_r, 2)
-        '''
-        print("discounting")
-        print(rewards)
-        print("discounted_r")
-        print(discounted_r)
-        print("np.mean(discounted_r)")
-        print(np.mean(discounted_r))
-        print("np.std(discounted_r)")
-        print(np.std(discounted_r))
-        print("np.linalg.norm(discounted_r, 1)")
-        print(np.linalg.norm(discounted_r, 1))
-        print("np.linalg.norm(discounted_r, 2)")
-        print(np.linalg.norm(discounted_r, 2))
-        print("normalised_r")
-        print(normalised_r)
-        '''
-        
-        return normalised_r
-
-    def reeval_rewards(self,rewards):
-        '''
-            Reevaluate cases - idea is: penelise only sequances which are fully negative, otherwise find the postive, make rewards prior positive which led to the pos reward and then make rest zeros, as they are irrelevant after that.
-                1.all neg: leave as it is
-                [-3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
-                [-3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
-                2. all pos: Leave first, make rest zeros
-                [3000.0, 3000.0, 3000.0, 3000.0, 3000.0]
-                [3000.0,    0.0,    0.0,    0.0,    0.0]
-                3. Middle switch from neg to pos, make all pos, leave rest zero
-                [-3000.0, -3000.0, -3000.0, 3000.0, 3000.0]
-                [ 3000.0, 3000.0,  3000.0, 3000.0,    0.0]
-                4. Middle switch from pos to neg - leave only the first one, then make rest zeros
-                [3000.0, 3000.0, 3000.0, -3000.0, -3000.0]
-                [3000.0,    0.0,    0.0,     0.0,     0.0]
-                5. First op neg rest pos: - make first and second pos, rest zeros, same as #3
-                [-3000.0, 3000.0, 3000.0, 3000.0, 3000.0]
-                [ 3000.0, 3000.0,    0.0,    0.0,    0.0]
-                6. First op pos rest neg - leave first - make rest zeros, make rest zero, as as #4
-                [3000.0, -3000.0, -3000.0, -3000.0, -3000.0]
-                [3000.0,     0.0,     0.0,     0.0,     0.0]
-                7. last op pos, rest neg - same as #3 - make all pos
-                [-3000.0, -3000.0, -3000.0, -3000.0, 3000.0]
-                [ 3000.0,  3000.0,  3000.0,  3000.0, 3000.0]
-                8. last op neg, rest pos - same as #4         
-                [3000.0, 3000.0, 3000.0, 3000.0, -3000.0]
-                [3000.0,    0.0,    0.0,    0.0,     0.0]
-        ''' 
-        rewards = list(rewards)
-        last_n_slice = len(rewards)
-        for t in range(last_n_slice):
-            #find the first positive reward
-            if rewards[t] > 0:
-                first = []
-                second = []
-                #slicing - [a:b] a is inclusive, b is exclusive boundary
-                #make all before postive
-                try:
-                    first = list(map(abs, rewards[0:t+1]))
-                except IndexError:
-                    pass
-                #make all rest zeros
-                try:
-                    second = list(np.zeros_like(rewards[t+1:last_n_slice]))
-                except IndexError:
-                    pass            
-                reeval_rewards = first + second
-                break
-            reeval_rewards = rewards
-        return reeval_rewards
-    
-    def calc_backprop(self, loss, cfg):
-        optimizer = tf.train.RMSPropOptimizer(cfg['learning_rate'])
-        train_step = optimizer.minimize(loss)
-        return train_step
+        return  dict(
+                    discount_rewards = discount_rewards,
+                    rewards = reeval_rewards,
+                    math_error = math_error,
+                    selections = selections,
+                    selections_mem = selections_mem,
+                    labels = labels,
+                    labels_mem = labels_mem,
+                    mem_masks = mem_masks,
+                    log_probs = log_probs,
+                    log_probs_mem = log_probs_mem,
+                    states = states,
+                    states_mem = states_mem,
+                    current_exes = current_exes,
+                    current_exes_mem = current_exes_mem,
+                    outputs = outputs,
+                    outputs_mem = outputs_mem
+                )

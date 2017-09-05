@@ -23,6 +23,16 @@ class MemRNN(NNbase):
             tf.set_random_seed(cfg['seed'])
             with tf.name_scope("Params"):
                 #model parameters
+                self.params["W_mem"] = tf.get_variable("W_mem", shape=[ cfg['state_size']+cfg['num_features'], cfg['state_size'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b_mem"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_mem")
+
+                self.params["W2_mem"] = tf.get_variable("W2_mem", shape=[ cfg['state_size'], ops.num_of_ops ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2_mem")
+                
+                self.params["W3_mem"] = tf.get_variable("W3_mem", shape=[ ops.num_of_ops, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b3_mem"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3_mem")
+                
+                '''
                 self.params["W_mem"] = tf.Variable(tf.truncated_normal([cfg['state_size']+cfg['num_features'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W_mem")
                 self.params["b_mem"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_mem")
 
@@ -31,6 +41,7 @@ class MemRNN(NNbase):
 
                 self.params["W3_mem"] = tf.Variable(tf.truncated_normal([self.ops.num_of_ops, cfg['num_features']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W3_mem")
                 self.params["b3_mem"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3_mem")
+                '''
     #forward pass
     def run_forward_pass(self,current_input, curent_x, cfg, mode="train"):
         with tf.name_scope("Forward_pass_"+mode):

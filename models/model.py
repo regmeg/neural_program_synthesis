@@ -14,6 +14,7 @@ from ops import Operations
 from session import run_session_2RNNS, run_session_HistoryRNN, run_session_RL_RNN
 from data_gen import samples_generator, split_train_test, OpsEnv
 from rl_rnn import RLRNN
+from rl_rnn_mem import RLRNNMEM
 
 def main():
     #get the global configuration
@@ -77,7 +78,8 @@ def main():
         model = eval(cfg['model']+"(cfg, ops, mem_sel, op_sel)")
         run_session_HistoryRNN(model, cfg, x_train, x_test, y_train, y_test)
     elif cfg['model'] == "RLRNN":
-        model = eval(cfg['model']+"(cfg, ops_env)")
+        mem = RLRNNMEM(cfg, ops_env) 
+        model = RLRNN(cfg, ops_env, mem) 
         run_session_RL_RNN(model, cfg, x_train, x_test, y_train, y_test)
     else:
         raise Exception('Wrong model specified to be run')
