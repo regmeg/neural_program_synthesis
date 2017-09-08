@@ -1,0 +1,45 @@
+reference 'ProseDSLModels.dll';
+using semantics ProseDSLModels.Semantics;
+language Dsl;
+
+@input double[] x;
+
+@start double[] program :=  add(out1)
+						  | mult(out1)
+						  | len(out1)
+						  | div(out1, mem)
+						  | sub(out1, mem)
+						  | stall(out1);
+
+double[] out1 :=  add(out2)
+			    | mult(out2)
+				| len(out2)
+				| div(out2, mem)
+				| sub(out2, mem)
+				| stall(out2);
+
+double[] out2 :=  add(out3)
+			    | mult(out3)
+				| len(out3)
+				| div(out3, mem)
+				| sub(out3, mem)
+				| stall(out3);
+
+double[] out3 :=  add(out4)
+			    | mult(out4)
+				| len(out4)
+				| div(out4, mem)
+				| sub(out4, mem)
+				| stall(out4);
+
+double[] out4 :=  add(x)
+			    | mult(x)
+				| len(x)
+				| div(x, mem)
+				| sub(x, mem)
+				| stall(x);
+
+double[] mem :=  add(x)
+			   | mult(x)
+			   | len(x)
+			   | stall(x);

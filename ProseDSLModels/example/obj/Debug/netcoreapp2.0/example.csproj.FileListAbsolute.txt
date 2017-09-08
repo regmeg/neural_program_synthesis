@@ -1,0 +1,11 @@
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/example.deps.json
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/example.runtimeconfig.json
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/example.runtimeconfig.dev.json
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/example.dll
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/bin/Debug/netcoreapp2.0/example.pdb
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/obj/Debug/netcoreapp2.0/example.csproj.CoreCompileInputs.cache
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/obj/Debug/netcoreapp2.0/example.dll
+/home/user/projects/neural_program_synthesis/ProseDSLModels/example/obj/Debug/netcoreapp2.0/example.pdb
