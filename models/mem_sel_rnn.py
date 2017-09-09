@@ -11,13 +11,13 @@ class MemRNN(NNbase):
         
         with tf.name_scope("RNN_mem"):
             #placeholder for the initial state of the model
-            self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state_mem")
+            self.init_state = tf.placeholder(cfg['datatype'], [None, cfg['state_size']], name="init_state_mem")
 
             #create a ROM cell for the raw inputs and applied op on them
             self.current_input = self.batchX_placeholder
             
             with tf.name_scope("Init_cell_vals"):
-                self.mem_cell = [op(self.current_input, self.dummy_matrix) for op in ops.ops]
+                self.mem_cell = [op(self.current_input, self.dummy_matrix) for op in ops.ops_mem]
 
             #set random seed
             tf.set_random_seed(cfg['seed'])
@@ -26,26 +26,26 @@ class MemRNN(NNbase):
                 self.params["W_mem"] = tf.get_variable("W_mem", shape=[ cfg['state_size']+cfg['num_features'], cfg['state_size'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
                 self.params["b_mem"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_mem")
 
-                self.params["W2_mem"] = tf.get_variable("W2_mem", shape=[ cfg['state_size'], ops.num_of_ops ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
-                self.params["b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2_mem")
+                self.params["W2_mem"] = tf.get_variable("W2_mem", shape=[ cfg['state_size'], ops.num_of_ops_mem ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops_mem)), dtype=cfg['datatype'], name="b2_mem")
                 
-                self.params["W3_mem"] = tf.get_variable("W3_mem", shape=[ ops.num_of_ops, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                """
+                self.params["W3_mem"] = tf.get_variable("W3_mem", shape=[ ops.num_of_ops_mem, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
                 self.params["b3_mem"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3_mem")
-                
+                """
                 '''
                 self.params["W_mem"] = tf.Variable(tf.truncated_normal([cfg['state_size']+cfg['num_features'], cfg['state_size']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']), dtype=cfg['datatype'], name="W_mem")
                 self.params["b_mem"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_mem")
 
-                self.params["W2_mem"] = tf.Variable(tf.truncated_normal([cfg['state_size'], self.ops.num_of_ops], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2_mem")
-                self.params["b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2_mem")
+                self.params["W2_mem"] = tf.Variable(tf.truncated_normal([cfg['state_size'], self.ops.num_of_ops_mem], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W2_mem")
+                self.params["b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops_mem)), dtype=cfg['datatype'], name="b2_mem")
 
-                self.params["W3_mem"] = tf.Variable(tf.truncated_normal([self.ops.num_of_ops, cfg['num_features']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W3_mem")
+                self.params["W3_mem"] = tf.Variable(tf.truncated_normal([self.ops.num_of_ops_mem, cfg['num_features']], -1*cfg['param_init'], cfg['param_init'], dtype=cfg['datatype']),dtype=cfg['datatype'], name="W3_mem")
                 self.params["b3_mem"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3_mem")
                 '''
     #forward pass
-    def run_forward_pass(self,current_input, curent_x, cfg, mode="train"):
+    def run_forward_pass(self,curent_x, current_state, step, cfg, mode="train"):
         with tf.name_scope("Forward_pass_"+mode):
-            current_state = self.init_state
             with tf.name_scope("Comp_softmax"):
                 input_and_state_concatenated = tf.concat([curent_x, current_state], 1, name="concat_input_state_mem")  # Increasing number of columns
                 _mul1 = tf.matmul(input_and_state_concatenated, self.params["W_mem"], name="input-state_mult_W")
@@ -77,13 +77,15 @@ class MemRNN(NNbase):
                 #in test change to hardmax
                 if mode is "test":
                     argmax  = tf.argmax(softmax, 1, )
-                    softmax  = tf.one_hot(argmax, self.ops.num_of_ops, dtype=cfg['datatype'])
+                    softmax  = tf.one_hot(argmax, self.ops.num_of_ops_mem, dtype=cfg['datatype'])
                 #in the train mask = saturated softmax for all ops. in test change it to onehot(hardmax)
             with tf.name_scope("Comp_mem"):
                  output = self.select_mem(self.mem_cell, softmax, cfg)
             
+            """
             with tf.name_scope("Comp_next_x"):
                 next_x = tf.add(tf.matmul(logits, self.params["W3_mem"], name="state_mul_W3_mem"), self.params["b3_mem"], name="add_bias3_mem")
                 current_x = next_x
-                
-        return output, current_state, softmax, current_x
+            """ 
+        #return output, current_state, softmax, current_x
+        return output, current_state, softmax

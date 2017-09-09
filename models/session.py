@@ -35,6 +35,30 @@ def determine_loss(epoch, cfg):
     if mod < period: return True
     else :           return False
 
+
+def gen_cmd_from_name(name_in, cfg):
+    new_seed = int(round(random.random()*100000))
+    tokens = name_in.split("~")
+    string = "python3 ./model.py"
+    name = " --name="
+    for token in tokens:
+        key, val = token.split("#")
+        if key == 'grad_clip_val':
+            val = val.split("*")
+            string += " --"+str(key)+"_min="+str(val[0])
+            string += " --"+str(key)+"_max="+str(val[1])
+            name += str(key)+"#"+str(val[0])+"*"+str(val[1])+"~"
+        elif key == 'seed': continue
+        else:
+            string += " --"+str(key)+"="+str(val)
+            name += str(key)+"#"+str(val)+"~"
+    string += " --max_output_ops="+str(cfg["max_output_ops"])
+    string += " --train_fn="+str(cfg["train_fn"].__name__)
+    string += " --model="+str(cfg["model"])
+    name += "seed#" + str(new_seed)
+    seed  = " --seed="+str(new_seed)
+    return string + seed + name
+    
 def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
     #pre training setting
     np.set_printoptions(precision=3, suppress=True)
@@ -77,7 +101,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
         
         _W_mem = sess.run([m.params['W_mem']])
         _W2_mem = sess.run([m.params['W2_mem']])
-        _W3_mem = sess.run([m.params['W3_mem']])
+        #_W3_mem = sess.run([m.params['W3_mem']])
         
         print("W1")
         print(m.params['W'].eval())
@@ -90,8 +114,15 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
         print(m.params['W_mem'].eval())
         print("W2_mem")
         print(m.params['W2_mem'].eval())
-        print("W3_mem")
-        print(m.params['W3_mem'].eval())
+        
+        #print("W3_mem")
+        #print(m.params['W3_mem'].eval())
+        
+        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+        _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+        
         
         globalstartTime = time.time()
         for epoch_idx in range(cfg['num_epochs']):
@@ -128,13 +159,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             
             #determine if use both losses to train during current traiing
             use_both_losses = determine_loss(epoch_idx, cfg) 
-            
-            #set states
-            _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
-            _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-            _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
-            _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
-            
+
                 #backprop and test training set for softmax and hardmax loss
             for batch_idx in range(num_batches):
                 
@@ -148,6 +173,14 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
 
                     batchX = x_train[start_idx:end_idx]
                     batchY = y_train[start_idx:end_idx]
+                    
+                                
+                    #set states
+                    _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+                    _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+                    _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+                    _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+            
 
                     #for non testing cylce, simply do one forward and back prop with 1 batch with train data
                     if epoch_idx % cfg['test_cycle'] != 0 :                       
@@ -232,16 +265,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             reduced_loss_train_soft = reduce(lambda x, y: x+y, loss_list_train_soft)
             last_train_losses.append(reduced_loss_train_soft)
             ##every 'test_cycle' epochs test the testing set for sotmax/harmax loss
-            if epoch_idx % cfg['test_cycle'] == 0 :
-                
-                #if sharing state, share state between training and testing data, lese
-                #else completely reset the state
-                if cfg['share_state'] is False:
-                    _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
-                    _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-                    _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
-                    _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
- 
+            if epoch_idx % cfg['test_cycle'] == 0 : 
             
                 for batch_idx in range(num_test_batches):
             
@@ -255,7 +279,14 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
 
                         batchX = x_test[start_idx:end_idx]
                         batchY = y_test[start_idx:end_idx]
-
+                        
+                        
+                        #set states
+                        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+                        _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+                        _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+                        _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+                        
                         _total_loss_train,\
                         _current_state_train,\
                         _current_state_train_mem,\
@@ -366,13 +397,46 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
 
             #as well check early stopping options, once hardmax train error is small enough - there is not point to check softmax, as its combinations of math error and penalties
             if cfg['hardmax_break']:
-                if (epoch_idx % cfg['test_cycle'] == 0) and ((reduced_loss_train_hard < 10) or (reduced_loss_test_hard < 10)):
+                if (epoch_idx % cfg['test_cycle'] == 0) and ((reduced_loss_train_hard < 0.01) or (reduced_loss_test_hard < 0.01)):
+                        ## check thousand random samples
+                        print("@@checking random thousand samples")
+
+                        #gen new seed
+                        test_seed = round(random.random()*100000)
+                        num_tests = 1000
+                        print("test_seed", test_seed, "num_tests", num_tests)
+                        x_sample, y_sample = samples_generator(cfg['train_fn'], (num_tests, cfg['num_features']) , cfg['samples_value_rng'], test_seed)
+                        match_count = 0
+                        for i in range(num_tests):
+                            batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+                            batchX = np.concatenate(([x_sample[i]], batchX), axis=0)  
+                            output = sess.run([m.test['output']],
+                                feed_dict={
+                                        m.init_state:np.zeros((cfg['batch_size'], cfg['state_size'])),
+                                        m.mem.init_state:np.zeros((cfg['batch_size'], cfg['state_size'])),
+                                        m.batchX_placeholder:batchX
+                                    })
+                            match = np.allclose(y_sample[i], output[0][0])
+                            print("i", i , "match", match)
+                            print("input", list(x_sample[i]))
+                            print("expect", list(y_sample[i]))
+                            print("actual", list(output[0][0].tolist()))
+                            if match:
+                                match_count = match_count + 1
+                        print()
+                        print(match_count, "out of", num_tests,"matched")
+                        
                         print("#################################")
                         print("Model reached hardmax, breaking ...")
-                        print("#################################")
+                        print("#################################")                                                     
+
+          
+                        
+                        ##break
                         break
+
     if cfg['relaunch']:
-            cmd = "python3 ./gridsearch.py --type=RNN"
+            cmd = gen_cmd_from_name(cfg["name"], cfg)
             print("ReLnch: " + cmd)
             subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
 
@@ -1283,196 +1347,161 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
 
                     batchX = x_train[start_idx:end_idx]
                     batchY = y_train[start_idx:end_idx]
-
+                    
+                    #print("computing rollout")
+                    #rollout policites to get rewards
+                    p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, True)
+                    
+                    #maks non mem cases for the mem backprop
+                    width = np.vstack(p['states_mem']).shape[1]
+                    mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
+                    mem_state = np.vstack(p['states_mem'])[mask == True].reshape(-1, width)                        
+                    
+                    #width = np.vstack(p['current_exes_mem']).shape[1]
+                    #mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
+                    #mem_x = np.vstack(p['current_exes_mem'])[mask == True].reshape(-1, width)
+                    #use same exes for the mem
+                    width = np.vstack(p['current_exes']).shape[1]
+                    mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
+                    mem_x = np.vstack(p['current_exes'])[mask == True].reshape(-1, width)
+                    
+                    width = np.vstack(p['labels_mem']).shape[1]
+                    mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
+                    mem_y = np.vstack(p['labels_mem'])[mask == True].reshape(-1, width)
+                    
+                    mem_sel = np.vstack(p['selections_mem'])[np.vstack(p['mem_masks']) == True]
+                    mem_rews = np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1)))[np.vstack(p['mem_masks']) == True]                   
+                    no_mem_bprop = False
+                    
+                    if mem_state.size  == 0:
+                        no_mem_bprop = True
+                    if mem_x.size == 0: 
+                        no_mem_bprop = True
+                    if mem_y.size == 0:
+                        no_mem_bprop = True
+                    if mem_sel.size == 0:
+                        no_mem_bprop = True
+                    if mem_rews.size == 0: 
+                        no_mem_bprop = True
+                    
                     #for non testing cylce, simply do one forward and back prop with 1 batch with train data       
 
                     if epoch_idx % cfg['test_cycle'] != 0 :                       
                       
-                        #print("computing rollout")
-                        #rollout policites to get rewards
-                        p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg)
-                        
-                        #maks non mem cases for the mem backprop
-                        width = np.vstack(p['states_mem']).shape[1]
-                        mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        mem_state = np.vstack(p['states_mem'])[mask == True].reshape(-1, width)                        
-                        
-                        #width = np.vstack(p['current_exes_mem']).shape[1]
-                        #mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        #mem_x = np.vstack(p['current_exes_mem'])[mask == True].reshape(-1, width)
-                        #use same exes for the mem
-                        width = np.vstack(p['current_exes']).shape[1]
-                        mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        mem_x = np.vstack(p['current_exes'])[mask == True].reshape(-1, width)
-                        
-                        width = np.vstack(p['labels_mem']).shape[1]
-                        mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        mem_y = np.vstack(p['labels_mem'])[mask == True].reshape(-1, width)
-                        
-                        mem_sel = np.vstack(p['selections_mem'])[np.vstack(p['mem_masks']) == True]
-                        mem_rews = np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1)))[np.vstack(p['mem_masks']) == True]                   
-                        no_mem_bprop = False
-                        
-                        if mem_state.size  == 0:
-                            no_mem_bprop = True
-                        if mem_x.size == 0: 
-                            no_mem_bprop = True
-                        if mem_y.size == 0:
-                            no_mem_bprop = True
-                        if mem_sel.size == 0:
-                            no_mem_bprop = True
-                        if mem_rews.size == 0: 
-                            no_mem_bprop = True
-                        
-
-                        if no_mem_bprop:
-                                                                   
-                                #summary,\
-                                _total_loss_train,\
-                                _train_step        = sess.run([
-                                                                  #merged,
-                                                                  m.total_loss_train,
-                                                                  m.train_step],
-                                feed_dict={
-                                    m.init_state:np.vstack(p['states']),
-                                    
-                                    m.batchX_placeholder:np.vstack(p['current_exes']),
-
-                                    m.batchY_placeholder:np.vstack(p['labels']),
-
-                                    m.selections_placeholder:np.vstack(p['selections']),
-
-                                    m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
-
-                                })
-                        else:
-                                #summary,\
-                                _total_loss_train,\
-                                _train_step,\
-                                _trai_step_mem        = sess.run([
-                                                                  #merged,
-                                                                  m.total_loss_train,
-                                                                  m.train_step,
-                                                                  m.mem.train_step],
-                                feed_dict={
-                                    m.init_state:np.vstack(p['states']),
-                                    m.mem.init_state: np.vstack(mem_state),
-
-                                    m.batchX_placeholder:np.vstack(p['current_exes']),
-                                    m.mem.batchX_placeholder: np.vstack(mem_x),
-
-                                    m.batchY_placeholder:np.vstack(p['labels']),
-                                    m.mem.batchY_placeholder: np.vstack(mem_y),
-
-                                    m.selections_placeholder:np.vstack(p['selections']),
-                                    m.mem.selections_placeholder: np.vstack(mem_sel),
-
-                                    m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
-                                    m.mem.rewards_placeholder: np.vstack(mem_rews)
-
-                        })
-                        
-                        if cfg['num_samples'] < 16:
-                            print(list(zip(np.hstack(p['selections']).tolist(),np.around(p['discount_rewards'], decimals=3).tolist())))
-                            #print(list(zip( np.hstack(p['selections']).tolist(), np.hstack(p['mem_masks']).tolist() )))
-                            #print(list(zip(np.hstack(p['selections_mem']).tolist(),np.around(p['discount_rewards'], decimals=3).tolist())))
+                       
+                        #if no error, dont backprop
+                        #if p['math_error'].sum() > 0.0000000001:
+                        if True:
                             if no_mem_bprop:
-                                print("no_mem_sel_ops")
-                            else:
-                                print(list(zip(np.hstack(mem_sel).tolist(),np.around(mem_rews, decimals=3).tolist())))
-                            print('""')
 
-                        loss_list_train_log.append(_total_loss_train)
-                        loss_list_train_rewards.append( np.vstack(p['rewards']).sum() )
-                        loss_list_train_math_error.append(p['math_error'].sum())
+                                    #summary,\
+                                    _total_loss_train,\
+                                    _train_step        = sess.run([
+                                                                      #merged,
+                                                                      m.total_loss_train,
+                                                                      m.train_step],
+                                    feed_dict={
+                                        m.init_state:np.vstack(p['states']),
+
+                                        m.batchX_placeholder:np.vstack(p['current_exes']),
+
+                                        m.batchY_placeholder:np.vstack(p['labels']),
+
+                                        m.selections_placeholder:np.vstack(p['selections']),
+
+                                        m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
+                                        
+                                        m.training: True
+
+                                    })
+                            else:
+                                    #summary,\
+                                    _total_loss_train,\
+                                    _train_step,\
+                                    _trai_step_mem        = sess.run([
+                                                                      #merged,
+                                                                      m.total_loss_train,
+                                                                      m.train_step,
+                                                                      m.mem.train_step],
+                                    feed_dict={
+                                        m.init_state:np.vstack(p['states']),
+                                        m.mem.init_state: np.vstack(mem_state),
+
+                                        m.batchX_placeholder:np.vstack(p['current_exes']),
+                                        m.mem.batchX_placeholder: np.vstack(mem_x),
+
+                                        m.batchY_placeholder:np.vstack(p['labels']),
+                                        m.mem.batchY_placeholder: np.vstack(mem_y),
+
+                                        m.selections_placeholder:np.vstack(p['selections']),
+                                        m.mem.selections_placeholder: np.vstack(mem_sel),
+
+                                        m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
+                                        m.mem.rewards_placeholder: np.vstack(mem_rews),
+                                        
+                                        m.training: True
+
+                                })                        
+
 
                     else :
 
 
-                        #rollout policites to get rewards
-                        p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg)
-                        
-                        #maks non mem cases for the mem backprop
-                        width = np.vstack(p['states_mem']).shape[1]
-                        mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        mem_state = np.vstack(p['states_mem'])[mask == True].reshape(-1, width)                        
-                        
-                        #width = np.vstack(p['current_exes_mem']).shape[1]
-                        #mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        #mem_x = np.vstack(p['current_exes_mem'])[mask == True].reshape(-1, width)
-                        #use same exes for the mem
-                        width = np.vstack(p['current_exes']).shape[1]
-                        mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        mem_x = np.vstack(p['current_exes'])[mask == True].reshape(-1, width)
-                        
-                        width = np.vstack(p['labels_mem']).shape[1]
-                        mask = np.lib.pad(np.vstack(p['mem_masks']), ((0, 0), (0,  width - 1)), 'edge')                       
-                        mem_y = np.vstack(p['labels_mem'])[mask == True].reshape(-1, width)
-                        
-                        mem_sel = np.vstack(p['selections_mem'])[np.vstack(p['mem_masks']) == True]
-                        mem_rews = np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1)))[np.vstack(p['mem_masks']) == True]
-                        no_mem_bprop = False
-                        
-                        if mem_state.size  == 0:
-                            no_mem_bprop = True
-                        if mem_x.size == 0: 
-                            no_mem_bprop = True
-                        if mem_y.size == 0:
-                            no_mem_bprop = True
-                        if mem_sel.size == 0:
-                            no_mem_bprop = True
-                        if mem_rews.size == 0: 
-                            no_mem_bprop = True
-                        
+                        #if p['math_error'].sum() > 0.0000000001:
+                        if True:
 
-                        if no_mem_bprop:
-                                                                   
-                                summary,\
-                                _total_loss_train,\
-                                _train_step        = sess.run([
-                                                                  merged,
-                                                                  m.total_loss_train,
-                                                                  m.train_step],
-                                feed_dict={
-                                    m.init_state:np.vstack(p['states']),
-                                    
-                                    m.batchX_placeholder:np.vstack(p['current_exes']),
+                            if no_mem_bprop:
 
-                                    m.batchY_placeholder:np.vstack(p['labels']),
+                                    summary,\
+                                    _total_loss_train,\
+                                    _train_step        = sess.run([
+                                                                      merged,
+                                                                      m.total_loss_train,
+                                                                      m.train_step],
+                                    feed_dict={
+                                        m.init_state:np.vstack(p['states']),
 
-                                    m.selections_placeholder:np.vstack(p['selections']),
+                                        m.batchX_placeholder:np.vstack(p['current_exes']),
 
-                                    m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
+                                        m.batchY_placeholder:np.vstack(p['labels']),
+
+                                        m.selections_placeholder:np.vstack(p['selections']),
+
+                                        m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
+                                        
+                                        m.training: True
+
+                                    })
+                            else:
+                                    summary,\
+                                    _total_loss_train,\
+                                    _train_step,\
+                                    _trai_step_mem        = sess.run([
+                                                                      merged,
+                                                                      m.total_loss_train,
+                                                                      m.train_step,
+                                                                      m.mem.train_step],
+                                    feed_dict={
+                                        m.init_state:np.vstack(p['states']),
+                                        m.mem.init_state: np.vstack(mem_state),
+
+                                        m.batchX_placeholder:np.vstack(p['current_exes']),
+                                        m.mem.batchX_placeholder: np.vstack(mem_x),
+
+                                        m.batchY_placeholder:np.vstack(p['labels']),
+                                        m.mem.batchY_placeholder: np.vstack(mem_y),
+
+                                        m.selections_placeholder:np.vstack(p['selections']),
+                                        m.mem.selections_placeholder: np.vstack(mem_sel),
+
+                                        m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
+                                        m.mem.rewards_placeholder: np.vstack(mem_rews),
+                                        
+                                        m.training: True
 
                                 })
-                        else:
-                                summary,\
-                                _total_loss_train,\
-                                _train_step,\
-                                _trai_step_mem        = sess.run([
-                                                                  merged,
-                                                                  m.total_loss_train,
-                                                                  m.train_step,
-                                                                  m.mem.train_step],
-                                feed_dict={
-                                    m.init_state:np.vstack(p['states']),
-                                    m.mem.init_state: np.vstack(mem_state),
-
-                                    m.batchX_placeholder:np.vstack(p['current_exes']),
-                                    m.mem.batchX_placeholder: np.vstack(mem_x),
-
-                                    m.batchY_placeholder:np.vstack(p['labels']),
-                                    m.mem.batchY_placeholder: np.vstack(mem_y),
-
-                                    m.selections_placeholder:np.vstack(p['selections']),
-                                    m.mem.selections_placeholder: np.vstack(mem_sel),
-
-                                    m.rewards_placeholder:np.vstack(np.hstack(np.stack(p['discount_rewards'], axis=1))),
-                                    m.mem.rewards_placeholder: np.vstack(mem_rews)
-
-                        })
                         
-                        if cfg['num_samples'] < 16:
+                    if cfg['num_samples'] < 16:
                             print(list(zip(np.hstack(p['selections']).tolist(),np.around(p['discount_rewards'], decimals=3).tolist())))
                             #print(list(zip( np.hstack(p['selections']).tolist(), np.hstack(p['mem_masks']).tolist() )))
                             #print(list(zip(np.hstack(p['selections_mem']).tolist(),np.around(p['discount_rewards'], decimals=3).tolist())))
@@ -1481,10 +1510,11 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                             else:
                                 print(list(zip(np.hstack(mem_sel).tolist(),np.around(mem_rews, decimals=3).tolist())))
                             print('""')
-
-                        loss_list_train_log.append(_total_loss_train)
-                        loss_list_train_rewards.append( np.vstack(p['rewards']).sum() )
-                        loss_list_train_math_error.append(p['math_error'].sum())
+                    #if p['math_error'].sum() > 0.0000000001:
+                    loss_list_train_log.append(_total_loss_train)
+                    loss_list_train_rewards.append( np.vstack(p['rewards']).sum() )
+                    loss_list_train_math_error.append(p['math_error'].sum())
+                        
 
             ##save loss for the convergance chassing 
             reduced_loss_train_log = reduce(lambda x, y: x+y, loss_list_train_log)
@@ -1513,16 +1543,42 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                       
                         #print("computing rollout")
                         #rollout policites to get rewards
-                        p = m.policy_rollout(sess, _current_state_test, _current_state_test_mem, batchX, batchY, cfg)
+                        p = m.policy_rollout(sess, _current_state_test, _current_state_test_mem, batchX, batchY, cfg, False)
                         
                         loss_list_test_rewards.append( np.vstack(p['rewards']).sum() )
                         loss_list_test_math_error.append(p['math_error'].sum())
+                
+                #do an extra check for test cycle of the train data without backprop
+                loss_list_train_rewards = [0,0]
+                loss_list_train_math_error = [0,0]
+                for batch_idx in range(num_batches):
+                            
+                    start_idx = cfg['batch_size'] * batch_idx
+                    end_idx   = cfg['batch_size'] * batch_idx + cfg['batch_size']
 
-
-
-                #save model            
-                saver.save(sess, './summaries/' + cfg['dst'] + '/model/',global_step=epoch_idx)
-                #write variables/loss summaries after all training/testing done
+                    batchX = x_train[start_idx:end_idx]
+                    batchY = y_train[start_idx:end_idx]
+                    
+                    #print("computing rollout")
+                    #rollout policites to get rewards
+                    """
+                    print("train without backprop")
+                    print("_current_state_train")
+                    print(_current_state_train)
+                    print("_current_state_train_mem")
+                    print(_current_state_train_mem)
+                    """
+                    p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, False)
+                    
+                    loss_list_train_rewards.append( np.vstack(p['rewards']).sum() )
+                    loss_list_train_math_error.append(p['math_error'].sum())
+                    
+                    if cfg['num_samples'] < 16:
+                        print("no backprop train data test")
+                        print(list(zip(np.hstack(p['selections']).tolist(),np.around(p['discount_rewards'], decimals=3).tolist())))
+                        print(list(zip( np.hstack(p['selections']).tolist(), np.hstack(p['mem_masks']).tolist() )))
+                        print(list(zip(np.hstack(p['selections_mem']).tolist(),np.around(p['discount_rewards'], decimals=3).tolist())))
+                
 
             reduced_loss_train_log = reduced_loss_train_log
             reduced_loss_train_rewards = reduce(lambda x, y: x+y, loss_list_train_rewards)
@@ -1532,6 +1588,9 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
             reduced_loss_test_soft = reduce(lambda x, y: x+y, loss_list_test_math_error)
                 
             if epoch_idx % cfg['test_cycle'] == 0 :
+                #save model            
+                saver.save(sess, './summaries/' + cfg['dst'] + '/model/',global_step=epoch_idx)
+                #write variables/loss summaries after all training/testing done
                 train_writer.add_summary(summary, epoch_idx)
                 write_no_tf_summary(train_writer, "Log_train_loss",      reduced_loss_train_log, epoch_idx)               
                 write_no_tf_summary(train_writer, "Rewards_train",      reduced_loss_train_rewards, epoch_idx)               
@@ -1563,14 +1622,65 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                     last_train_losses = []
             #also break on math error, as theres noice on gradients and model will not nesecerrilily converge
             if cfg['hardmax_break']:
-                if (epoch_idx % cfg['test_cycle'] == 0) and (reduced_loss_train_math_error < 0.0000000001): #or (reduced_loss_test_soft < 2)):
+                if (epoch_idx % cfg['test_cycle'] == 0) and (reduced_loss_train_math_error < 0.0000000001 or reduced_loss_test_soft < 0.0000000001):
+                                                ## check thousand random samples
+                        print("@@checking random thousand samples")
+
+                        #gen new seed
+                        test_seed = round(random.random()*100000)
+                        num_tests = 1000
+                        print("test_seed", test_seed, "num_tests", num_tests)
+                        x_sample, y_sample = samples_generator(cfg['train_fn'], (num_tests, cfg['num_features']) , cfg['samples_value_rng'], test_seed)
+                        match_count = 0
+                        _current_state_train = np.zeros((1, cfg['state_size']))
+                        _current_state_train_mem  = np.zeros((1, cfg['state_size']))
+                        for i in range(num_tests):
+                            batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+                            batchX = np.concatenate(([x_sample[i]], batchX), axis=0)
+                            p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, [x_sample[i]], [y_sample[i]], cfg, False)
+                            match = np.allclose(y_sample[i], p['output'][0])
+                            print("i", i , "match", match)
+                            print("input", list(x_sample[i]))
+                            print("expect", list(y_sample[i]))
+                            print("actual", list(p['output'][0].tolist()))
+                            if match:
+                                match_count = match_count + 1
+                        print()
+                        print(match_count, "out of", num_tests,"matched")          
+                        
+                        ##break
                         print("#################################")
                         print("Model reached hardmax, breaking ...")
                         print("#################################")
                         break
-
+    if cfg['relaunch']:
+            cmd = gen_cmd_from_name(cfg["name"], cfg)
+            print("ReLnch: " + cmd)
+            subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
 
 def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
+    """
+        #create a saver to save the trained model
+    saver=tf.train.Saver(var_list=tf.trainable_variables())
+    #Enable jit
+    config = tf.ConfigProto()
+    config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+    #def batches num
+    num_batches = x_train.shape[0]//cfg['batch_size']
+    num_test_batches = x_test.shape[0]//cfg['batch_size']
+    print("num batches train:", num_batches)
+    print("num batches test:", num_test_batches)
+    with tf.Session(config=config) as sess:
+        ##enable debugger if necessary
+        if (cfg['debug']):
+            print("Running in a debug mode")
+            sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+            sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
+
+        #init the var
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, tf.train.latest_checkpoint(path))
+    """
     #create a saver to save the trained model
     saver=tf.train.Saver(var_list=tf.trainable_variables())
     #Enable jit
@@ -1584,7 +1694,7 @@ def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
     with tf.Session(config=config) as sess:
 
         #init the var
-        sess.run(tf.global_variables_initializer())
+        #sess.run(tf.global_variables_initializer())
         saver.restore(sess, tf.train.latest_checkpoint(path))
         # reset variables
 
@@ -1654,7 +1764,7 @@ def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
                 
                 #print("computing rollout")
                 #rollout policites to get rewards
-                p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg)           
+                p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, False)           
 
                 train_rewards.append( np.vstack(p['rewards']).sum() )
                 train_math_error.append(p['math_error'].sum())
@@ -1690,7 +1800,7 @@ def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
             
             #print("computing rollout")
             #rollout policites to get rewards
-            p = m.policy_rollout(sess, _current_state_test, _current_state_test_mem, batchX, batchY, cfg)
+            p = m.policy_rollout(sess, _current_state_test, _current_state_test_mem, batchX, batchY, cfg, False)
             
             test_rewards.append( np.vstack(p['rewards']).sum() )
             test_math_error.append(p['math_error'].sum())

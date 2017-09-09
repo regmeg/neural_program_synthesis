@@ -93,7 +93,7 @@ class RLRNN(NNbase):
                         droupout_seed = cfg['seed'] + self.dropout_cntr
                         state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], seed=droupout_seed, training = (mode is 'train'))
                         '''
-                        state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = (mode is 'train'))
+                        state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = self.training)
                         
                         #calculate softmax and produce the mask of operations
                         #logits = tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2")
@@ -113,7 +113,7 @@ class RLRNN(NNbase):
                    )
     
         #perform policy rollout - select up to five ops max
-    def policy_rollout(self, sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg):
+    def policy_rollout(self, sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, training):
         
         _current_x = batchX
         _current_x_mem = batchX
@@ -172,7 +172,8 @@ class RLRNN(NNbase):
                                 self.batchX_placeholder: _current_x,
                                 #self.mem.batchX_placeholder: _current_x_mem
                                 #feed the same exes to the mem network
-                                self.mem.batchX_placeholder: _current_x
+                                self.mem.batchX_placeholder: _current_x,
+                                self.training: training
                             })
 
             #print(np.hstack([_selection, _logits, _log_probs]))
@@ -231,5 +232,6 @@ class RLRNN(NNbase):
                     current_exes = current_exes,
                     current_exes_mem = current_exes_mem,
                     outputs = outputs,
-                    outputs_mem = outputs_mem
+                    outputs_mem = outputs_mem,
+                    output = output
                 )

@@ -11,7 +11,7 @@ class RNN(NNbase):
         
         #placeholder for the initial state of the model
         with tf.name_scope("RNN_op"):
-            self.init_state = tf.placeholder(cfg['datatype'], [cfg['batch_size'], cfg['state_size']], name="init_state")
+            self.init_state = tf.placeholder(cfg['datatype'], [None, cfg['state_size']], name="init_state")
 
             #set mem
             self.mem = mem
@@ -55,10 +55,11 @@ class RNN(NNbase):
         #write model param and grad summaries outside of all scopes
         with tf.name_scope("Summaries_params"):
             for param, tensor in self.params.items(): self.variable_summaries(tensor)               
-        
+               
         with tf.name_scope("Summaries_grads"):
-            param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
-            for i, grad in enumerate(self.grads): self.variable_summaries(grad, name=param_names[i]+"_grad")
+            for grad, var in self.grads: 
+                print("writing grad", var.name.replace(":","_")+"_grad")
+                self.variable_summaries(grad, name=var.name.replace(":","_")+"_grad")
         
         if cfg['norm']:
             with tf.name_scope("Summaries_norms"):
@@ -67,6 +68,7 @@ class RNN(NNbase):
     #forward pass
     def run_forward_pass(self, cfg, mode="train"):
         current_state = self.init_state
+        current_state_mem = self.init_state
 
         output = self.batchX_placeholder
         current_x = self.batchX_placeholder
@@ -122,7 +124,8 @@ class RNN(NNbase):
 
                     with tf.name_scope("Comp_mem"):
                         #run the forward pass from the mem module, hence select mem cell
-                        output_mem, current_state_mem, softmax_mem, current_x_mem = self.mem.run_forward_pass(current_input, current_x_mem, cfg, mode)
+                        #output_mem, current_state_mem, softmax_mem, current_x_mem = self.mem.run_forward_pass(current_input, current_x_mem, cfg, mode)
+                        output_mem, current_state_mem, softmax_mem = self.mem.run_forward_pass(current_x, current_state_mem , timestep, cfg, mode)
                         outputs_mem.append(output_mem)
                         softmaxes_mem.append(softmax_mem)
                         current_xes_mem.append(current_x_mem)
@@ -156,8 +159,8 @@ class RNN(NNbase):
                     softmax_mem = softmax_mem,
                     outputs_mem = outputs_mem,
                     softmaxes_mem = softmaxes_mem,
-                    current_x_mem = current_x_mem,
-                    current_xes_mem = current_xes_mem
+                    #current_x_mem = current_x_mem,
+                    #current_xes_mem = current_xes_mem
                    )
 
 

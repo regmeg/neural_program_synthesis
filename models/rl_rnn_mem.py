@@ -81,7 +81,7 @@ class RLRNNMEM(NNbase):
                         droupout_seed = cfg['seed'] + self.dropout_cntr
                         state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], seed=droupout_seed, training = (mode is 'train'))
                         '''
-                        state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = (mode is 'train'))
+                        state_dropped = tf.layers.dropout(next_state, cfg['drop_rate'], training = self.training)
                         
                         #calculate softmax and produce the mask of operations
                         #logits = tf.matmul(state_dropped, self.params["W2"], name="state_mul_W2")

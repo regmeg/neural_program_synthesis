@@ -7,9 +7,12 @@ class Operations:
         self.cfg = cfg
         #self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add]
         #self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall]
-        self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall, self.tf_sub]
+        self.ops = [self.tf_inpt_len, self.tf_divide, self.tf_add, self.tf_stall, self.tf_sub, self.tf_multiply]
         self.num_of_ops = len(self.ops)
-
+        
+        self.ops_mem = [self.tf_inpt_len, self.tf_add, self.tf_stall, self.tf_multiply]
+        self.num_of_ops_mem = len(self.ops_mem)
+    
     #model operations
     #for each reduce based operation, result is reshaped and repadded to fit the model working size num_featuresxbatch_size
     def tf_add(self, inpt, mem_sel=None):

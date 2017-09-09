@@ -23,13 +23,13 @@ def gen_cmd(cfg_dict, seed):
         if key == 'grad_clip_val':
             string += " --"+str(key)+"_min="+str(val[0])
             string += " --"+str(key)+"_max="+str(val[1])
-            name += str(key)+"_"+str(val[0])+"_"+str(val[1])+"-"
+            name += str(key)+"#"+str(val[0])+"*"+str(val[1])+"~"
         else:
             string += " --"+str(key)+"="+str(val)
             if key == 'max_output_ops' or key == 'train_fn' or key == 'model': continue
-            name += str(key)+"_"+str(val)+"-"
+            name += str(key)+"#"+str(val)+"~"
     if seed == 0: seed = int(round(random.random()*100000))
-    name += "seed_" + str(seed)
+    name += "seed#" + str(seed)
     seed  = " --seed="+str(seed)
     return string + seed + name
 
@@ -54,54 +54,44 @@ params=OrderedDict(
 
 if FLAGS.type == "RNN":
     params=OrderedDict()
-    params['state_size'] = [600]
-    params['num_samples'] = [3500]
-    params['batch_size']  = [100]
+    params['total_num_epochs'] = [40000]
+    params['state_size'] = [300, 300, 300, 300]
+    params['test_ratio'] = [0.5]
+    params['num_samples'] = [2]
+    params['batch_size']  = [1]
     params['learning_rate'] = [0.01]
     params['epsilon'] = [1e-3]
-    #params['loss_weight'] = [0.5]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]
-    params['train_fn'] = ["np_center"]
-    #params['model'] = ["HistoryRNN", "RNN"]
+    params['train_fn'] = ["np_avg_val", "np_center"]
     params['model'] = ["RNN"]
     params['norm'] = [True]
-    #params['grad_norm'] = [10e2]
-    #params['softmax_sat'] = [30, 100]
-    params['softmax_sat'] = [800]
     params['clip'] = [False]
-    #params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
-    params['share_state'] = [True]
-    #params['state_fn'] = ["relu", "tanh"]
+    params['softmax_sat'] = [100]
     params['state_fn'] = ["relu"]
     params['smax_pen_r'] = [0.0]
-    params['total_num_epochs'] = [1000]
+    params['augument_grad'] = [True]
     params['relaunch'] = [True]
-    #params['loss_swap_per'] = [30, 50, 80]
-    #params['test_ratio'] = [0.5]
 
 elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
-    params['state_size'] = [200]
-    params['num_samples'] = [15]
-    params['batch_size']  = [2]
-    params['drop_rate'] = [0.15]
+    params['total_num_epochs'] = [80000]
+    params['state_size'] = [200, 200, 200, 200]
+    params['test_ratio'] = [0.5]
+    params['num_samples'] = [2]
+    params['batch_size']  = [1]
     params['learning_rate'] = [0.005]
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]
-    params['train_fn'] = ["np_avg_val"]
+    params['train_fn'] = ["np_avg_val", "np_center"]
     params['model'] = ["RLRNN"]
-    params['norm'] = [True]
-    params['clip'] = [False]
-    #params['grad_clip_val'] = [[-10e2, 10e2],[-10e3, 10e3], [-10e4, 10e4]]
-    params['share_state'] = [True]
-    #params['state_fn'] = ["relu", "tanh"]
     params['state_fn'] = ["relu"]
     params['pen_sofmax'] = [False]
     params['augument_grad'] = [False]
     params['max_reward'] = [1000]
+    params['relaunch'] = [True]
 else:
     raise Exception('Wrong model specified to be run')
 

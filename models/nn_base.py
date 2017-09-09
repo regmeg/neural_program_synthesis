@@ -14,6 +14,7 @@ class NNbase(object):
         batchX_placeholder = None
         batchY_placeholder = None
         use_both_losses = None
+        training = None
     
     def __init__(self, cfg, ops):   
         self.ops = ops
@@ -25,6 +26,8 @@ class NNbase(object):
             NNbase.batchY_placeholder = tf.placeholder(cfg['datatype'], [None, cfg['num_features']], name="batchY")
         if NNbase.use_both_losses is None:
             NNbase.use_both_losses = tf.placeholder(dtype=tf.bool, name='use_both_penalty_and_math_loss')
+        if NNbase.training is None:            
+            NNbase.training = tf.placeholder(dtype=tf.bool, name='training_placeholder')
         if "global_step" not in NNbase.model_vars:
             self.model_vars["global_step"] = tf.Variable(0, name='global_step', trainable=False, dtype=cfg['datatype'])
 
@@ -129,32 +132,47 @@ class NNbase(object):
 
     def calc_backprop(self, cfg):
         print(list(self.params.values()))
+        optimizer = tf.train.AdamOptimizer(cfg['learning_rate'], cfg['epsilon'] ,name="AdamOpt")
+        
         with tf.name_scope("Grads"):            
             grads = optimizer.compute_gradients(self.total_loss_train, var_list=list(self.params.values()) )
 
-           
+    
+                               
             if cfg['add_noise']:
                 noisy_gradients = []
-                for grad in grads:
+                for grad, var in grads: 
                     denom = tf.pow( (1+self.model_vars["global_step"]), tf.cast(0.55, cfg['datatype']))
                     variance =  tf.cast(1/denom, cfg['datatype'])
-                    gradient_shape = grad[0].get_shape()
+                    #variance =  tf.cast(1, cfg['datatype'])
+                    gradient_shape = grad.get_shape()
                     noise = random_ops.truncated_normal(gradient_shape, stddev=tf.sqrt(variance), dtype=cfg['datatype'])
-                    noisy_gradients.append((grad[0] + noise, grad[1]))
-                grads = noisy_gradients
+                    noisy_gradients.append((grad + noise, var))
+                grads = noisy_gradients   
             
             if cfg['augument_grad']:
                 augumented_grads = []
                 #param_names = [tensor.name.replace(":","_") for param, tensor in self.params.items()]
-                for grad in enumerate(grads): 
-                        if "W3" or "b3" in grads[1].name.replace(":","_"): 
-                            augumented_grads.append((grad[0], grad[1]))
-                        else:
-                            aug_ratio = tf.log1p(self.math_error_train)* tf.cast(cfg['softmax_sat'], cfg['datatype'])
-                            augumented_grads.append((aug_ratio*grad[0], grad[1]))
+                for grad, var in grads: 
+                            """
+                            if ("W" or "b") and "3" in var.name.replace(":","_"):
+                                print("#not augmenting grad for")
+                                print(var.name.replace(":","_"))
+                                augumented_grads.append((grad, var))
+                            else:
+                            """
+                            print("#augmenting grad for")
+                            print(var.name.replace(":","_"))                            
+                            #aug_ratio = tf.log1p(self.math_error_train)* tf.cast(cfg['softmax_sat'], cfg['datatype'])
+                            aug_ratio = tf.cast(cfg['softmax_sat'], cfg['datatype'])
+                            grad_aug = tf.cast(10*aug_ratio*grad, cfg['datatype'])
+                            augumented_grads.append((grad_aug, var))
+            
+                        
                 grads = augumented_grads
+         
                 
-                        #clip gradients by norm and add summaries
+            #clip gradients by norm and add summaries
             if cfg['norm']:
                 print("norming the grads")
                 gradients, variables = zip(*grads)
@@ -171,8 +189,9 @@ class NNbase(object):
                 norms = []
                 
         with tf.name_scope("Train_step"):
-            train_step = optimizer.apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
+            #train_step = optimizer.apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
             #train_step = train_step = tf.train.RMSPropOptimizer(cfg['learning_rate'], name="RMSPropOpt").apply_gradients(zip(grads, list(self.params.values())), global_step=self.model_vars["global_step"], name="min_loss")
+            train_step = optimizer.apply_gradients(grads, global_step=self.model_vars["global_step"], name="min_loss")
             
             print("grads are")
             print(grads)
@@ -246,7 +265,7 @@ class NNbase(object):
     
     
     #perform policy rollout - select up to five ops max
-    def policy_rollout_no_mem(self, sess, _current_state_train, batchX, batchY, cfg):
+    def policy_rollout_no_mem(self, sess, _current_state_train, batchX, batchY, cfg, training):
         
         _current_x = batchX
         output = batchX
@@ -281,7 +300,8 @@ class NNbase(object):
                                       self.selection],
                             feed_dict={
                                 self.init_state:_current_state_train,
-                                self.batchX_placeholder: _current_x
+                                self.batchX_placeholder: _current_x,
+                                self.training: training
                             })
             
             #print(np.hstack([_selection, _logits, _log_probs]))
