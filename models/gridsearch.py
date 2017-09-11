@@ -54,7 +54,7 @@ params=OrderedDict(
 
 if FLAGS.type == "RNN":
     params=OrderedDict()
-    params['total_num_epochs'] = [40000]
+    params['total_num_epochs'] = [25000]
     #params['state_size'] = [300, 300, 300, 300, 300, 300, 300, 300]
     params['state_size'] = [300, 300, 300, 300]
     params['test_ratio'] = [0.33]
@@ -78,8 +78,8 @@ if FLAGS.type == "RNN":
 elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
-    params['total_num_epochs'] = [80000]
-    #params['state_size'] = [200, 200, 200, 200, 200, 200, 200, 200
+    params['total_num_epochs'] = [50000]
+    #params['state_size'] = [200, 200, 200, 200, 200, 200, 200, 200]
     params['state_size'] = [200, 200, 200, 200]
     params['test_ratio'] = [0.33]
     params['num_samples'] = [15]
