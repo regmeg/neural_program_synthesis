@@ -1632,12 +1632,16 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                         print("test_seed", test_seed, "num_tests", num_tests)
                         x_sample, y_sample = samples_generator(cfg['train_fn'], (num_tests, cfg['num_features']) , cfg['samples_value_rng'], test_seed)
                         match_count = 0
-                        _current_state_train = np.zeros((1, cfg['state_size']))
-                        _current_state_train_mem  = np.zeros((1, cfg['state_size']))
+                        _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+                        _current_state_train_mem  = np.zeros((cfg['batch_size'], cfg['state_size']))
                         for i in range(num_tests):
                             batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
                             batchX = np.concatenate(([x_sample[i]], batchX), axis=0)
-                            p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, [x_sample[i]], [y_sample[i]], cfg, False)
+                            
+                            batchY = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+                            batchY = np.concatenate(([y_sample[i]], batchX), axis=0)
+                            
+                            p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, False)
                             match = np.allclose(y_sample[i], p['output'][0])
                             print("i", i , "match", match)
                             print("input", list(x_sample[i]))
