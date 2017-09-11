@@ -734,7 +734,10 @@ def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, pa
                 batchesX_train = batchesX_train,
                 batchesY_train = batchesY_train,
                 batchesX_test = batchesX_test,
-                batchesY_test = batchesY_test
+                batchesY_test = batchesY_test,
+                
+                #resturn session
+                sess = sess
         )
 
 def predict_form_sess(m, cfg, x, state, state_mem, path, mode="hard"):
@@ -1639,7 +1642,7 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
                             batchX = np.concatenate(([x_sample[i]], batchX), axis=0)
                             
                             batchY = np.zeros((cfg['batch_size']-1, cfg['num_features']))
-                            batchY = np.concatenate(([y_sample[i]], batchX), axis=0)
+                            batchY = np.concatenate(([y_sample[i]], batchY), axis=0)
                             
                             p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, False)
                             match = np.allclose(y_sample[i], p['output'][0])
@@ -1662,7 +1665,7 @@ def run_session_RL_RNN(m, cfg, x_train, x_test, y_train, y_test):
             print("ReLnch: " + cmd)
             subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT)
 
-def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
+def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path, test_1000):
     """
         #create a saver to save the trained model
     saver=tf.train.Saver(var_list=tf.trainable_variables())
@@ -1817,6 +1820,8 @@ def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
             test_states_mem.append(p['states_mem'])
             test_current_exes.append(p['current_exes'])
             test_current_exes_mem.append(p['current_exes_mem'])
+           
+
 
 
         batchesX_train = []
@@ -1859,6 +1864,9 @@ def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
                 batchesX_test.append(batchX) 
                 batchesY_test.append(batchY) 
 
+        if test_1000:
+            test_1000_samples_RL(m, sess, cfg)
+
         return dict(
                 #outputs for the train data
                 train_rewards = train_rewards,
@@ -1890,5 +1898,39 @@ def restore_selection_RL_RNN(m, cfg, x_train, x_test, y_train, y_test, path):
                 batchesX_train = batchesX_train,
                 batchesY_train = batchesY_train,
                 batchesX_test = batchesX_test,
-                batchesY_test = batchesY_test
-        )
+                batchesY_test = batchesY_test,
+            
+                )
+def test_1000_samples_RL(m, sess, cfg):
+            print("########################################################")
+            print("########################################################")
+            print("@@checking random thousand samples")
+
+            #gen new seed
+            test_seed = round(random.random()*100000)
+            num_tests = 1000
+            print("test_seed", test_seed, "num_tests", num_tests)
+            x_sample, y_sample = samples_generator(cfg['train_fn'], (num_tests, cfg['num_features']) , cfg['samples_value_rng'], test_seed)
+            match_count = 0
+            _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+            _current_state_train_mem  = np.zeros((cfg['batch_size'], cfg['state_size']))
+            for i in range(num_tests):
+                batchX = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+                batchX = np.concatenate(([x_sample[i]], batchX), axis=0)
+
+                batchY = np.zeros((cfg['batch_size']-1, cfg['num_features']))
+                batchY = np.concatenate(([y_sample[i]], batchY), axis=0)
+
+                p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, batchX, batchY, cfg, False)
+                match = np.allclose(y_sample[i], p['output'][0])
+                print("i", i , "match", match)
+                print("input", list(x_sample[i]))
+                print("expect", list(y_sample[i]))
+                print("actual", list(p['output'][0].tolist()))
+                if match:
+                    match_count = match_count + 1
+            print()
+            print(match_count, "out of", num_tests,"matched") 
+            print("#################################")
+            print("Model reached hardmax, breaking ...")
+            print("#################################")                                                     
