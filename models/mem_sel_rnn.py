@@ -23,10 +23,10 @@ class MemRNN(NNbase):
             tf.set_random_seed(cfg['seed'])
             with tf.name_scope("Params"):
                 #model parameters
-                self.params["W_mem"] = tf.get_variable("W_mem", shape=[ cfg['state_size']+cfg['num_features'], cfg['state_size'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["W_mem"] = tf.get_variable("W_mem", shape=[ cfg['state_size']+cfg['num_features'], cfg['state_size'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params["b_mem"] = tf.Variable(np.zeros((cfg['state_size'])), dtype=cfg['datatype'], name="b_mem")
 
-                self.params["W2_mem"] = tf.get_variable("W2_mem", shape=[ cfg['state_size'], ops.num_of_ops_mem ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["W2_mem"] = tf.get_variable("W2_mem", shape=[ cfg['state_size'], ops.num_of_ops_mem ], dtype=cfg['datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params["b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops_mem)), dtype=cfg['datatype'], name="b2_mem")
                 
                 """
