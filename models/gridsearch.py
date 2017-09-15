@@ -54,7 +54,7 @@ params=OrderedDict(
 
 if FLAGS.type == "RNN":
     params=OrderedDict()
-    params['total_num_epochs'] = [25000]
+    params['total_num_epochs'] = [2000, 17000]
     #params['state_size'] = [300, 300, 300, 300, 300, 300, 300, 300]
     params['state_size'] = [300, 300, 300, 300]
     params['test_ratio'] = [0.33]
@@ -63,9 +63,9 @@ if FLAGS.type == "RNN":
     params['learning_rate'] = [0.01]
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
-    params['num_features'] = [4]
-    params['train_fn'] = ["np_avg_val", "np_center"]
-    #params['train_fn'] = ["np_center"]
+    params['num_features'] = [4]    
+    #params['train_fn'] = ["np_avg_val" ,"np_center"]
+    params['train_fn'] = ["np_center"]
     params['model'] = ["RNN"]
     params['norm'] = [True]
     params['clip'] = [False]
@@ -78,7 +78,7 @@ if FLAGS.type == "RNN":
 elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
-    params['total_num_epochs'] = [50000]
+    params['total_num_epochs'] = [3000, 27000]
     #params['state_size'] = [200, 200, 200, 200, 200, 200, 200, 200]
     params['state_size'] = [200, 200, 200, 200]
     params['test_ratio'] = [0.33]
@@ -88,8 +88,8 @@ elif FLAGS.type == "RL":
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]
-    params['train_fn'] = ["np_avg_val", "np_center"]
-    #params['train_fn'] = ["np_center"]
+    #params['train_fn'] = ["np_avg_val", "np_center"]
+    params['train_fn'] = ["np_center"]
     params['model'] = ["RLRNN"]
     params['state_fn'] = ["relu"]
     params['pen_sofmax'] = [False]
