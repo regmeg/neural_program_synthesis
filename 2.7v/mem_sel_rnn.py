@@ -25,14 +25,14 @@ class MemRNN(NNbase):
             tf.set_random_seed(cfg[u'seed'])
             with tf.name_scope(u"Params"):
                 #model parameters
-                self.params[u"W_mem"] = tf.get_variable(u"W_mem", shape=[ cfg[u'state_size']+cfg[u'num_features'], cfg[u'state_size'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W_mem"] = tf.get_variable(u"W_mem", shape=[ cfg[u'state_size']+cfg[u'num_features'], cfg[u'state_size'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b_mem"] = tf.Variable(np.zeros((cfg[u'state_size'])), dtype=cfg[u'datatype'], name=u"b_mem")
 
-                self.params[u"W2_mem"] = tf.get_variable(u"W2_mem", shape=[ cfg[u'state_size'], ops.num_of_ops_mem ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W2_mem"] = tf.get_variable(u"W2_mem", shape=[ cfg[u'state_size'], ops.num_of_ops_mem ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b2_mem"] = tf.Variable(np.zeros((ops.num_of_ops_mem)), dtype=cfg[u'datatype'], name=u"b2_mem")
                 
                 u"""
-                self.params["W3_mem"] = tf.get_variable("W3_mem", shape=[ ops.num_of_ops_mem, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params["W3_mem"] = tf.get_variable("W3_mem", shape=[ ops.num_of_ops_mem, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params["b3_mem"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3_mem")
                 """
                 u'''

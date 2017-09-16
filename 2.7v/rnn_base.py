@@ -23,13 +23,13 @@ class RNN(NNbase):
             #model parameters
             with tf.name_scope(u"Params"):
                 
-                self.params[u"W"] = tf.get_variable(u"W", shape=[ cfg[u'state_size']+cfg[u'num_features'], cfg[u'state_size'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W"] = tf.get_variable(u"W", shape=[ cfg[u'state_size']+cfg[u'num_features'], cfg[u'state_size'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b"] = tf.Variable(np.zeros((cfg[u'state_size'])), dtype=cfg[u'datatype'], name=u"b")
 
-                self.params[u"W2"] = tf.get_variable(u"W2", shape=[ cfg[u'state_size'], ops.num_of_ops ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W2"] = tf.get_variable(u"W2", shape=[ cfg[u'state_size'], ops.num_of_ops ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b2"] = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg[u'datatype'], name=u"b2")
                 
-                self.params[u"W3"] = tf.get_variable(u"W3", shape=[ ops.num_of_ops, cfg[u'num_features'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W3"] = tf.get_variable(u"W3", shape=[ ops.num_of_ops, cfg[u'num_features'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b3"] = tf.Variable(np.zeros((cfg[u'num_features'])), dtype=cfg[u'datatype'], name=u"b3")
                 
                 

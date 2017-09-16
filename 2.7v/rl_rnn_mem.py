@@ -28,13 +28,13 @@ class RLRNNMEM(NNbase):
             #model parameters
             with tf.name_scope(u"Params"):
 
-                self.params[u"W_mem"] = tf.get_variable(u"W_mem", shape=[ cfg[u'state_size']+cfg[u'num_features'], cfg[u'state_size'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W_mem"] = tf.get_variable(u"W_mem", shape=[ cfg[u'state_size']+cfg[u'num_features'], cfg[u'state_size'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b_mem"] = tf.Variable(np.zeros((cfg[u'state_size'])), dtype=cfg[u'datatype'], name=u"b_mem")
 
-                self.params[u"W2_mem"] = tf.get_variable(u"W2_mem", shape=[ cfg[u'state_size'], ops_env.num_of_ops_mem ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W2_mem"] = tf.get_variable(u"W2_mem", shape=[ cfg[u'state_size'], ops_env.num_of_ops_mem ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b2_mem"] = tf.Variable(np.zeros((ops_env.num_of_ops_mem)), dtype=cfg[u'datatype'], name=u"b2_mem")
                 
-                self.params[u"W3_mem"] = tf.get_variable(u"W3_mem", shape=[ cfg[u'num_features'], cfg[u'num_features'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.xavier_initializer())
+                self.params[u"W3_mem"] = tf.get_variable(u"W3_mem", shape=[ cfg[u'num_features'], cfg[u'num_features'] ], dtype=cfg[u'datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params[u"b3_mem"] = tf.Variable(np.zeros((cfg[u'num_features'])), dtype=cfg[u'datatype'], name=u"b3_mem")
 
                 
