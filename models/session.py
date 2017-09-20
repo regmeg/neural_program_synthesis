@@ -20,7 +20,18 @@ def write_no_tf_summary(writer, tag, val, step):
    summary=tf.Summary()
    summary.value.add(tag=tag, simple_value = val)
    writer.add_summary(summary, step)
-    
+
+def print_ops_matrix(matrix_lst, ops_list, indeces = None):
+    np.set_printoptions(precision=3, suppress=True)
+    for elem in range(len(matrix_lst[0])):
+        if indeces is not None and elem not in indeces: continue 
+        for matrix in matrix_lst:
+            index = np.argmax(matrix[elem])
+            if len(matrix[elem]) < 2:
+                index = matrix[elem][0]
+            op_name = ops_list[index].__name__
+            print(str(matrix[elem][index])+"[ "+op_name+" ]", end=" ")
+        print("")
 
 #helpder func
 def get_time_hhmmss(dif):
@@ -192,6 +203,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                         _output_train,\
                         _grads,\
                         _softmaxes_train,\
+                        _softmaxes_train_mem,\
                         _math_error_train = sess.run([m.total_loss_train, 
                                                       m.train_step,
                                                       m.train["current_state"], 
@@ -199,6 +211,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                                                       m.train["output"], 
                                                       m.grads, 
                                                       m.train["softmaxes"],
+                                                      m.train["softmaxes_mem"],
                                                       m.math_error_train],
                         feed_dict={
                             m.init_state:_current_state_train,
@@ -221,6 +234,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                         _output_train,\
                         _grads,\
                         _softmaxes_train,\
+                        _softmaxes_train_mem,\
                         _math_error_train = sess.run([merged,
                                                       m.total_loss_train,
                                                       m.train_step,
@@ -229,6 +243,7 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
                                                       m.train["output"],
                                                       m.grads,
                                                       m.train["softmaxes"],
+                                                      m.train["softmaxes_mem"],
                                                       m.math_error_train],
                         feed_dict={
                             m.init_state:_current_state_train,
@@ -370,6 +385,10 @@ def run_session_2RNNS(m, cfg, x_train, x_test, y_train, y_test):
             print("mat_error_train\t\t\t\t\math_error_test")
             print(np.column_stack((_math_error, _math_error_test)))
             '''
+            print("#################Ops####################")
+            print_ops_matrix(_softmaxes_train,cfg["used_ops_obj"])
+            print("#################Mem####################")
+            print_ops_matrix(_softmaxes_train_mem,cfg["used_ops_obj_mem"])
             print("Epoch",epoch_idx, "use_both_losses", use_both_losses)
             print("Softmax train loss\t", reduced_loss_train_soft, "(m:",reduced_math_error_train_soft ,"p:",pen_loss_train_soft,")")
             print("Hardmax train loss\t", reduced_loss_train_hard, "(m:",reduced_math_error_train_hard ,"p:",pen_loss_train_hard,")")
@@ -499,6 +518,10 @@ def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, pa
                 batchX = x_train[start_idx:end_idx]
                 batchY = y_train[start_idx:end_idx]
 
+                _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+                _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+                _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+                _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
                
                 
                 #FOR THE SOFTMAX SELECTION
@@ -577,12 +600,7 @@ def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, pa
         
         softmaxes_testd_test =[]
         softmaxes_testd_test_mem =[]
-        
-        if cfg['share_state'] is False:
-            _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
-            _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
-            _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
-            _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+
         
         #FOR THE TESTING DATA
         for batch_idx in range(num_test_batches):
@@ -597,6 +615,11 @@ def restore_selection_matrixes2RNNS(m, cfg, x_train, x_test, y_train, y_test, pa
 
                 batchX = x_test[start_idx:end_idx]
                 batchY = y_test[start_idx:end_idx]
+                
+                _current_state_train = np.zeros((cfg['batch_size'], cfg['state_size']))
+                _current_state_test = np.zeros((cfg['batch_size'], cfg['state_size']))
+                _current_state_train_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
+                _current_state_test_mem = np.zeros((cfg['batch_size'], cfg['state_size']))
                 
                 #FOR THE SOFTMAX SELECTION
                 _total_loss_testd_train,\

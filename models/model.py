@@ -37,6 +37,7 @@ def main():
         ops.num_of_ops = len(ops.ops)
     
     cfg["used_ops_obj"] = ops.ops
+    cfg["used_ops_obj_mem"] = ops.ops_mem
     if cfg['model'] == "RLRNN":
         ops_env = OpsEnv(cfg)
         cfg["used_ops_env"] = ops_env
