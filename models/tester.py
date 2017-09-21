@@ -49,7 +49,7 @@ if cfg['model'] == "RNN":
         # instanitae the model graph with the main OP selection RNN
         if old: model = oldRNN(cfg, ops, mem)
         else:   model = RNN(cfg, ops, mem)
-        res = restore_selection_matrixes2RNNS(model, cfg, x_train, x_test, y_train, y_test, model_path)
+        res = restore_selection_matrixes2RNNS(model, cfg, x_train, x_test, y_train, y_test, model_path, test_1000)
 elif cfg['model'] == "HistoryRNN":
         ops = Operations(cfg)
         ops.ops = cfg["used_ops_obj"]
@@ -59,7 +59,7 @@ elif cfg['model'] == "HistoryRNN":
         op_sel = OpSel(cfg, ops)
         # instanitae the model graph with the main OP selection RNN
         model = HistoryRNN(cfg, ops, mem_sel, op_sel)
-        res = restore_selection_matrixes_HistoryRNNS(model, cfg, x_train, x_test, y_train, y_test, model_path)
+        res = restore_selection_matrixes_HistoryRNNS(model, cfg, x_train, x_test, y_train, y_test, model_path, test_1000)
 elif cfg['model'] == "RLRNN":
         ops_env = cfg["used_ops_env"]
         mem = RLRNNMEM(cfg, ops_env) 
