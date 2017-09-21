@@ -56,6 +56,7 @@ namespace ProseDSLModels
             var spec = new ExampleSpec(examples);
             var learnedSet = prose.LearnGrammar(spec);
             var output = (double[]) learnedSet.RealizedPrograms.First().Invoke(input);
+            stdoutprogram(learnedSet.RealizedPrograms.First().ToString(), "Add");
             Assert.AreEqual(23.7, output[0], 0.001d);
             TestContext.WriteLine("Running random exmaples for LearnAdd");
             //test 1000 random examples
@@ -67,6 +68,50 @@ namespace ProseDSLModels
                 TestContext.WriteLine("Excpt [{0}]", string.Join(", ", oTmp));
                 TestContext.WriteLine("Actul [{0}]", string.Join(", ", outTmp));
                 Assert.AreEqual(oTmp[0], outTmp[0], 0.001d);
+            }
+
+        }
+
+        [TestMethod]
+        public void TestLearnStall()
+        {
+            var grammar = DSLCompiler.LoadGrammarFromFile("../../../ProseDSLModels.grammar");
+            printGrammar(grammar);
+            SynthesisEngine prose = new SynthesisEngine(grammar.Value);
+            //{30.3, -8.9, -19.0, -2.4};
+            /*
+            double[] inp1 = new double[4] {10.9, 15.0, -14.5, 12.3};
+            double[] out1 = stall(inp1);
+            var input1 = State.Create(grammar.Value.InputSymbol, inp1);
+            double[] inp2 = new double[4] {30.3, -8.9, -19.0, -2.4};
+            double[] out2 = stall(inp1);
+            var input2 = State.Create(grammar.Value.InputSymbol, inp1);
+            var examples = new Dictionary<State, object> { { input1, out1 },  { input2, out2 }};
+            */
+            double[] inp1 = new double[4] {10.9, 15.0, -14.5, 12.3};
+            double[] out1 = stall(inp1);
+
+            var input = State.Create(grammar.Value.InputSymbol, inp1);
+    
+            var examples = new Dictionary<State, object> { { input, out1 }};
+            var spec = new ExampleSpec(examples);
+            var learnedSet = prose.LearnGrammar(spec);
+            var output = (double[]) learnedSet.RealizedPrograms.First().Invoke(input);
+            stdoutprogram(learnedSet.RealizedPrograms.First().ToString(), "Stall");
+
+            TestContext.WriteLine("Running random exmaples for Stall");
+            //test 1000 random examples
+            for (int i=0;i<1000;++i) {
+                var iTmp = genRnd();
+                var inpTmp = State.Create(grammar.Value.InputSymbol, iTmp);
+                var oTmp = stall(iTmp);
+                var outTmp = (double[]) learnedSet.RealizedPrograms.First().Invoke(inpTmp);
+                TestContext.WriteLine("Excpt [{0}]", string.Join(", ", oTmp));
+                TestContext.WriteLine("Actul [{0}]", string.Join(", ", outTmp));
+                Assert.AreEqual(oTmp[0], outTmp[0], 0.001d);
+                Assert.AreEqual(oTmp[1], outTmp[1], 0.001d);
+                Assert.AreEqual(oTmp[2], outTmp[2], 0.001d);
+                Assert.AreEqual(oTmp[3], outTmp[3], 0.001d);
             }
 
         }
@@ -101,6 +146,7 @@ namespace ProseDSLModels
             var examples = new Dictionary<State, object> { { input, out1 }};
             var spec = new ExampleSpec(examples);
             var learnedSet = prose.LearnGrammar(spec);
+            stdoutprogram(learnedSet.RealizedPrograms.First().ToString(), "Mult");
             var output = (double[]) learnedSet.RealizedPrograms.First().Invoke(input);
             Assert.AreEqual(-29160.225, output[0], 0.001d);
             //test 1000 random examples
@@ -250,6 +296,7 @@ namespace ProseDSLModels
             var examples = new Dictionary<State, object> { { input, out1 }};
             var spec = new ExampleSpec(examples);
             var learnedSet = prose.LearnGrammar(spec);
+            stdoutprogram(learnedSet.RealizedPrograms.First().ToString(), "AvgVal");
             var output = (double[]) learnedSet.RealizedPrograms.First().Invoke(input);
             Assert.AreEqual(5.925, output[0], 0.001d);
             //test 1000 random examples
@@ -295,6 +342,7 @@ namespace ProseDSLModels
             var examples = new Dictionary<State, object> { { input, out1 }};
             var spec = new ExampleSpec(examples);
             var learnedSet = prose.LearnGrammar(spec);
+            stdoutprogram(learnedSet.RealizedPrograms.First().ToString(), "Centre");
             var output = (double[]) learnedSet.RealizedPrograms.First().Invoke(input);
             Assert.AreEqual(4.975,   output[0], 0.001d);
             Assert.AreEqual(9.075,  output[1], 0.001d);
@@ -319,6 +367,10 @@ namespace ProseDSLModels
             var ans = x.Aggregate((a, b) => a + b);
             double[] res = new double[4] {Math.Round(ans,4), 0.0, 0.0, 0.0};
             return res;
+        }
+
+        private double[] stall(double[] x) {
+            return x;
         }
 
         private double[] mult(double[] x){
@@ -367,6 +419,16 @@ namespace ProseDSLModels
 
             Console.WriteLine("grammar.TraceDiagnostics()");
             grammar.TraceDiagnostics();
+        }
+
+        private void stdoutprogram(string program,string name){
+            using (System.IO.StreamWriter file = 
+            new System.IO.StreamWriter(@"../../../programs.log", true))
+            {
+                file.WriteLine("#"+name);
+                file.WriteLine(program);
+                file.WriteLine("");
+            }
         }
 
     }

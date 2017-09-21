@@ -1,0 +1,15 @@
+#Add
+add(add(add(add(add(x)))))
+
+#Stall
+sub(add(add(mult(add(x)))), stall(x))
+
+#Mult
+add(add(add(add(mult(x)))))
+
+#AvgVal
+add(add(add(div(add(x), len(x)))))
+
+#Centre
+sub(add(add(div(add(x), len(x)))), stall(x))
+

@@ -54,18 +54,18 @@ params=OrderedDict(
 
 if FLAGS.type == "RNN":
     params=OrderedDict()
-    params['total_num_epochs'] = [2000, 17000]
+    params['total_num_epochs'] = [27000]
     #params['state_size'] = [300, 300, 300, 300, 300, 300, 300, 300]
-    params['state_size'] = [300, 300, 300, 300]
+    params['state_size'] = [50]
     params['test_ratio'] = [0.33]
     params['num_samples'] = [15]
-    params['batch_size']  = [2]
+    params['batch_size']  = [1]
     params['learning_rate'] = [0.01]
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]    
     #params['train_fn'] = ["np_avg_val" ,"np_center"]
-    params['train_fn'] = ["np_center"]
+    params['train_fn'] = ["np_mult"]
     params['model'] = ["RNN"]
     params['norm'] = [True]
     params['clip'] = [False]
@@ -73,29 +73,30 @@ if FLAGS.type == "RNN":
     params['state_fn'] = ["relu"]
     params['smax_pen_r'] = [0.0]
     params['augument_grad'] = [True]
-    params['relaunch'] = [True]
+    params['relaunch'] = [False]
 
 elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
-    params['total_num_epochs'] = [3000, 27000]
+    params['total_num_epochs'] = [47000]
     #params['state_size'] = [200, 200, 200, 200, 200, 200, 200, 200]
-    params['state_size'] = [200, 200, 200, 200]
+    #params['state_size'] = [200, 200, 200, 200]
+    params['state_size'] = [50]
     params['test_ratio'] = [0.33]
-    params['num_samples'] = [15]
-    params['batch_size']  = [2]
+    params['num_samples'] = [1500, 3500]
+    params['batch_size']  = [100]
     params['learning_rate'] = [0.005]
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]
-    #params['train_fn'] = ["np_avg_val", "np_center"]
-    params['train_fn'] = ["np_center"]
+    #params['train_fn'] = ["np_add"]
+    params['train_fn'] = ["np_mult"]
     params['model'] = ["RLRNN"]
     params['state_fn'] = ["relu"]
     params['pen_sofmax'] = [False]
     params['augument_grad'] = [False]
     params['max_reward'] = [1000]
-    params['relaunch'] = [True]
+    params['relaunch'] = [False]
 else:
     raise Exception('Wrong model specified to be run')
 
