@@ -38,8 +38,9 @@ x_train, x_test, y_train, y_test = split_train_test (x, y , cfg['test_ratio'])
 
 if cfg['model'] == "RNN":
         ops = Operations(cfg)
-        ops.ops = cfg["used_ops_obj"]
-        ops.num_of_ops = len(ops.ops)
+        if 'used_ops_obj' in cfg:
+                ops.ops = cfg["used_ops_obj"]
+                ops.num_of_ops = len(ops.ops)
         if 'used_ops_obj_mem' in cfg:
                 ops.ops_mem = cfg["used_ops_obj_mem"]
                 ops.num_of_ops_mem = len(ops.ops_mem)
@@ -61,7 +62,9 @@ elif cfg['model'] == "HistoryRNN":
         model = HistoryRNN(cfg, ops, mem_sel, op_sel)
         res = restore_selection_matrixes_HistoryRNNS(model, cfg, x_train, x_test, y_train, y_test, model_path, test_1000)
 elif cfg['model'] == "RLRNN":
-        ops_env = cfg["used_ops_env"]
+        ops_env = OpsEnv(cfg)
+        if 'used_ops_env' in cfg:
+                ops_env = cfg["used_ops_env"]
         mem = RLRNNMEM(cfg, ops_env) 
         model = RLRNN(cfg, ops_env, mem) 
         res = restore_selection_RL_RNN(model, cfg, x_train, x_test, y_train, y_test, model_path, test_1000)

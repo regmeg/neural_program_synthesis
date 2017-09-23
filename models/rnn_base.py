@@ -27,7 +27,7 @@ class RNN(NNbase):
                 self.params["W2"] = tf.get_variable("W2", shape=[ cfg['state_size'], ops.num_of_ops ], dtype=cfg['datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params["b2"] = tf.Variable(np.zeros((ops.num_of_ops)), dtype=cfg['datatype'], name="b2")
                 
-                self.params["W3"] = tf.get_variable("W3", shape=[ ops.num_of_ops, cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
+                self.params["W3"] = tf.get_variable("W3",  shape=[ cfg['num_features'], cfg['num_features'] ], dtype=cfg['datatype'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None,  dtype=cfg['datatype']))
                 self.params["b3"] = tf.Variable(np.zeros((cfg['num_features'])), dtype=cfg['datatype'], name="b3")
                 
                 
@@ -91,7 +91,13 @@ class RNN(NNbase):
                 with tf.name_scope("Step_"+str(timestep)):
                     current_input = output
             
+                    with tf.name_scope("Comp_next_x"):
+                        next_x = tf.add(tf.matmul(current_x, self.params["W3"], name="x_mul_W3"), self.params["b3"], name="add_bias3")
+                        current_x = next_x
+                        current_xes.append(current_x)
+
                     with tf.name_scope("Comp_softmax"):
+
                         input_and_state_concatenated = tf.concat([current_x, current_state], 1, name="concat_input_state")  # Increasing number of columns
                         _mul1 = tf.matmul(input_and_state_concatenated, self.params["W"], name="input-state_mult_W")
                         _add1 = tf.add(_mul1, self.params["b"], name="add_bias")
@@ -137,11 +143,7 @@ class RNN(NNbase):
                         #save the sequance of softmaxes and outputs
                         outputs.append(output)
                         softmaxes.append(softmax)
-                    
-                    with tf.name_scope("Comp_next_x"):
-                        next_x = tf.add(tf.matmul(logits, self.params["W3"], name="state_mul_W3"), self.params["b3"], name="add_bias3")
-                        current_x = next_x
-                        current_xes.append(current_x)
+
 
             #build the response dict
         return dict(

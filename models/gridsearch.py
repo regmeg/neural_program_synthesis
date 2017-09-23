@@ -12,7 +12,7 @@ This module simulates the gridsearch funtionality, in order to tune the hyperpar
 '''
 
 tf.flags.DEFINE_integer("seed", 0, "the global simulation seed for np and tf")
-tf.flags.DEFINE_string("type", "RL", "model type")
+tf.flags.DEFINE_string("type", " ", "model type")
 
 FLAGS = tf.flags.FLAGS
 
@@ -52,28 +52,110 @@ params=OrderedDict(
 '''
 #gridsearch for supervised models
 
-if FLAGS.type == "RNN":
+if FLAGS.type == "RNN1":
     params=OrderedDict()
-    params['total_num_epochs'] = [27000]
-    #params['state_size'] = [300, 300, 300, 300, 300, 300, 300, 300]
-    params['state_size'] = [50]
-    params['test_ratio'] = [0.33]
-    params['num_samples'] = [15]
+    params['total_num_epochs'] = [10000]
+    params['state_size'] = [50, 50]
+    params['test_ratio'] = [0.5]
+    params['num_samples'] = [2]
     params['batch_size']  = [1]
     params['learning_rate'] = [0.01]
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]    
-    #params['train_fn'] = ["np_avg_val" ,"np_center"]
-    params['train_fn'] = ["np_mult"]
+    params['train_fn'] = ["np_add"]
     params['model'] = ["RNN"]
     params['norm'] = [True]
     params['clip'] = [False]
-    params['softmax_sat'] = [100]
     params['state_fn'] = ["relu"]
-    params['smax_pen_r'] = [0.0]
+    params['softmax_sat'] = [100]
     params['augument_grad'] = [True]
-    params['relaunch'] = [False]
+    params['add_noise'] = [True]
+    params['hardmax_break'] = [False]
+
+elif FLAGS.type == "RNN2":
+    params=OrderedDict()
+    params['total_num_epochs'] = [10000]
+    params['state_size'] = [50, 50]
+    params['test_ratio'] = [0.33]
+    params['num_samples'] = [15]
+    params['batch_size']  = [4]
+    params['learning_rate'] = [0.01]
+    params['epsilon'] = [1e-3]
+    params['max_output_ops'] = [5]
+    params['num_features'] = [4]    
+    params['train_fn'] = ["np_add"]
+    params['model'] = ["RNN"]
+    params['norm'] = [True]
+    params['clip'] = [False]
+    params['state_fn'] = ["relu"]
+    params['softmax_sat'] = [100]
+    params['augument_grad'] = [True]
+    params['add_noise'] = [True]
+    params['hardmax_break'] = [False]
+
+elif FLAGS.type == "RNN3":
+    params=OrderedDict()
+    params['total_num_epochs'] = [10000]
+    params['state_size'] = [50, 50]
+    params['test_ratio'] = [0.33]
+    params['num_samples'] = [150]
+    params['batch_size']  = [10]
+    params['learning_rate'] = [0.01]
+    params['epsilon'] = [1e-3]
+    params['max_output_ops'] = [5]
+    params['num_features'] = [4]    
+    params['train_fn'] = ["np_add"]
+    params['model'] = ["RNN"]
+    params['norm'] = [True]
+    params['clip'] = [False]
+    params['state_fn'] = ["relu"]
+    params['softmax_sat'] = [100]
+    params['augument_grad'] = [True]
+    params['add_noise'] = [True]
+    params['hardmax_break'] = [False]
+
+elif FLAGS.type == "RNN4":
+    params=OrderedDict()
+    params['total_num_epochs'] = [10000]
+    params['state_size'] = [50, 50]
+    params['test_ratio'] = [0.33]
+    params['num_samples'] = [1500]
+    params['batch_size']  = [100]
+    params['learning_rate'] = [0.01]
+    params['epsilon'] = [1e-3]
+    params['max_output_ops'] = [5]
+    params['num_features'] = [4]    
+    params['train_fn'] = ["np_add"]
+    params['model'] = ["RNN"]
+    params['norm'] = [True]
+    params['clip'] = [False]
+    params['state_fn'] = ["relu"]
+    params['softmax_sat'] = [100]
+    params['augument_grad'] = [True]
+    params['add_noise'] = [True]
+    params['hardmax_break'] = [False]
+
+elif FLAGS.type == "RNN5":
+    params=OrderedDict()
+    params['total_num_epochs'] = [10000]
+    params['state_size'] = [50, 50]
+    params['test_ratio'] = [0.33]
+    params['num_samples'] = [3500]
+    params['batch_size']  = [100]
+    params['learning_rate'] = [0.01]
+    params['epsilon'] = [1e-3]
+    params['max_output_ops'] = [5]
+    params['num_features'] = [4]    
+    params['train_fn'] = ["np_add"]
+    params['model'] = ["RNN"]
+    params['norm'] = [True]
+    params['clip'] = [False]
+    params['state_fn'] = ["relu"]
+    params['softmax_sat'] = [100]
+    params['augument_grad'] = [True]
+    params['add_noise'] = [True]
+    params['hardmax_break'] = [False]
 
 elif FLAGS.type == "RL":
     #cfg for RL models
@@ -90,6 +172,7 @@ elif FLAGS.type == "RL":
     params['max_output_ops'] = [5]
     params['num_features'] = [4]
     #params['train_fn'] = ["np_add"]
+    #params['train_fn'] = ["np_avg_val" ,"np_center"]
     params['train_fn'] = ["np_mult"]
     params['model'] = ["RLRNN"]
     params['state_fn'] = ["relu"]

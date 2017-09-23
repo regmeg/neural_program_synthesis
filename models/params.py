@@ -60,7 +60,7 @@ def get_cfg():
         test_ratio = FLAGS.test_ratio,
         param_init = 0.1,
         epsilon= FLAGS.epsilon,
-        test_cycle = 5,
+        test_cycle = 10,
         #test_cycle = 150,
         convergance_check_epochs = 500,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
