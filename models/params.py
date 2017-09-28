@@ -38,7 +38,7 @@ tf.flags.DEFINE_boolean("clip", False, "weather to clip grads")
 tf.flags.DEFINE_float("grad_clip_val_max", 10e3, "grad_clip_val_max")
 tf.flags.DEFINE_float("grad_clip_val_min", -10e3, "grad_clip_val_min")
 
-tf.flags.DEFINE_boolean("pen_sofmax", True, "whether to compute sofmax penalties")
+tf.flags.DEFINE_boolean("pen_sofmax", False, "whether to compute sofmax penalties")
 tf.flags.DEFINE_boolean("augument_grad", True, "whether to augument grads involved in sofmax with sfotmax_sat val")
 
 tf.flags.DEFINE_integer("seed", round(random.random()*100000), "the global simulation seed for np and tf")
@@ -60,8 +60,7 @@ def get_cfg():
         test_ratio = FLAGS.test_ratio,
         param_init = 0.1,
         epsilon= FLAGS.epsilon,
-        test_cycle = 10,
-        #test_cycle = 150,
+        test_cycle = 150,
         convergance_check_epochs = 500,
         sim_start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S"),
         datatype = tf.float64,

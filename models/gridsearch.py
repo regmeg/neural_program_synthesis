@@ -52,94 +52,10 @@ params=OrderedDict(
 '''
 #gridsearch for supervised models
 
-if FLAGS.type == "RNN1":
+if FLAGS.type == "RNN":
     params=OrderedDict()
-    params['total_num_epochs'] = [10000]
-    params['state_size'] = [50, 50]
-    params['test_ratio'] = [0.5]
-    params['num_samples'] = [2]
-    params['batch_size']  = [1]
-    params['learning_rate'] = [0.01]
-    params['epsilon'] = [1e-3]
-    params['max_output_ops'] = [5]
-    params['num_features'] = [4]    
-    params['train_fn'] = ["np_add"]
-    params['model'] = ["RNN"]
-    params['norm'] = [True]
-    params['clip'] = [False]
-    params['state_fn'] = ["relu"]
-    params['softmax_sat'] = [100]
-    params['augument_grad'] = [True]
-    params['add_noise'] = [True]
-    params['hardmax_break'] = [False]
-
-elif FLAGS.type == "RNN2":
-    params=OrderedDict()
-    params['total_num_epochs'] = [10000]
-    params['state_size'] = [50, 50]
-    params['test_ratio'] = [0.33]
-    params['num_samples'] = [15]
-    params['batch_size']  = [4]
-    params['learning_rate'] = [0.01]
-    params['epsilon'] = [1e-3]
-    params['max_output_ops'] = [5]
-    params['num_features'] = [4]    
-    params['train_fn'] = ["np_add"]
-    params['model'] = ["RNN"]
-    params['norm'] = [True]
-    params['clip'] = [False]
-    params['state_fn'] = ["relu"]
-    params['softmax_sat'] = [100]
-    params['augument_grad'] = [True]
-    params['add_noise'] = [True]
-    params['hardmax_break'] = [False]
-
-elif FLAGS.type == "RNN3":
-    params=OrderedDict()
-    params['total_num_epochs'] = [10000]
-    params['state_size'] = [50, 50]
-    params['test_ratio'] = [0.33]
-    params['num_samples'] = [150]
-    params['batch_size']  = [10]
-    params['learning_rate'] = [0.01]
-    params['epsilon'] = [1e-3]
-    params['max_output_ops'] = [5]
-    params['num_features'] = [4]    
-    params['train_fn'] = ["np_add"]
-    params['model'] = ["RNN"]
-    params['norm'] = [True]
-    params['clip'] = [False]
-    params['state_fn'] = ["relu"]
-    params['softmax_sat'] = [100]
-    params['augument_grad'] = [True]
-    params['add_noise'] = [True]
-    params['hardmax_break'] = [False]
-
-elif FLAGS.type == "RNN4":
-    params=OrderedDict()
-    params['total_num_epochs'] = [10000]
-    params['state_size'] = [50, 50]
-    params['test_ratio'] = [0.33]
-    params['num_samples'] = [1500]
-    params['batch_size']  = [100]
-    params['learning_rate'] = [0.01]
-    params['epsilon'] = [1e-3]
-    params['max_output_ops'] = [5]
-    params['num_features'] = [4]    
-    params['train_fn'] = ["np_add"]
-    params['model'] = ["RNN"]
-    params['norm'] = [True]
-    params['clip'] = [False]
-    params['state_fn'] = ["relu"]
-    params['softmax_sat'] = [100]
-    params['augument_grad'] = [True]
-    params['add_noise'] = [True]
-    params['hardmax_break'] = [False]
-
-elif FLAGS.type == "RNN5":
-    params=OrderedDict()
-    params['total_num_epochs'] = [10000]
-    params['state_size'] = [50, 50]
+    params['total_num_epochs'] = [10000, 3500]
+    params['state_size'] = [50, 100, 200, 250, 350]
     params['test_ratio'] = [0.33]
     params['num_samples'] = [3500]
     params['batch_size']  = [100]
@@ -147,7 +63,7 @@ elif FLAGS.type == "RNN5":
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]    
-    params['train_fn'] = ["np_add"]
+    params['train_fn'] = ["np_add", "np_stall", "np_mult", "np_avg_val" ,"np_center"]
     params['model'] = ["RNN"]
     params['norm'] = [True]
     params['clip'] = [False]
@@ -160,30 +76,25 @@ elif FLAGS.type == "RNN5":
 elif FLAGS.type == "RL":
     #cfg for RL models
     params=OrderedDict()
-    params['total_num_epochs'] = [47000]
-    #params['state_size'] = [200, 200, 200, 200, 200, 200, 200, 200]
-    #params['state_size'] = [200, 200, 200, 200]
+    params['total_num_epochs'] = [10000, 140000]
+    params['state_size'] = [50, 100, 200, 250, 350]
     params['state_size'] = [50]
     params['test_ratio'] = [0.33]
-    params['num_samples'] = [1500, 3500]
-    params['batch_size']  = [100]
+    params['num_samples'] = [150]
+    params['batch_size']  = [10]
     params['learning_rate'] = [0.005]
     params['epsilon'] = [1e-3]
     params['max_output_ops'] = [5]
     params['num_features'] = [4]
-    #params['train_fn'] = ["np_add"]
-    #params['train_fn'] = ["np_avg_val" ,"np_center"]
-    params['train_fn'] = ["np_mult"]
+    params['train_fn'] = ["np_add", "np_mult", "np_avg_val" ,"np_center"]
     params['model'] = ["RLRNN"]
     params['state_fn'] = ["relu"]
-    params['pen_sofmax'] = [False]
-    params['augument_grad'] = [False]
+    params['add_noise'] = [False]
+    params['logoff'] = [True]
     params['max_reward'] = [1000]
     params['relaunch'] = [False]
 else:
     raise Exception('Wrong model specified to be run')
-
-#cfg which unlinkely is going to be iterated, but still can be configured
 
 #seed
 seed = FLAGS.seed

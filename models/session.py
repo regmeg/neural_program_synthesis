@@ -22,6 +22,10 @@ def write_no_tf_summary(writer, tag, val, step):
    writer.add_summary(summary, step)
 
 def print_ops_matrix(matrix_lst, ops_list, indeces = None):
+    pass
+
+"""
+def print_ops_matrix(matrix_lst, ops_list, indeces = None):
     np.set_printoptions(precision=3, suppress=True)
     for elem in range(len(matrix_lst[0])):
         if indeces is not None and elem not in indeces: continue 
@@ -32,7 +36,7 @@ def print_ops_matrix(matrix_lst, ops_list, indeces = None):
             op_name = ops_list[index].__name__
             print(str(matrix[elem][index])+"[ "+op_name+" ]", end=" ")
         print("")
-
+"""
 #helpder func
 def get_time_hhmmss(dif):
     m, s = divmod(dif, 60)

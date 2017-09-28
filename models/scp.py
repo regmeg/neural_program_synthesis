@@ -18,6 +18,7 @@ from data_gen import *
 import pickle
 from functools import reduce
 
+"""
 paths = [
 
 ["1500RNNnp_avg_val",
@@ -44,7 +45,11 @@ paths = [
 ["3500RLRNNnp_center",
 "/home/rb7e15/2.7v/summaries/RLRNN/np_center-5ops/total_num_epochs#8000~state_size#200~test_ratio#0.33~num_samples#3500~batch_size#100~learning_rate#0.005~epsilon#0.001~num_features#4~state_fn#relu~pen_sofmax#False~augument_grad#False~max_reward#1000~relaunch#True~seed#94097"]
 ]
-
+"""
+paths = [
+["3500RLRNNnp_avgvalconv",
+"/home/rb7e15/2.7v/summaries/RLRNN/np_avg_val-5ops/total_num_epochs#21000~state_size#200~test_ratio#0.33~num_samples#3500~batch_size#100~learning_rate#0.005~epsilon#0.001~num_features#4~state_fn#relu~pen_sofmax#False~augument_grad#False~max_reward#1000~relaunch#True~seed#35428"]
+]
 for elem in paths:
 	cmd = "sshpass -f /home/user/.psw scp -r rb7e15@lyceum2.soton.ac.uk:"+elem[1]+" ./scp_pulled/"+elem[0]
 	print(cmd)
