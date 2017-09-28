@@ -1,3 +1,6 @@
+'''
+This module runs the training and restoring/prediction sessions for the both models plus the history based RNN model
+'''
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt

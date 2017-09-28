@@ -1,3 +1,6 @@
+'''
+This module simulates the gridsearch funtionality, in order to tune the hyperparmaters
+'''
 import os
 import subprocess
 import sys
@@ -7,9 +10,6 @@ import tensorflow as tf
 import itertools
 from collections import OrderedDict
 
-'''
-This module simulates the gridsearch funtionality, in order to tune the hyperparmaters
-'''
 
 tf.flags.DEFINE_integer("seed", 0, "the global simulation seed for np and tf")
 tf.flags.DEFINE_string("type", " ", "model type")

@@ -1,3 +1,6 @@
+'''
+This module is the memory policy network for the RL model
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

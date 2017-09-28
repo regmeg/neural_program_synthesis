@@ -1,3 +1,6 @@
+'''
+This module peforms the thousand randoms samples test on already saved models.
+'''
 import pprint
 import os
 import sys

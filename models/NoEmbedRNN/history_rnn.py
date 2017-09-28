@@ -1,3 +1,7 @@
+'''
+This is a history RNN which replicates the neural programmer in more detail
+'''
+
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

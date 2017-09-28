@@ -1,3 +1,6 @@
+'''
+This modlue is the op selector required for the history rnns
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

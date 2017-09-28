@@ -1,3 +1,6 @@
+'''
+This module is the base of the Supervised learning model without the embeddings
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

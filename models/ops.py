@@ -1,3 +1,6 @@
+'''
+This module implements the operations used in the supervised learning model
+'''
 import tensorflow as tf
 import numpy as np
 

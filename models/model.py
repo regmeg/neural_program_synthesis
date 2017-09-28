@@ -1,3 +1,6 @@
+'''
+This module launches the simulation for different types of models
+'''
 import pprint
 import os
 import sys

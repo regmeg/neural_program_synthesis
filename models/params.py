@@ -1,3 +1,6 @@
+'''
+This module handles the parameter definitions of the model
+'''
 import tensorflow as tf
 import random
 import time

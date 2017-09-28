@@ -1,3 +1,6 @@
+'''
+This module is the base of the Supervised Learning model and defines the timestep rollout, memory/operation selection interactions and the operations selection network.
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

@@ -1,3 +1,7 @@
+'''
+This module is the memory selection RNN for the supervised learning model
+'''
+
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

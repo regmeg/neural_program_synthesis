@@ -1,3 +1,6 @@
+'''
+This is a mememroy selection model required for the history rnn
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

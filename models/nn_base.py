@@ -1,3 +1,7 @@
+'''
+This is a common NN base for both models, which defines backprop and some extra common operations.
+'''
+
 import tensorflow as tf
 import numpy as np
 from collections import OrderedDict

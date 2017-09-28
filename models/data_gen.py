@@ -1,3 +1,6 @@
+'''
+This module contains all the operations implemented in numpy and data generation methods and as well as the program execution envfiroment for the reinforcment learning model
+'''
 import numpy as np
 from functools import reduce
 from numpy.random import RandomState

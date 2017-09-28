@@ -1,3 +1,6 @@
+'''
+this script helps to automate scp copying for the VM generated models
+'''
 import pprint
 import os
 import sys

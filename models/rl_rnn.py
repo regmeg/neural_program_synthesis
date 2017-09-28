@@ -1,3 +1,6 @@
+'''
+This module is the RL model base and defines the op selection policy network and the policy rollout
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

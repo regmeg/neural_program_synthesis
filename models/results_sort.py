@@ -1,3 +1,6 @@
+'''
+This script sorts the result logs produced by the gridserach
+'''
 ##python2
 
 import time

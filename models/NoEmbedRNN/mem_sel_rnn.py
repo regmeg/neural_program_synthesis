@@ -1,3 +1,6 @@
+'''
+This module is a mem selection module for the Supversied learning model without embeddings
+'''
 import tensorflow as tf
 import numpy as np
 from nn_base import NNbase

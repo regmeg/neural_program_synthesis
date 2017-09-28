@@ -1,3 +1,6 @@
+'''
+This script launches the distributed  version of tensroflow simulations
+'''
 import os
 import subprocess
 import sys

@@ -1,3 +1,6 @@
+'''
+This is a distributed version of the model ment to be run with parameters server and workers
+'''
 import numpy as np
 import tensorflow as tf
 from functools import reduce
