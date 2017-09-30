@@ -1,0 +1,4504 @@
+###########CFG dict is###########
+{u'add_noise': u'True',
+ u'augument_grad': u'False',
+ u'batch_size': u'100',
+ u'clip': u'False',
+ u'convergance_check_epochs': u'500',
+ u'datatype': u"<dtype: 'float64'>",
+ u'debug': u'False',
+ u'drop_rate': u'0.15',
+ u'dst': u'RLRNN/np_avg_val-5ops/total_num_epochs#80000~state_size#200~test_ratio#0.33~num_samples#1500~batch_size#100~learning_rate#0.005~epsilon#0.001~num_features#4~state_fn#relu~pen_sofmax#False~augument_grad#False~max_reward#1000~relaunch#False~seed#69690',
+ u'epsilon': u'0.001',
+ u'grad_clip_val_max': u'10000.0',
+ u'grad_clip_val_min': u'-10000.0',
+ u'grad_norm': u'1000.0',
+ u'hardmax_break': u'True',
+ u'iters_per_epoch': u'1',
+ u'learning_rate': u'0.005',
+ u'logoff': u'False',
+ u'loss_swap_per': u'50',
+ u'loss_weight': u'0.5',
+ u'max_output_ops': u'5',
+ u'max_reward': u'1000.0',
+ u'model': u'RLRNN',
+ u'name': u'total_num_epochs#80000~state_size#200~test_ratio#0.33~num_samples#1500~batch_size#100~learning_rate#0.005~epsilon#0.001~num_features#4~state_fn#relu~pen_sofmax#False~augument_grad#False~max_reward#1000~relaunch#False~seed#69690',
+ u'norm': u'True',
+ u'num_epochs': u'80000',
+ u'num_features': u'4',
+ u'num_samples': u'1500',
+ u'param_init': u'0.1',
+ u'pen_sofmax': u'False',
+ u'relaunch': u'False',
+ u'rerun_cfg': u'',
+ u'rnns_same_state': u'False',
+ u'samples_value_rng': u'(-100, 100)',
+ u'seed': u'69690',
+ u'share_state': u'True',
+ u'sim_start_time': u'2017_09_12_124318',
+ u'smax_pen_r': u'0',
+ u'softmax_sat': u'1',
+ u'state_fn': u'relu',
+ u'state_size': u'200',
+ u'test_cycle': u'5',
+ u'test_ratio': u'0.33',
+ u'total_num_epochs': u'80000',
+ u'train_fn': u'<function np_avg_val at 0x4ac4488>'}
+#############################
+norming the grads
+grads are
+[(<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_0:0' shape=(204, 200) dtype=float64>, <tf.Variable 'W_mem:0' shape=(204, 200) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_1:0' shape=(200,) dtype=float64>, <tf.Variable 'RNN_mem/Params/b_mem:0' shape=(200,) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_2:0' shape=(200, 4) dtype=float64>, <tf.Variable 'W2_mem:0' shape=(200, 4) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_3:0' shape=(4,) dtype=float64>, <tf.Variable 'RNN_mem/Params/b2_mem:0' shape=(4,) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_4:0' shape=(4, 4) dtype=float64>, <tf.Variable 'W3_mem:0' shape=(4, 4) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_5:0' shape=(4,) dtype=float64>, <tf.Variable 'RNN_mem/Params/b3_mem:0' shape=(4,) dtype=float64_ref>)]
+norming the grads
+grads are
+[(<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_0:0' shape=(204, 200) dtype=float64>, <tf.Variable 'W:0' shape=(204, 200) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_1:0' shape=(200,) dtype=float64>, <tf.Variable 'RNN_op/Params/b:0' shape=(200,) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_2:0' shape=(200, 5) dtype=float64>, <tf.Variable 'W2:0' shape=(200, 5) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_3:0' shape=(5,) dtype=float64>, <tf.Variable 'RNN_op/Params/b2:0' shape=(5,) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_4:0' shape=(4, 4) dtype=float64>, <tf.Variable 'W3:0' shape=(4, 4) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_5:0' shape=(4,) dtype=float64>, <tf.Variable 'RNN_op/Params/b3:0' shape=(4,) dtype=float64_ref>)]
+writing grad W_0_grad
+writing grad RNN_op/Params/b_0_grad
+writing grad W2_0_grad
+writing grad RNN_op/Params/b2_0_grad
+writing grad W3_0_grad
+writing grad RNN_op/Params/b3_0_grad
+num batches train: 10
+num batches test: 4
+W1
+[[ 0.052 -0.057 -0.034 ..., -0.045 -0.091  0.1  ]
+ [ 0.084 -0.011 -0.008 ...,  0.109 -0.004  0.013]
+ [-0.049 -0.026 -0.092 ..., -0.095  0.116  0.107]
+ ..., 
+ [-0.067 -0.083 -0.082 ..., -0.098  0.072  0.025]
+ [ 0.049 -0.02   0.048 ..., -0.116  0.017  0.078]
+ [ 0.028  0.07  -0.053 ..., -0.106  0.021 -0.078]]
+W2
+[[-0.001  0.033 -0.057 -0.052  0.069]
+ [ 0.091  0.085 -0.157  0.117  0.109]
+ [ 0.012 -0.149  0.003  0.049 -0.096]
+ [ 0.064  0.129 -0.006 -0.017  0.049]
+ [ 0.116 -0.061  0.166  0.011  0.046]
+ [-0.145  0.143  0.112  0.04  -0.119]
+ [ 0.163 -0.121  0.079 -0.118 -0.083]
+ [-0.167 -0.149  0.158 -0.006 -0.088]
+ [ 0.055  0.034 -0.004  0.085 -0.136]
+ [ 0.163  0.083 -0.169  0.038  0.143]
+ [ 0.041  0.091 -0.162 -0.033  0.147]
+ [-0.115  0.055 -0.026  0.071  0.005]
+ [-0.092  0.104  0.045  0.084 -0.061]
+ [ 0.009  0.103 -0.155 -0.171 -0.145]
+ [ 0.068 -0.125 -0.06  -0.064  0.015]
+ [-0.007  0.035  0.039  0.141  0.151]
+ [-0.17  -0.082  0.076 -0.12  -0.011]
+ [-0.054  0.01   0.011  0.101 -0.09 ]
+ [-0.04   0.034  0.093  0.008  0.051]
+ [-0.097 -0.072 -0.008 -0.14   0.046]
+ [-0.097 -0.145 -0.153  0.142 -0.147]
+ [ 0.124 -0.037 -0.047 -0.116 -0.05 ]
+ [ 0.027 -0.142 -0.013  0.107  0.137]
+ [-0.109 -0.019  0.006  0.123  0.143]
+ [-0.144 -0.056 -0.067 -0.074  0.15 ]
+ [-0.145  0.066 -0.012  0.131  0.053]
+ [ 0.149  0.097  0.021 -0.101  0.171]
+ [-0.031 -0.092  0.072  0.117 -0.146]
+ [ 0.051 -0.104 -0.168 -0.07  -0.028]
+ [ 0.084  0.063 -0.052  0.013  0.029]
+ [-0.17   0.045 -0.167  0.111  0.158]
+ [-0.139 -0.094  0.1   -0.001  0.103]
+ [ 0.159 -0.111 -0.136 -0.088  0.037]
+ [ 0.162 -0.136 -0.102  0.141 -0.005]
+ [-0.11  -0.104  0.079 -0.021  0.135]
+ [ 0.138 -0.082 -0.058 -0.057  0.037]
+ [-0.086  0.168  0.056 -0.002  0.02 ]
+ [ 0.047  0.111 -0.083  0.074  0.   ]
+ [-0.02   0.088  0.15  -0.085  0.068]
+ [ 0.079 -0.094  0.142 -0.038 -0.047]
+ [-0.096 -0.078 -0.008  0.073 -0.074]
+ [ 0.011  0.15  -0.165  0.065 -0.049]
+ [-0.013 -0.003 -0.026  0.031  0.009]
+ [ 0.078  0.066 -0.102 -0.091 -0.04 ]
+ [-0.079 -0.124  0.138  0.089 -0.109]
+ [-0.159  0.068  0.144 -0.152 -0.096]
+ [ 0.059  0.091 -0.04   0.163 -0.118]
+ [-0.122  0.063  0.014 -0.162 -0.066]
+ [ 0.127 -0.051  0.023  0.107  0.038]
+ [ 0.01  -0.051  0.044  0.167  0.079]
+ [-0.054 -0.137 -0.008 -0.085  0.152]
+ [-0.014 -0.118 -0.108 -0.154  0.104]
+ [-0.15  -0.06  -0.125 -0.171  0.041]
+ [-0.087 -0.126  0.134  0.138  0.164]
+ [ 0.158 -0.033 -0.104  0.017  0.122]
+ [ 0.026 -0.142 -0.051  0.107  0.017]
+ [-0.076 -0.161 -0.008  0.096 -0.142]
+ [ 0.166  0.126 -0.104  0.138  0.134]
+ [ 0.072  0.085  0.039  0.074 -0.167]
+ [-0.013 -0.025 -0.13  -0.16  -0.169]
+ [-0.085  0.074 -0.052  0.017 -0.076]
+ [-0.15   0.17  -0.05  -0.101  0.02 ]
+ [ 0.02   0.155  0.125 -0.05   0.057]
+ [ 0.04  -0.061  0.017  0.042 -0.156]
+ [ 0.123  0.111  0.082  0.047 -0.099]
+ [-0.029 -0.018 -0.078 -0.16   0.114]
+ [-0.072 -0.031 -0.049  0.164 -0.074]
+ [ 0.019  0.117 -0.145  0.005 -0.131]
+ [ 0.065 -0.014 -0.146  0.107  0.045]
+ [-0.107 -0.087  0.039 -0.063 -0.016]
+ [ 0.13  -0.109  0.164  0.124  0.021]
+ [-0.135 -0.141  0.072  0.17  -0.036]
+ [ 0.081  0.136  0.126  0.138  0.045]
+ [-0.094  0.011  0.023  0.156  0.15 ]
+ [ 0.083  0.032  0.168  0.065 -0.069]
+ [ 0.073  0.064  0.129 -0.037 -0.052]
+ [ 0.15  -0.171 -0.131 -0.157  0.04 ]
+ [ 0.085  0.021 -0.054  0.016  0.103]
+ [-0.055  0.119 -0.074 -0.148  0.003]
+ [ 0.024 -0.004  0.11   0.144 -0.087]
+ [-0.041 -0.083 -0.051  0.097  0.122]
+ [ 0.13  -0.158 -0.038  0.12  -0.143]
+ [ 0.076  0.102 -0.101  0.154  0.108]
+ [-0.115 -0.168  0.096  0.104  0.064]
+ [ 0.12  -0.053 -0.106  0.036 -0.113]
+ [-0.04   0.16   0.163 -0.04  -0.072]
+ [-0.069 -0.066 -0.016 -0.043  0.052]
+ [-0.042  0.035  0.131  0.119 -0.052]
+ [-0.166  0.168 -0.149 -0.052  0.063]
+ [ 0.13  -0.103 -0.054  0.074 -0.044]
+ [-0.012  0.168  0.17   0.03  -0.119]
+ [-0.052 -0.041  0.056  0.167 -0.031]
+ [-0.055 -0.006  0.06   0.065  0.017]
+ [ 0.044  0.004  0.046 -0.092 -0.026]
+ [ 0.079 -0.119 -0.108  0.008  0.023]
+ [-0.099  0.113  0.113 -0.014  0.121]
+ [-0.14   0.066 -0.06  -0.02  -0.07 ]
+ [ 0.124 -0.075  0.053 -0.101 -0.139]
+ [-0.091  0.048 -0.058  0.013  0.064]
+ [ 0.057 -0.117 -0.024  0.103  0.13 ]
+ [ 0.004 -0.171 -0.037 -0.167  0.106]
+ [ 0.049 -0.05  -0.079  0.159 -0.02 ]
+ [-0.128  0.128  0.098  0.13  -0.106]
+ [-0.103 -0.012  0.067  0.14  -0.054]
+ [-0.089  0.107  0.101  0.102  0.14 ]
+ [-0.057  0.06  -0.032  0.152 -0.005]
+ [ 0.141 -0.005  0.002 -0.012  0.136]
+ [ 0.165 -0.079  0.118 -0.07  -0.001]
+ [ 0.141 -0.025  0.058 -0.026  0.16 ]
+ [ 0.115 -0.043  0.09  -0.077 -0.126]
+ [ 0.109  0.167  0.163 -0.098 -0.033]
+ [-0.131  0.123 -0.079 -0.063 -0.092]
+ [-0.021  0.06   0.145  0.022 -0.095]
+ [ 0.045  0.079 -0.11  -0.133  0.137]
+ [-0.031 -0.039  0.139 -0.04   0.081]
+ [ 0.054  0.149  0.014 -0.01   0.125]
+ [ 0.035 -0.072  0.073 -0.1   -0.112]
+ [ 0.146  0.024 -0.131 -0.147  0.024]
+ [ 0.115 -0.018 -0.125  0.039  0.08 ]
+ [ 0.117  0.017  0.111 -0.057 -0.146]
+ [ 0.157  0.045  0.124  0.018  0.019]
+ [ 0.13   0.134 -0.051  0.129  0.121]
+ [ 0.068 -0.032 -0.168  0.116 -0.009]
+ [ 0.112  0.007  0.002 -0.088 -0.167]
+ [-0.105 -0.051  0.16   0.063 -0.154]
+ [ 0.066  0.067  0.14  -0.008  0.168]
+ [ 0.008 -0.077  0.153  0.069  0.049]
+ [ 0.036  0.12   0.093 -0.16  -0.15 ]
+ [-0.105  0.138 -0.101  0.115  0.045]
+ [ 0.084 -0.15  -0.084  0.047  0.106]
+ [ 0.052 -0.094  0.116 -0.131 -0.141]
+ [ 0.03   0.052  0.019  0.116  0.008]
+ [-0.061 -0.105 -0.071 -0.063  0.05 ]
+ [-0.107  0.07  -0.085 -0.044 -0.099]
+ [-0.057  0.165 -0.133 -0.128  0.002]
+ [-0.01  -0.103 -0.027  0.051  0.124]
+ [-0.164 -0.071  0.088 -0.066  0.117]
+ [ 0.072 -0.033 -0.088 -0.14   0.127]
+ [-0.092  0.088  0.001 -0.143 -0.018]
+ [ 0.075 -0.151 -0.048 -0.011 -0.121]
+ [ 0.065  0.079  0.147 -0.023 -0.1  ]
+ [ 0.037  0.102  0.046 -0.062  0.026]
+ [-0.032  0.081 -0.162  0.055  0.103]
+ [-0.117  0.048 -0.037 -0.168 -0.011]
+ [-0.028  0.054 -0.079  0.113  0.055]
+ [ 0.144 -0.098 -0.156 -0.081  0.164]
+ [ 0.062  0.059 -0.077 -0.153 -0.17 ]
+ [-0.152  0.026  0.022 -0.131 -0.067]
+ [ 0.112 -0.002  0.109  0.058 -0.011]
+ [ 0.033 -0.164  0.055 -0.024 -0.047]
+ [ 0.123 -0.043  0.143  0.042 -0.13 ]
+ [-0.151  0.034  0.099 -0.032  0.025]
+ [-0.047  0.162 -0.133  0.061 -0.035]
+ [ 0.1    0.076 -0.042 -0.091 -0.013]
+ [-0.021  0.114  0.068 -0.125 -0.168]
+ [ 0.08  -0.149  0.116  0.146  0.081]
+ [ 0.099 -0.062  0.009 -0.072 -0.113]
+ [-0.015 -0.088 -0.072 -0.133  0.01 ]
+ [ 0.049 -0.    -0.002 -0.159  0.035]
+ [ 0.164 -0.15  -0.035 -0.079  0.032]
+ [ 0.066 -0.097  0.122  0.165  0.075]
+ [ 0.141 -0.135  0.125  0.161  0.061]
+ [ 0.139 -0.036  0.011  0.001  0.072]
+ [-0.159 -0.137 -0.165  0.096 -0.112]
+ [-0.154  0.048  0.132  0.094  0.062]
+ [ 0.124 -0.035  0.074  0.095  0.062]
+ [ 0.159 -0.147  0.107  0.069  0.119]
+ [-0.169  0.153 -0.064 -0.087  0.161]
+ [ 0.071 -0.018 -0.138 -0.147  0.045]
+ [-0.146  0.054  0.103 -0.048 -0.061]
+ [-0.15  -0.084  0.057 -0.152  0.116]
+ [ 0.08  -0.056 -0.129  0.065 -0.007]
+ [-0.028  0.047  0.17   0.065 -0.064]
+ [ 0.09   0.008  0.098  0.151  0.001]
+ [-0.006  0.002 -0.043 -0.145 -0.086]
+ [ 0.021  0.166 -0.     0.088  0.087]
+ [ 0.005 -0.031 -0.046 -0.122  0.028]
+ [ 0.147 -0.12  -0.023 -0.144 -0.162]
+ [-0.164  0.118  0.105 -0.018  0.043]
+ [-0.078  0.022 -0.164  0.115 -0.016]
+ [ 0.046 -0.111 -0.153 -0.159  0.065]
+ [-0.024  0.058  0.064 -0.043 -0.002]
+ [-0.052 -0.059  0.095  0.1   -0.081]
+ [ 0.059 -0.14   0.07   0.031 -0.042]
+ [ 0.095  0.153 -0.069 -0.129  0.09 ]
+ [ 0.159 -0.035  0.115  0.114 -0.061]
+ [ 0.142 -0.163  0.17   0.16   0.095]
+ [-0.165  0.082  0.149  0.006 -0.108]
+ [-0.093 -0.152 -0.166 -0.079 -0.036]
+ [-0.085 -0.105  0.092  0.092 -0.122]
+ [-0.159 -0.118  0.165 -0.011 -0.098]
+ [ 0.139  0.146  0.037 -0.056 -0.103]
+ [-0.054 -0.069 -0.014  0.107 -0.09 ]
+ [-0.03  -0.098  0.088 -0.11   0.167]
+ [ 0.085 -0.05  -0.058 -0.024 -0.019]
+ [ 0.16  -0.046 -0.089 -0.033 -0.132]
+ [ 0.168 -0.113  0.006  0.06   0.137]
+ [-0.159  0.029  0.123  0.037  0.095]
+ [ 0.15   0.12  -0.107  0.026  0.097]
+ [-0.011 -0.077 -0.04   0.106 -0.057]]
+W3
+[[-0.101 -0.003 -0.022  0.363]
+ [-0.164  0.639 -0.53   0.621]
+ [ 0.167  0.079 -0.191 -0.538]
+ [-0.754 -0.439  0.206  0.004]]
+W1_mem
+[[-0.    -0.01  -0.062 ..., -0.005 -0.012  0.024]
+ [-0.053  0.035 -0.095 ..., -0.057  0.114 -0.022]
+ [-0.091 -0.015  0.012 ...,  0.029  0.076  0.117]
+ ..., 
+ [-0.003  0.03   0.108 ..., -0.01  -0.047 -0.102]
+ [ 0.009 -0.057 -0.062 ...,  0.086  0.07  -0.096]
+ [-0.016  0.018  0.023 ...,  0.074 -0.008 -0.057]]
+W2_mem
+[[-0.103 -0.163  0.148  0.088]
+ [ 0.113 -0.15   0.154  0.049]
+ [ 0.155 -0.009 -0.121  0.139]
+ [-0.085 -0.133  0.03   0.098]
+ [ 0.08  -0.018  0.085  0.034]
+ [ 0.055 -0.155 -0.058  0.124]
+ [-0.15   0.04  -0.149  0.058]
+ [ 0.088 -0.168 -0.099 -0.17 ]
+ [ 0.034 -0.159  0.111  0.157]
+ [ 0.162 -0.116  0.049 -0.16 ]
+ [-0.144  0.016 -0.132  0.05 ]
+ [ 0.029 -0.061 -0.078 -0.044]
+ [ 0.003  0.13   0.044 -0.087]
+ [-0.087  0.143 -0.069  0.087]
+ [ 0.007 -0.083  0.073  0.016]
+ [-0.087  0.16   0.169  0.171]
+ [-0.13  -0.069 -0.081 -0.043]
+ [ 0.142 -0.148 -0.034  0.019]
+ [-0.149  0.145  0.047 -0.11 ]
+ [ 0.077 -0.155  0.075  0.009]
+ [-0.104  0.036 -0.092 -0.057]
+ [ 0.075  0.025  0.01  -0.011]
+ [-0.011 -0.049  0.136  0.096]
+ [ 0.143  0.086 -0.136  0.03 ]
+ [-0.127  0.057  0.152  0.059]
+ [ 0.003 -0.13   0.058 -0.034]
+ [ 0.031 -0.089 -0.123 -0.111]
+ [-0.112  0.014 -0.155  0.029]
+ [-0.019  0.082 -0.139 -0.157]
+ [-0.044  0.139  0.152 -0.148]
+ [ 0.143  0.144  0.028  0.055]
+ [ 0.114 -0.164  0.1   -0.124]
+ [ 0.153  0.086 -0.097  0.058]
+ [ 0.052 -0.164  0.006 -0.027]
+ [ 0.157 -0.056 -0.16   0.128]
+ [ 0.09  -0.062 -0.13   0.038]
+ [ 0.13   0.004 -0.152 -0.162]
+ [-0.107  0.069 -0.037  0.102]
+ [-0.096  0.005 -0.164 -0.126]
+ [-0.084  0.038  0.007 -0.116]
+ [ 0.138  0.06   0.034  0.148]
+ [ 0.012  0.104 -0.136 -0.162]
+ [ 0.045 -0.097  0.078 -0.05 ]
+ [-0.06  -0.146  0.084 -0.107]
+ [-0.106  0.053  0.166 -0.102]
+ [-0.081  0.006  0.153 -0.063]
+ [-0.044 -0.035 -0.135 -0.021]
+ [-0.081 -0.093  0.021 -0.166]
+ [ 0.047 -0.074 -0.149  0.055]
+ [ 0.042 -0.043 -0.063  0.116]
+ [ 0.157 -0.161  0.06   0.022]
+ [ 0.119 -0.025 -0.091 -0.159]
+ [ 0.072 -0.058 -0.077  0.059]
+ [ 0.077 -0.115  0.087  0.029]
+ [-0.161 -0.026  0.07   0.097]
+ [ 0.038  0.164 -0.052 -0.076]
+ [-0.012 -0.019 -0.132 -0.073]
+ [-0.059 -0.132 -0.081  0.02 ]
+ [ 0.02   0.01   0.135 -0.018]
+ [ 0.011  0.136 -0.08   0.078]
+ [-0.049 -0.13   0.011 -0.084]
+ [-0.074  0.083  0.163  0.127]
+ [ 0.087  0.152 -0.08  -0.128]
+ [ 0.064  0.154  0.123  0.132]
+ [ 0.043 -0.015  0.148 -0.062]
+ [ 0.042 -0.097 -0.065  0.055]
+ [ 0.126  0.162  0.018  0.117]
+ [-0.171  0.026  0.06   0.043]
+ [ 0.118 -0.167  0.033 -0.027]
+ [ 0.129  0.09   0.099  0.062]
+ [-0.123 -0.147 -0.056  0.021]
+ [-0.137  0.005 -0.063 -0.076]
+ [-0.117 -0.033 -0.01  -0.146]
+ [-0.156 -0.114  0.082  0.027]
+ [-0.077  0.004 -0.095  0.055]
+ [ 0.077  0.157 -0.027 -0.084]
+ [ 0.157 -0.11   0.108 -0.058]
+ [ 0.12  -0.079  0.103  0.129]
+ [-0.033 -0.056 -0.107  0.039]
+ [ 0.088 -0.075  0.059  0.023]
+ [ 0.033  0.099 -0.165 -0.162]
+ [-0.035  0.014  0.068 -0.012]
+ [-0.038 -0.007  0.066  0.132]
+ [ 0.097  0.088  0.156  0.118]
+ [ 0.074  0.136 -0.146 -0.099]
+ [ 0.119 -0.136 -0.07   0.078]
+ [ 0.121  0.136 -0.043  0.16 ]
+ [ 0.08   0.149  0.114  0.013]
+ [-0.057 -0.153  0.08  -0.047]
+ [ 0.    -0.169  0.036 -0.001]
+ [-0.014 -0.148 -0.122 -0.111]
+ [ 0.136  0.028  0.064  0.159]
+ [-0.14   0.057  0.027 -0.154]
+ [-0.006 -0.079  0.116 -0.166]
+ [ 0.139 -0.158  0.113  0.065]
+ [-0.036  0.088  0.051 -0.141]
+ [-0.152 -0.027 -0.157  0.061]
+ [-0.122  0.113  0.079 -0.161]
+ [ 0.09  -0.113  0.133  0.069]
+ [ 0.102 -0.129  0.097 -0.084]
+ [ 0.129  0.115  0.147  0.09 ]
+ [-0.063 -0.151 -0.111 -0.08 ]
+ [-0.171  0.032  0.1    0.081]
+ [ 0.035 -0.034 -0.135  0.015]
+ [ 0.118  0.09   0.119  0.042]
+ [ 0.023  0.023 -0.157  0.089]
+ [ 0.144  0.129 -0.035 -0.061]
+ [ 0.014  0.044 -0.154  0.107]
+ [ 0.078  0.051 -0.043 -0.167]
+ [ 0.029  0.062  0.001 -0.039]
+ [ 0.149 -0.027  0.02   0.097]
+ [-0.111  0.151  0.089  0.083]
+ [-0.128 -0.127  0.048  0.16 ]
+ [ 0.144 -0.151  0.015 -0.07 ]
+ [-0.085 -0.136 -0.075  0.093]
+ [ 0.101 -0.107  0.064  0.11 ]
+ [ 0.129 -0.124  0.034  0.016]
+ [-0.115  0.075  0.169  0.062]
+ [ 0.005  0.017  0.071 -0.155]
+ [-0.034  0.145 -0.02   0.143]
+ [-0.146  0.064 -0.094 -0.042]
+ [-0.104  0.158  0.077  0.009]
+ [-0.085  0.169 -0.089 -0.004]
+ [ 0.001 -0.005 -0.038 -0.079]
+ [ 0.042  0.11  -0.058 -0.133]
+ [-0.068  0.17   0.098 -0.067]
+ [ 0.144 -0.084  0.009 -0.107]
+ [-0.162  0.029 -0.092 -0.12 ]
+ [ 0.007  0.064 -0.124 -0.032]
+ [ 0.01  -0.115  0.149 -0.103]
+ [-0.154  0.018  0.104  0.135]
+ [-0.008  0.138  0.122 -0.163]
+ [-0.063 -0.082 -0.043  0.103]
+ [ 0.143 -0.08  -0.139 -0.13 ]
+ [ 0.001 -0.058 -0.073 -0.053]
+ [-0.136  0.101 -0.094 -0.093]
+ [-0.129  0.071 -0.081  0.154]
+ [ 0.162 -0.085  0.102 -0.101]
+ [-0.095  0.023 -0.09   0.046]
+ [-0.032  0.017 -0.036  0.094]
+ [-0.139 -0.127  0.069 -0.012]
+ [-0.117 -0.098  0.078 -0.101]
+ [-0.077 -0.162  0.11   0.051]
+ [-0.001 -0.013  0.005  0.099]
+ [ 0.05   0.062  0.153 -0.034]
+ [ 0.01   0.054  0.122  0.061]
+ [-0.138  0.063  0.127 -0.108]
+ [ 0.136  0.033 -0.078  0.04 ]
+ [ 0.149  0.118 -0.093 -0.027]
+ [-0.141  0.165  0.138 -0.119]
+ [-0.147  0.089 -0.076 -0.066]
+ [ 0.055  0.155  0.083  0.014]
+ [ 0.104  0.023 -0.145  0.021]
+ [-0.053 -0.023  0.029 -0.036]
+ [ 0.158 -0.128 -0.153 -0.105]
+ [ 0.15  -0.     0.096  0.005]
+ [-0.171 -0.123  0.13  -0.157]
+ [ 0.103  0.163 -0.152  0.077]
+ [-0.035 -0.166  0.074 -0.018]
+ [-0.039  0.088 -0.121 -0.094]
+ [ 0.119 -0.092 -0.171  0.153]
+ [ 0.029 -0.059  0.09  -0.154]
+ [-0.063 -0.161 -0.165  0.053]
+ [-0.05  -0.13   0.135 -0.116]
+ [-0.115  0.122 -0.118 -0.146]
+ [ 0.092 -0.082  0.082 -0.122]
+ [ 0.168 -0.156 -0.057  0.047]
+ [ 0.17  -0.007 -0.069  0.099]
+ [ 0.037  0.056 -0.07   0.139]
+ [ 0.093 -0.06   0.168  0.111]
+ [ 0.012 -0.167  0.153 -0.032]
+ [-0.152  0.03  -0.086  0.137]
+ [ 0.122 -0.075  0.151 -0.154]
+ [ 0.059  0.065  0.117  0.066]
+ [-0.154  0.156  0.021 -0.056]
+ [ 0.006 -0.097  0.047  0.008]
+ [ 0.153  0.047 -0.053 -0.147]
+ [-0.003 -0.092  0.056 -0.146]
+ [ 0.141  0.136 -0.021  0.058]
+ [-0.053 -0.089  0.038  0.121]
+ [-0.07   0.015  0.01  -0.067]
+ [-0.084 -0.148  0.024  0.029]
+ [ 0.167 -0.04  -0.033 -0.049]
+ [ 0.152 -0.018 -0.077  0.109]
+ [ 0.06  -0.054  0.014 -0.131]
+ [-0.009  0.01  -0.04  -0.089]
+ [-0.102  0.052 -0.048 -0.093]
+ [-0.05   0.157 -0.07   0.068]
+ [ 0.081 -0.106 -0.052 -0.07 ]
+ [ 0.028 -0.081 -0.149  0.087]
+ [-0.169  0.16  -0.138  0.053]
+ [-0.13  -0.166 -0.164 -0.063]
+ [-0.022 -0.008 -0.098 -0.161]
+ [ 0.115  0.016  0.022  0.149]
+ [ 0.007  0.085 -0.136  0.022]
+ [-0.07   0.156 -0.035  0.011]
+ [ 0.102  0.036 -0.011  0.058]
+ [ 0.129 -0.027 -0.111 -0.092]
+ [-0.033  0.074 -0.107  0.128]
+ [ 0.098 -0.061  0.021  0.17 ]]
+W3_mem
+[[ 0.615 -0.194  0.644 -0.63 ]
+ [-0.47   0.557 -0.852  0.522]
+ [-0.408  0.784 -0.189  0.387]
+ [-0.836 -0.136  0.693  0.81 ]]
+
+Epoch 0
+Log_train_loss	-17130515.7168
+Rewards_train	-5000000.0
+Math_train_er	1208848640.34
+Rewards_test	-2000000.0
+Math_test_er	1426223398.24
+Epoch time:  4.34294199944  Global Time:  00:00:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 1
+Log_train_loss	-18963113.3877
+Rewards_train	-5000000.0
+Math_train_er	6.00539392258e+21
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41731500626  Global Time:  00:00:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 2
+Log_train_loss	-19580335.7714
+Rewards_train	-4980000.0
+Math_train_er	3.97568960851e+25
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34412384033  Global Time:  00:00:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 3
+Log_train_loss	-19547796.6177
+Rewards_train	-4991000.0
+Math_train_er	5.4460857344e+22
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3536939621  Global Time:  00:00:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 4
+Log_train_loss	-19632560.5055
+Rewards_train	-4973000.0
+Math_train_er	4.97429671304e+29
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.35173487663  Global Time:  00:00:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 5
+Log_train_loss	-16098330.9232
+Rewards_train	-5000000.0
+Math_train_er	2.24784240771e+13
+Rewards_test	-2000000.0
+Math_test_er	274786204593.0
+Epoch time:  4.24124979973  Global Time:  00:00:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 6
+Log_train_loss	-18440863.1285
+Rewards_train	-5000000.0
+Math_train_er	9.72487074041e+29
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3505628109  Global Time:  00:00:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 7
+Log_train_loss	-17799525.3882
+Rewards_train	-4820000.0
+Math_train_er	1.66392820259e+31
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.39334893227  Global Time:  00:00:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 8
+Log_train_loss	-18292096.5627
+Rewards_train	-4946000.0
+Math_train_er	1.87025057235e+29
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4282310009  Global Time:  00:00:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 9
+Log_train_loss	-17313645.361
+Rewards_train	-5000000.0
+Math_train_er	36266188.3519
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43983101845  Global Time:  00:00:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 10
+Log_train_loss	-19670424.0993
+Rewards_train	-5000000.0
+Math_train_er	124078653.946
+Rewards_test	-2000000.0
+Math_test_er	8254254.89638
+Epoch time:  4.37400984764  Global Time:  00:00:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 11
+Log_train_loss	-19407188.843
+Rewards_train	-5000000.0
+Math_train_er	2744422053.91
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43681001663  Global Time:  00:00:25
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 12
+Log_train_loss	-18684974.434
+Rewards_train	-5000000.0
+Math_train_er	1.28486522607e+28
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37794613838  Global Time:  00:00:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 13
+Log_train_loss	-17446167.0361
+Rewards_train	-5000000.0
+Math_train_er	4993136666.13
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37815093994  Global Time:  00:00:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 14
+Log_train_loss	-18913099.6788
+Rewards_train	-5000000.0
+Math_train_er	8.02433990946e+24
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.39619708061  Global Time:  00:00:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 15
+Log_train_loss	-19976629.2149
+Rewards_train	-5000000.0
+Math_train_er	180968974610.0
+Rewards_test	-2000000.0
+Math_test_er	24413979458.0
+Epoch time:  4.37888002396  Global Time:  00:00:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 16
+Log_train_loss	-18005919.8796
+Rewards_train	-5000000.0
+Math_train_er	8378700575.25
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47080302238  Global Time:  00:00:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 17
+Log_train_loss	-19421945.9344
+Rewards_train	-5000000.0
+Math_train_er	67619677.2238
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4617459774  Global Time:  00:00:36
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 18
+Log_train_loss	-19752052.8352
+Rewards_train	-5000000.0
+Math_train_er	44939558.8056
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41899180412  Global Time:  00:00:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 19
+Log_train_loss	-19330702.2683
+Rewards_train	-5000000.0
+Math_train_er	4393269.07234
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40264701843  Global Time:  00:00:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 20
+Log_train_loss	-19320988.8025
+Rewards_train	-5000000.0
+Math_train_er	63049.1094162
+Rewards_test	-2000000.0
+Math_test_er	27968.6470911
+Epoch time:  4.33051896095  Global Time:  00:00:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 21
+Log_train_loss	-19402492.1452
+Rewards_train	-5000000.0
+Math_train_er	59367.5643161
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41908097267  Global Time:  00:00:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 22
+Log_train_loss	-19798394.04
+Rewards_train	-5000000.0
+Math_train_er	38530745.3187
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38399910927  Global Time:  00:00:46
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 23
+Log_train_loss	-19632467.3044
+Rewards_train	-4964000.0
+Math_train_er	4234520.33448
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33578896523  Global Time:  00:00:48
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 24
+Log_train_loss	-19580008.0124
+Rewards_train	-5000000.0
+Math_train_er	2.5790523214e+25
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38154911995  Global Time:  00:00:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 25
+Log_train_loss	-19599227.1003
+Rewards_train	-5000000.0
+Math_train_er	328652.059969
+Rewards_test	-2000000.0
+Math_test_er	210331.066889
+Epoch time:  4.40811705589  Global Time:  00:00:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 26
+Log_train_loss	-19705325.8733
+Rewards_train	-5000000.0
+Math_train_er	9.51102991124e+30
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38898587227  Global Time:  00:00:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 27
+Log_train_loss	-17402284.2507
+Rewards_train	-5000000.0
+Math_train_er	6.71905640387e+20
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33209180832  Global Time:  00:00:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 28
+Log_train_loss	-19025126.0175
+Rewards_train	-5000000.0
+Math_train_er	2488380971.98
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36717200279  Global Time:  00:00:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 29
+Log_train_loss	-18669510.2408
+Rewards_train	-5000000.0
+Math_train_er	32999043.9115
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36625695229  Global Time:  00:00:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 30
+Log_train_loss	-18411415.545
+Rewards_train	-5000000.0
+Math_train_er	123233.969988
+Rewards_test	-2000000.0
+Math_test_er	52438.1598257
+Epoch time:  4.21474504471  Global Time:  00:01:03
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 31
+Log_train_loss	-18598927.5759
+Rewards_train	-4937000.0
+Math_train_er	73528.6054314
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34469008446  Global Time:  00:01:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 32
+Log_train_loss	-19046705.2502
+Rewards_train	-4951000.0
+Math_train_er	1346088.88966
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36964297295  Global Time:  00:01:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 33
+Log_train_loss	-17560032.6616
+Rewards_train	-4944000.0
+Math_train_er	11823661.8641
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41305208206  Global Time:  00:01:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 34
+Log_train_loss	-17142925.7943
+Rewards_train	-4680000.0
+Math_train_er	2846377.91412
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38992500305  Global Time:  00:01:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 35
+Log_train_loss	-11557479.1309
+Rewards_train	-4853000.0
+Math_train_er	1761767269.45
+Rewards_test	-1951000.0
+Math_test_er	868380126.406
+Epoch time:  3.83815693855  Global Time:  00:01:13
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 36
+Log_train_loss	-15591637.2598
+Rewards_train	-4633000.0
+Math_train_er	402729686.163
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.255890131  Global Time:  00:01:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 37
+Log_train_loss	-14662514.7828
+Rewards_train	-4517000.0
+Math_train_er	584821837.372
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30186200142  Global Time:  00:01:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 38
+Log_train_loss	-14531847.3983
+Rewards_train	-3908000.0
+Math_train_er	73041.5249453
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44886207581  Global Time:  00:01:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 39
+Log_train_loss	-16396388.4476
+Rewards_train	-4228000.0
+Math_train_er	52921.9234192
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3594892025  Global Time:  00:01:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 40
+Log_train_loss	-17151073.8974
+Rewards_train	-4210000.0
+Math_train_er	35301.5387229
+Rewards_test	-1707000.0
+Math_test_er	14503.3962377
+Epoch time:  4.35219693184  Global Time:  00:01:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 41
+Log_train_loss	-16980943.971
+Rewards_train	-4372000.0
+Math_train_er	198321486.005
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.35987019539  Global Time:  00:01:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 42
+Log_train_loss	-17571504.2982
+Rewards_train	-4744000.0
+Math_train_er	83490.6483125
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37649512291  Global Time:  00:01:25
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 43
+Log_train_loss	-16952781.2173
+Rewards_train	-4518000.0
+Math_train_er	30791.5048652
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37695598602  Global Time:  00:01:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 44
+Log_train_loss	-16461682.5936
+Rewards_train	-4500000.0
+Math_train_er	810188.445544
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43070816994  Global Time:  00:01:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 45
+Log_train_loss	-15086093.8969
+Rewards_train	-4776000.0
+Math_train_er	30779.5301852
+Rewards_test	-1944000.0
+Math_test_er	11668.8339732
+Epoch time:  4.55986595154  Global Time:  00:01:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 46
+Log_train_loss	-16118377.6177
+Rewards_train	-4755000.0
+Math_train_er	385786.782178
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47059297562  Global Time:  00:01:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 47
+Log_train_loss	-16855459.8394
+Rewards_train	-4888000.0
+Math_train_er	65502.0834498
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41256809235  Global Time:  00:01:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 48
+Log_train_loss	-17509445.3741
+Rewards_train	-4986000.0
+Math_train_er	69768.4448334
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40283203125  Global Time:  00:01:37
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 49
+Log_train_loss	-16424841.1051
+Rewards_train	-4888000.0
+Math_train_er	79603.8475558
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41216301918  Global Time:  00:01:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 50
+Log_train_loss	-15095242.4868
+Rewards_train	-4860000.0
+Math_train_er	33182.2097814
+Rewards_test	-1930000.0
+Math_test_er	11863.3918436
+Epoch time:  4.48228502274  Global Time:  00:01:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 51
+Log_train_loss	-14700720.3839
+Rewards_train	-4839000.0
+Math_train_er	26695.4535085
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42737007141  Global Time:  00:01:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 52
+Log_train_loss	-14177567.928
+Rewards_train	-4734000.0
+Math_train_er	28914.4743012
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.39943385124  Global Time:  00:01:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 53
+Log_train_loss	-15870873.896
+Rewards_train	-4601000.0
+Math_train_er	35906.6510841
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36769104004  Global Time:  00:01:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 54
+Log_train_loss	-17465901.9609
+Rewards_train	-4533000.0
+Math_train_er	47634.6849365
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36337590218  Global Time:  00:01:48
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 55
+Log_train_loss	-17862079.0341
+Rewards_train	-4811000.0
+Math_train_er	123225933415.0
+Rewards_test	-1937000.0
+Math_test_er	15831579708.3
+Epoch time:  4.5922601223  Global Time:  00:01:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 56
+Log_train_loss	-11123358.4459
+Rewards_train	-4154000.0
+Math_train_er	2329425846.36
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42843985558  Global Time:  00:01:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 57
+Log_train_loss	-9825984.10637
+Rewards_train	-3774000.0
+Math_train_er	85311037511.7
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41891908646  Global Time:  00:01:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 58
+Log_train_loss	-11240062.3598
+Rewards_train	-4165000.0
+Math_train_er	5476787331.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42551898956  Global Time:  00:01:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 59
+Log_train_loss	-12164819.7165
+Rewards_train	-4011000.0
+Math_train_er	916874985930.0
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41067099571  Global Time:  00:01:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 60
+Log_train_loss	-12481474.8193
+Rewards_train	-4267000.0
+Math_train_er	6617500143.59
+Rewards_test	-1672000.0
+Math_test_er	13800821.4742
+Epoch time:  5.38202190399  Global Time:  00:02:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 61
+Log_train_loss	-12977904.1778
+Rewards_train	-4148000.0
+Math_train_er	35923838096.5
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40408110619  Global Time:  00:02:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 62
+Log_train_loss	-15044961.5108
+Rewards_train	-4454000.0
+Math_train_er	42474905085.1
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40815281868  Global Time:  00:02:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 63
+Log_train_loss	-18369809.1094
+Rewards_train	-4734000.0
+Math_train_er	81609345939.9
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41465902328  Global Time:  00:02:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 64
+Log_train_loss	-18051427.9764
+Rewards_train	-4809000.0
+Math_train_er	3.4455172026e+13
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37847805023  Global Time:  00:02:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 65
+Log_train_loss	-13843249.6624
+Rewards_train	-4986000.0
+Math_train_er	1.39769030762e+14
+Rewards_test	-2000000.0
+Math_test_er	1.790333246e+13
+Epoch time:  6.02280187607  Global Time:  00:02:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 66
+Log_train_loss	-11209020.3707
+Rewards_train	-4993000.0
+Math_train_er	5.63838919777e+13
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.25857901573  Global Time:  00:02:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 67
+Log_train_loss	-11542605.536
+Rewards_train	-4993000.0
+Math_train_er	1.7160916386e+13
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.27540493011  Global Time:  00:02:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 68
+Log_train_loss	-14485585.5727
+Rewards_train	-4909000.0
+Math_train_er	2667753032.59
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.2746629715  Global Time:  00:02:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 69
+Log_train_loss	-16130832.6748
+Rewards_train	-4979000.0
+Math_train_er	1937425765.48
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34899902344  Global Time:  00:02:21
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 70
+Log_train_loss	-18624434.1475
+Rewards_train	-5000000.0
+Math_train_er	58923766.4532
+Rewards_test	-2000000.0
+Math_test_er	731017.109883
+Epoch time:  7.24463701248  Global Time:  00:02:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 71
+Log_train_loss	-16233200.1867
+Rewards_train	-5000000.0
+Math_train_er	47059209.3042
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43138098717  Global Time:  00:02:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 72
+Log_train_loss	-15630739.0791
+Rewards_train	-5000000.0
+Math_train_er	1050142.44883
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47099590302  Global Time:  00:02:31
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 73
+Log_train_loss	-15436121.8289
+Rewards_train	-5000000.0
+Math_train_er	227283.943113
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.55005598068  Global Time:  00:02:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 74
+Log_train_loss	-15360006.6015
+Rewards_train	-5000000.0
+Math_train_er	836821.343871
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50240898132  Global Time:  00:02:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 75
+Log_train_loss	-16525714.813
+Rewards_train	-5000000.0
+Math_train_er	24365.3956439
+Rewards_test	-2000000.0
+Math_test_er	10031.0143291
+Epoch time:  6.8719689846  Global Time:  00:02:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 76
+Log_train_loss	-17767174.4406
+Rewards_train	-5000000.0
+Math_train_er	228691010.246
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40997695923  Global Time:  00:02:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 77
+Log_train_loss	-18037153.2006
+Rewards_train	-5000000.0
+Math_train_er	66385846.0016
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44062304497  Global Time:  00:02:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 78
+Log_train_loss	-17814070.6786
+Rewards_train	-5000000.0
+Math_train_er	181183294.365
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45459198952  Global Time:  00:02:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 79
+Log_train_loss	-17715130.9449
+Rewards_train	-5000000.0
+Math_train_er	243262.057473
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50770187378  Global Time:  00:02:46
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 80
+Log_train_loss	-17563674.9052
+Rewards_train	-5000000.0
+Math_train_er	53739187.9121
+Rewards_test	-2000000.0
+Math_test_er	902342.172532
+Epoch time:  5.73031497002  Global Time:  00:02:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 81
+Log_train_loss	-18387513.3754
+Rewards_train	-5000000.0
+Math_train_er	300961634.153
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41853809357  Global Time:  00:02:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 82
+Log_train_loss	-17321701.7638
+Rewards_train	-5000000.0
+Math_train_er	2663146.84785
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44046092033  Global Time:  00:02:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 83
+Log_train_loss	-17483732.2432
+Rewards_train	-5000000.0
+Math_train_er	83605.9127253
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44524407387  Global Time:  00:02:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 84
+Log_train_loss	-18467456.6286
+Rewards_train	-5000000.0
+Math_train_er	1807556759.49
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43946886063  Global Time:  00:02:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 85
+Log_train_loss	-18951951.3017
+Rewards_train	-5000000.0
+Math_train_er	2105982571.41
+Rewards_test	-2000000.0
+Math_test_er	993883489.187
+Epoch time:  4.33368206024  Global Time:  00:03:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 86
+Log_train_loss	-18981726.5213
+Rewards_train	-5000000.0
+Math_train_er	1425923686.86
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3714530468  Global Time:  00:03:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 87
+Log_train_loss	-18670772.9187
+Rewards_train	-5000000.0
+Math_train_er	538856431.626
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40765690804  Global Time:  00:03:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 88
+Log_train_loss	-18339038.4554
+Rewards_train	-5000000.0
+Math_train_er	178646295.665
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44759583473  Global Time:  00:03:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 89
+Log_train_loss	-18477003.8995
+Rewards_train	-5000000.0
+Math_train_er	289297485.965
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46965694427  Global Time:  00:03:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 90
+Log_train_loss	-18696952.1407
+Rewards_train	-5000000.0
+Math_train_er	1176054036.97
+Rewards_test	-2000000.0
+Math_test_er	595681224.822
+Epoch time:  4.52273488045  Global Time:  00:03:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 91
+Log_train_loss	-18433534.0709
+Rewards_train	-5000000.0
+Math_train_er	1811989590.21
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38873815536  Global Time:  00:03:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 92
+Log_train_loss	-17399231.9762
+Rewards_train	-5000000.0
+Math_train_er	915842139.357
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48222017288  Global Time:  00:03:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 93
+Log_train_loss	-15929238.103
+Rewards_train	-5000000.0
+Math_train_er	428079.297953
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.39833688736  Global Time:  00:03:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 94
+Log_train_loss	-18047132.5127
+Rewards_train	-5000000.0
+Math_train_er	1286123549.39
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37171292305  Global Time:  00:03:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 95
+Log_train_loss	-17695009.3868
+Rewards_train	-5000000.0
+Math_train_er	22960.2895664
+Rewards_test	-2000000.0
+Math_test_er	8825.32955615
+Epoch time:  4.27016305923  Global Time:  00:03:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 96
+Log_train_loss	-16908247.6701
+Rewards_train	-5000000.0
+Math_train_er	625768.411692
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50267410278  Global Time:  00:03:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 97
+Log_train_loss	-17373489.6418
+Rewards_train	-5000000.0
+Math_train_er	292635858.421
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40118598938  Global Time:  00:03:25
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 98
+Log_train_loss	-18383493.7995
+Rewards_train	-5000000.0
+Math_train_er	1298598243.58
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38207793236  Global Time:  00:03:27
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 99
+Log_train_loss	-17434792.2899
+Rewards_train	-5000000.0
+Math_train_er	6668074416.78
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.35852193832  Global Time:  00:03:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 100
+Log_train_loss	-17543437.3886
+Rewards_train	-5000000.0
+Math_train_er	9378448111.32
+Rewards_test	-2000000.0
+Math_test_er	3873313793.01
+Epoch time:  6.2528181076  Global Time:  00:03:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 101
+Log_train_loss	-17705525.5854
+Rewards_train	-5000000.0
+Math_train_er	8511710251.02
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34747505188  Global Time:  00:03:36
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 102
+Log_train_loss	-18782062.4036
+Rewards_train	-5000000.0
+Math_train_er	3622486584.86
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37051892281  Global Time:  00:03:37
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 103
+Log_train_loss	-18859167.1607
+Rewards_train	-5000000.0
+Math_train_er	5182434697.06
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34713292122  Global Time:  00:03:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 104
+Log_train_loss	-15786555.0691
+Rewards_train	-5000000.0
+Math_train_er	7964023230.13
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.26389503479  Global Time:  00:03:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 105
+Log_train_loss	-14202295.0064
+Rewards_train	-5000000.0
+Math_train_er	7126173124.28
+Rewards_test	-2000000.0
+Math_test_er	2956039810.37
+Epoch time:  3.98797798157  Global Time:  00:03:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 106
+Log_train_loss	-14373130.2396
+Rewards_train	-5000000.0
+Math_train_er	6992303203.57
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31507396698  Global Time:  00:03:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 107
+Log_train_loss	-14367919.7035
+Rewards_train	-5000000.0
+Math_train_er	7111857340.77
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.29175806046  Global Time:  00:03:46
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 108
+Log_train_loss	-15167171.7683
+Rewards_train	-5000000.0
+Math_train_er	8220137687.44
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.25892400742  Global Time:  00:03:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 109
+Log_train_loss	-15755686.1856
+Rewards_train	-5000000.0
+Math_train_er	10842201477.8
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31838321686  Global Time:  00:03:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 110
+Log_train_loss	-15885626.5864
+Rewards_train	-5000000.0
+Math_train_er	11300592942.5
+Rewards_test	-2000000.0
+Math_test_er	4544541934.5
+Epoch time:  4.13892197609  Global Time:  00:03:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 111
+Log_train_loss	-16569622.6085
+Rewards_train	-5000000.0
+Math_train_er	10814091683.1
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34603309631  Global Time:  00:03:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 112
+Log_train_loss	-15289296.4616
+Rewards_train	-5000000.0
+Math_train_er	8153845825.85
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.26078796387  Global Time:  00:03:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 113
+Log_train_loss	-15164755.0144
+Rewards_train	-5000000.0
+Math_train_er	8871182613.55
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.26136803627  Global Time:  00:03:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 114
+Log_train_loss	-15848067.6198
+Rewards_train	-5000000.0
+Math_train_er	11222648253.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.26797699928  Global Time:  00:03:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 115
+Log_train_loss	-16229473.153
+Rewards_train	-5000000.0
+Math_train_er	13362851067.8
+Rewards_test	-2000000.0
+Math_test_er	5527616988.77
+Epoch time:  4.13011908531  Global Time:  00:04:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 116
+Log_train_loss	-16490584.7815
+Rewards_train	-5000000.0
+Math_train_er	15850073263.8
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30180907249  Global Time:  00:04:03
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 117
+Log_train_loss	-16725766.2578
+Rewards_train	-5000000.0
+Math_train_er	17569507983.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31617617607  Global Time:  00:04:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 118
+Log_train_loss	-16461090.0234
+Rewards_train	-5000000.0
+Math_train_er	18021997313.7
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30476212502  Global Time:  00:04:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 119
+Log_train_loss	-16566291.9138
+Rewards_train	-5000000.0
+Math_train_er	17203705118.5
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3431699276  Global Time:  00:04:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 120
+Log_train_loss	-16601936.3624
+Rewards_train	-5000000.0
+Math_train_er	16772808444.5
+Rewards_test	-2000000.0
+Math_test_er	6549447737.66
+Epoch time:  4.18493700027  Global Time:  00:04:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 121
+Log_train_loss	-16306477.3407
+Rewards_train	-5000000.0
+Math_train_er	16595744638.0
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.32983899117  Global Time:  00:04:13
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 122
+Log_train_loss	-16479384.7563
+Rewards_train	-5000000.0
+Math_train_er	15621582662.5
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33989405632  Global Time:  00:04:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 123
+Log_train_loss	-17474416.294
+Rewards_train	-5000000.0
+Math_train_er	16150625774.4
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.29804587364  Global Time:  00:04:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 124
+Log_train_loss	-17674442.9202
+Rewards_train	-5000000.0
+Math_train_er	16903136429.0
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34662008286  Global Time:  00:04:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 125
+Log_train_loss	-17855877.6859
+Rewards_train	-5000000.0
+Math_train_er	15997865185.7
+Rewards_test	-2000000.0
+Math_test_er	5650120127.83
+Epoch time:  4.58237290382  Global Time:  00:04:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 126
+Log_train_loss	-18671802.3041
+Rewards_train	-5000000.0
+Math_train_er	13711700671.4
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36933398247  Global Time:  00:04:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 127
+Log_train_loss	-18562671.9908
+Rewards_train	-5000000.0
+Math_train_er	13080469368.4
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38307404518  Global Time:  00:04:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 128
+Log_train_loss	-18257831.9644
+Rewards_train	-5000000.0
+Math_train_er	18210489082.1
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.37188100815  Global Time:  00:04:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 129
+Log_train_loss	-17393323.0329
+Rewards_train	-5000000.0
+Math_train_er	15986069502.2
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.39965200424  Global Time:  00:04:27
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 130
+Log_train_loss	-17581941.9239
+Rewards_train	-5000000.0
+Math_train_er	8028170958.27
+Rewards_test	-2000000.0
+Math_test_er	3428619407.6
+Epoch time:  4.16343402863  Global Time:  00:04:31
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 131
+Log_train_loss	-17688203.7218
+Rewards_train	-5000000.0
+Math_train_er	11469369683.3
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.29724907875  Global Time:  00:04:33
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 132
+Log_train_loss	-16123850.5202
+Rewards_train	-5000000.0
+Math_train_er	10215624152.0
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.25891494751  Global Time:  00:04:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 133
+Log_train_loss	-15660103.7424
+Rewards_train	-5000000.0
+Math_train_er	8782519471.02
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30101203918  Global Time:  00:04:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 134
+Log_train_loss	-15180513.1298
+Rewards_train	-5000000.0
+Math_train_er	8764108987.43
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33091211319  Global Time:  00:04:36
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 135
+Log_train_loss	-14154015.6005
+Rewards_train	-5000000.0
+Math_train_er	8180181038.52
+Rewards_test	-2000000.0
+Math_test_er	3233004854.03
+Epoch time:  4.00881814957  Global Time:  00:04:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 136
+Log_train_loss	-13840328.0183
+Rewards_train	-5000000.0
+Math_train_er	8716257543.04
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.23124313354  Global Time:  00:04:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 137
+Log_train_loss	-14056082.057
+Rewards_train	-5000000.0
+Math_train_er	8168759960.09
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.23981714249  Global Time:  00:04:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 138
+Log_train_loss	-14247858.0786
+Rewards_train	-5000000.0
+Math_train_er	7941370125.01
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31273317337  Global Time:  00:04:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 139
+Log_train_loss	-14147113.4318
+Rewards_train	-5000000.0
+Math_train_er	7890148730.46
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.29964613914  Global Time:  00:04:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 140
+Log_train_loss	-14206056.251
+Rewards_train	-5000000.0
+Math_train_er	7264579909.36
+Rewards_test	-2000000.0
+Math_test_er	2903986196.38
+Epoch time:  4.09371805191  Global Time:  00:04:50
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 141
+Log_train_loss	-14350179.319
+Rewards_train	-5000000.0
+Math_train_er	7471167368.49
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.27086591721  Global Time:  00:04:51
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 142
+Log_train_loss	-14752913.5161
+Rewards_train	-5000000.0
+Math_train_er	7955522783.85
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31796693802  Global Time:  00:04:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 143
+Log_train_loss	-17700800.2014
+Rewards_train	-5000000.0
+Math_train_er	12295159445.9
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.36977100372  Global Time:  00:04:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 144
+Log_train_loss	-16877801.647
+Rewards_train	-5000000.0
+Math_train_er	12435861389.2
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.2752828598  Global Time:  00:04:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 145
+Log_train_loss	-17203143.2783
+Rewards_train	-5000000.0
+Math_train_er	11078846924.0
+Rewards_test	-2000000.0
+Math_test_er	4719328491.94
+Epoch time:  4.19957113266  Global Time:  00:04:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 146
+Log_train_loss	-17557975.1078
+Rewards_train	-5000000.0
+Math_train_er	9068557337.92
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.34749388695  Global Time:  00:05:00
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 147
+Log_train_loss	-17573808.6134
+Rewards_train	-5000000.0
+Math_train_er	8154654702.98
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38503193855  Global Time:  00:05:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 148
+Log_train_loss	-16710249.7829
+Rewards_train	-5000000.0
+Math_train_er	8140216406.71
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.32448196411  Global Time:  00:05:03
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 149
+Log_train_loss	-14818595.8076
+Rewards_train	-5000000.0
+Math_train_er	6934749014.98
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.28708600998  Global Time:  00:05:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 150
+Log_train_loss	-15002789.5292
+Rewards_train	-5000000.0
+Math_train_er	7065841495.77
+Rewards_test	-2000000.0
+Math_test_er	2890362914.53
+Epoch time:  4.03942608833  Global Time:  00:05:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 151
+Log_train_loss	-15059581.2766
+Rewards_train	-5000000.0
+Math_train_er	7501047167.04
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.35455679893  Global Time:  00:05:10
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 152
+Log_train_loss	-15020593.3486
+Rewards_train	-5000000.0
+Math_train_er	7221206263.67
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.25881791115  Global Time:  00:05:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 153
+Log_train_loss	-15599836.7161
+Rewards_train	-5000000.0
+Math_train_er	8901672942.84
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.28817796707  Global Time:  00:05:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 154
+Log_train_loss	-14799836.6852
+Rewards_train	-5000000.0
+Math_train_er	6992517711.28
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30761098862  Global Time:  00:05:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 155
+Log_train_loss	-15151052.2775
+Rewards_train	-5000000.0
+Math_train_er	13229352876.5
+Rewards_test	-2000000.0
+Math_test_er	5004153640.35
+Epoch time:  4.21222805977  Global Time:  00:05:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 156
+Log_train_loss	-17161257.635
+Rewards_train	-5000000.0
+Math_train_er	14232324576.7
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.32129907608  Global Time:  00:05:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 157
+Log_train_loss	-16913568.3107
+Rewards_train	-5000000.0
+Math_train_er	13131548713.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30925512314  Global Time:  00:05:20
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 158
+Log_train_loss	-17198934.0062
+Rewards_train	-5000000.0
+Math_train_er	14513234454.8
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30250287056  Global Time:  00:05:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 159
+Log_train_loss	-17175463.5098
+Rewards_train	-5000000.0
+Math_train_er	14806743886.5
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.28874897957  Global Time:  00:05:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 160
+Log_train_loss	-17316876.4227
+Rewards_train	-5000000.0
+Math_train_er	14172546008.0
+Rewards_test	-2000000.0
+Math_test_er	5641649800.9
+Epoch time:  4.48997998238  Global Time:  00:05:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 161
+Log_train_loss	-17645863.686
+Rewards_train	-5000000.0
+Math_train_er	14713689999.8
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3648788929  Global Time:  00:05:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 162
+Log_train_loss	-17801680.4522
+Rewards_train	-5000000.0
+Math_train_er	17153659714.4
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31707406044  Global Time:  00:05:30
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 163
+Log_train_loss	-18034187.7756
+Rewards_train	-5000000.0
+Math_train_er	16018120290.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33403992653  Global Time:  00:05:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 164
+Log_train_loss	-18172807.4798
+Rewards_train	-5000000.0
+Math_train_er	17730099469.1
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.32716703415  Global Time:  00:05:33
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 165
+Log_train_loss	-18095304.5174
+Rewards_train	-5000000.0
+Math_train_er	17765783722.8
+Rewards_test	-2000000.0
+Math_test_er	6966086305.73
+Epoch time:  4.38430309296  Global Time:  00:05:37
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 166
+Log_train_loss	-17879700.0944
+Rewards_train	-5000000.0
+Math_train_er	17603164487.4
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31576800346  Global Time:  00:05:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 167
+Log_train_loss	-18093958.2644
+Rewards_train	-5000000.0
+Math_train_er	15907946640.8
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31501197815  Global Time:  00:05:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 168
+Log_train_loss	-17746160.7563
+Rewards_train	-5000000.0
+Math_train_er	16394522566.7
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.28973889351  Global Time:  00:05:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 169
+Log_train_loss	-17254805.2489
+Rewards_train	-5000000.0
+Math_train_er	13975388172.1
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.31092405319  Global Time:  00:05:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 170
+Log_train_loss	-17676292.0746
+Rewards_train	-5000000.0
+Math_train_er	17518849296.4
+Rewards_test	-2000000.0
+Math_test_er	6862777846.97
+Epoch time:  4.57571291924  Global Time:  00:05:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 171
+Log_train_loss	-17845873.2898
+Rewards_train	-5000000.0
+Math_train_er	17019071888.8
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.30860686302  Global Time:  00:05:48
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 172
+Log_train_loss	-17476586.5002
+Rewards_train	-5000000.0
+Math_train_er	16152520571.0
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.29516100883  Global Time:  00:05:50
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 173
+Log_train_loss	-17436721.1631
+Rewards_train	-5000000.0
+Math_train_er	15877247311.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33230280876  Global Time:  00:05:51
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 174
+Log_train_loss	-17500888.9618
+Rewards_train	-5000000.0
+Math_train_er	15859800318.2
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.38177990913  Global Time:  00:05:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 175
+Log_train_loss	-17596318.9797
+Rewards_train	-5000000.0
+Math_train_er	16220195955.9
+Rewards_test	-2000000.0
+Math_test_er	6074582157.63
+Epoch time:  4.20084190369  Global Time:  00:05:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 176
+Log_train_loss	-17892582.9786
+Rewards_train	-5000000.0
+Math_train_er	14806928478.2
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.33933210373  Global Time:  00:05:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 177
+Log_train_loss	-18288356.4264
+Rewards_train	-5000000.0
+Math_train_er	14045106922.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.32378387451  Global Time:  00:05:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 178
+Log_train_loss	-14876432.5015
+Rewards_train	-5000000.0
+Math_train_er	5811408531.6
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50054097176  Global Time:  00:06:01
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 179
+Log_train_loss	-12646966.4751
+Rewards_train	-5000000.0
+Math_train_er	969331297.266
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4311311245  Global Time:  00:06:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 180
+Log_train_loss	-13394020.8668
+Rewards_train	-5000000.0
+Math_train_er	1522884008.44
+Rewards_test	-2000000.0
+Math_test_er	427941443.074
+Epoch time:  4.30041694641  Global Time:  00:06:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 181
+Log_train_loss	-15047296.5062
+Rewards_train	-5000000.0
+Math_train_er	2256710742.13
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48328399658  Global Time:  00:06:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 182
+Log_train_loss	-17093759.7385
+Rewards_train	-5000000.0
+Math_train_er	1988126765.03
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49241089821  Global Time:  00:06:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 183
+Log_train_loss	-17035020.7819
+Rewards_train	-5000000.0
+Math_train_er	1577650464.73
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48058605194  Global Time:  00:06:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 184
+Log_train_loss	-16877150.7345
+Rewards_train	-5000000.0
+Math_train_er	1972452729.73
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45670413971  Global Time:  00:06:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 185
+Log_train_loss	-16256739.3613
+Rewards_train	-5000000.0
+Math_train_er	210706603.51
+Rewards_test	-2000000.0
+Math_test_er	76765604.7929
+Epoch time:  5.00792717934  Global Time:  00:06:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 186
+Log_train_loss	-15646502.662
+Rewards_train	-5000000.0
+Math_train_er	690306332.777
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.434278965  Global Time:  00:06:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 187
+Log_train_loss	-16803772.5386
+Rewards_train	-5000000.0
+Math_train_er	816489181.419
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42961812019  Global Time:  00:06:20
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 188
+Log_train_loss	-16677938.4467
+Rewards_train	-5000000.0
+Math_train_er	1075668972.59
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4143679142  Global Time:  00:06:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 189
+Log_train_loss	-17008890.1685
+Rewards_train	-5000000.0
+Math_train_er	373848327.503
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42863488197  Global Time:  00:06:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 190
+Log_train_loss	-17332612.4472
+Rewards_train	-5000000.0
+Math_train_er	184292991.689
+Rewards_test	-2000000.0
+Math_test_er	106683661.482
+Epoch time:  4.57345986366  Global Time:  00:06:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 191
+Log_train_loss	-17653969.9494
+Rewards_train	-5000000.0
+Math_train_er	1660033005.45
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45034694672  Global Time:  00:06:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 192
+Log_train_loss	-16170795.0848
+Rewards_train	-5000000.0
+Math_train_er	5508565.38078
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43503093719  Global Time:  00:06:31
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 193
+Log_train_loss	-15907942.2566
+Rewards_train	-5000000.0
+Math_train_er	26560.4671821
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43456196785  Global Time:  00:06:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 194
+Log_train_loss	-15509351.3459
+Rewards_train	-5000000.0
+Math_train_er	26097.9655962
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48925805092  Global Time:  00:06:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 195
+Log_train_loss	-15142698.3514
+Rewards_train	-5000000.0
+Math_train_er	27651.8917354
+Rewards_test	-2000000.0
+Math_test_er	9517.29676106
+Epoch time:  4.61039400101  Global Time:  00:06:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 196
+Log_train_loss	-14635054.2571
+Rewards_train	-5000000.0
+Math_train_er	26302.578807
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49623799324  Global Time:  00:06:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 197
+Log_train_loss	-14582514.4504
+Rewards_train	-5000000.0
+Math_train_er	28672.4641087
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.51929998398  Global Time:  00:06:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 198
+Log_train_loss	-14051092.4976
+Rewards_train	-5000000.0
+Math_train_er	24839.5497028
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.55793905258  Global Time:  00:06:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 199
+Log_train_loss	-14384739.863
+Rewards_train	-5000000.0
+Math_train_er	25229.3130195
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47651100159  Global Time:  00:06:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 200
+Log_train_loss	-14425165.2848
+Rewards_train	-5000000.0
+Math_train_er	26680.9374407
+Rewards_test	-2000000.0
+Math_test_er	9997.18596908
+Epoch time:  4.41396284103  Global Time:  00:06:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 201
+Log_train_loss	-15018848.2203
+Rewards_train	-5000000.0
+Math_train_er	24798.1642227
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49389004707  Global Time:  00:06:50
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 202
+Log_train_loss	-15976739.6638
+Rewards_train	-5000000.0
+Math_train_er	28391.5846594
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.54196310043  Global Time:  00:06:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 203
+Log_train_loss	-16698392.2847
+Rewards_train	-5000000.0
+Math_train_er	485578005.851
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49239706993  Global Time:  00:06:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 204
+Log_train_loss	-18834208.9849
+Rewards_train	-5000000.0
+Math_train_er	5144508146.52
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.3675968647  Global Time:  00:06:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 205
+Log_train_loss	-16945172.5216
+Rewards_train	-5000000.0
+Math_train_er	30461.4915048
+Rewards_test	-2000000.0
+Math_test_er	12218.8367435
+Epoch time:  4.86494016647  Global Time:  00:06:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 206
+Log_train_loss	-14927023.7579
+Rewards_train	-5000000.0
+Math_train_er	31819.078729
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.56630110741  Global Time:  00:07:01
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 207
+Log_train_loss	-14742423.647
+Rewards_train	-5000000.0
+Math_train_er	31150.1701307
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50289702415  Global Time:  00:07:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 208
+Log_train_loss	-14365374.1954
+Rewards_train	-5000000.0
+Math_train_er	31234.1502166
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4490070343  Global Time:  00:07:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 209
+Log_train_loss	-14013524.0155
+Rewards_train	-5000000.0
+Math_train_er	30923.7693484
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45156908035  Global Time:  00:07:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 210
+Log_train_loss	-14080697.7533
+Rewards_train	-5000000.0
+Math_train_er	30436.0746171
+Rewards_test	-2000000.0
+Math_test_er	13076.3755012
+Epoch time:  6.29932403564  Global Time:  00:07:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 211
+Log_train_loss	-14086212.0162
+Rewards_train	-5000000.0
+Math_train_er	30336.2282754
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45910286903  Global Time:  00:07:13
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 212
+Log_train_loss	-14025901.077
+Rewards_train	-5000000.0
+Math_train_er	28322.6579601
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45903897285  Global Time:  00:07:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 213
+Log_train_loss	-14180403.277
+Rewards_train	-5000000.0
+Math_train_er	27561.0099712
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45469784737  Global Time:  00:07:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 214
+Log_train_loss	-14499801.9929
+Rewards_train	-5000000.0
+Math_train_er	26189.6057919
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44675183296  Global Time:  00:07:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 215
+Log_train_loss	-14498940.0265
+Rewards_train	-5000000.0
+Math_train_er	26001.5627458
+Rewards_test	-2000000.0
+Math_test_er	10603.1994139
+Epoch time:  6.32648491859  Global Time:  00:07:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 216
+Log_train_loss	-15666127.372
+Rewards_train	-5000000.0
+Math_train_er	26670.2257988
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45012807846  Global Time:  00:07:25
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 217
+Log_train_loss	-15762835.8429
+Rewards_train	-5000000.0
+Math_train_er	1764215.77839
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44817590714  Global Time:  00:07:27
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 218
+Log_train_loss	-15656189.6882
+Rewards_train	-5000000.0
+Math_train_er	332918.165374
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45220279694  Global Time:  00:07:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 219
+Log_train_loss	-15310189.4906
+Rewards_train	-5000000.0
+Math_train_er	33159.6219354
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45585799217  Global Time:  00:07:30
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 220
+Log_train_loss	-15798947.3208
+Rewards_train	-5000000.0
+Math_train_er	28517.0258727
+Rewards_test	-2000000.0
+Math_test_er	13399.6631665
+Epoch time:  7.94079899788  Global Time:  00:07:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 221
+Log_train_loss	-16427635.5924
+Rewards_train	-5000000.0
+Math_train_er	77341593.3032
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49277305603  Global Time:  00:07:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 222
+Log_train_loss	-16418657.9253
+Rewards_train	-5000000.0
+Math_train_er	761174922.256
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46758317947  Global Time:  00:07:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 223
+Log_train_loss	-15312080.4508
+Rewards_train	-5000000.0
+Math_train_er	640748323.047
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48244190216  Global Time:  00:07:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 224
+Log_train_loss	-16084926.3532
+Rewards_train	-5000000.0
+Math_train_er	356827609.18
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47690486908  Global Time:  00:07:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 225
+Log_train_loss	-16043053.1468
+Rewards_train	-5000000.0
+Math_train_er	319488971.781
+Rewards_test	-2000000.0
+Math_test_er	40858035.9376
+Epoch time:  8.34244799614  Global Time:  00:07:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 226
+Log_train_loss	-16019803.6864
+Rewards_train	-5000000.0
+Math_train_er	617849585.809
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41720700264  Global Time:  00:07:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 227
+Log_train_loss	-15513367.8569
+Rewards_train	-5000000.0
+Math_train_er	567585113.478
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41684699059  Global Time:  00:07:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 228
+Log_train_loss	-15163056.4259
+Rewards_train	-5000000.0
+Math_train_er	780685589.802
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40108299255  Global Time:  00:07:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 229
+Log_train_loss	-14998840.6783
+Rewards_train	-5000000.0
+Math_train_er	651415002.79
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43870806694  Global Time:  00:07:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 230
+Log_train_loss	-16973409.6485
+Rewards_train	-5000000.0
+Math_train_er	232053651.236
+Rewards_test	-2000000.0
+Math_test_er	57606639.4815
+Epoch time:  4.59337806702  Global Time:  00:08:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 231
+Log_train_loss	-17008792.561
+Rewards_train	-5000000.0
+Math_train_er	206314826.932
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41794085503  Global Time:  00:08:03
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 232
+Log_train_loss	-16896117.2931
+Rewards_train	-5000000.0
+Math_train_er	212767978.265
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4208920002  Global Time:  00:08:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 233
+Log_train_loss	-17010645.6185
+Rewards_train	-5000000.0
+Math_train_er	111995730.156
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.51718902588  Global Time:  00:08:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 234
+Log_train_loss	-16414680.5357
+Rewards_train	-5000000.0
+Math_train_er	28094569.7596
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.494120121  Global Time:  00:08:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 235
+Log_train_loss	-16594253.2159
+Rewards_train	-5000000.0
+Math_train_er	48763762.6714
+Rewards_test	-2000000.0
+Math_test_er	20165945.7683
+Epoch time:  4.52427315712  Global Time:  00:08:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 236
+Log_train_loss	-16304842.6663
+Rewards_train	-5000000.0
+Math_train_er	50053626.5392
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45594906807  Global Time:  00:08:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 237
+Log_train_loss	-15999780.1619
+Rewards_train	-5000000.0
+Math_train_er	37788347.4096
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.5277261734  Global Time:  00:08:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 238
+Log_train_loss	-15453557.7674
+Rewards_train	-5000000.0
+Math_train_er	52258637.516
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42965292931  Global Time:  00:08:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 239
+Log_train_loss	-15353013.9384
+Rewards_train	-5000000.0
+Math_train_er	92847984.402
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4317688942  Global Time:  00:08:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 240
+Log_train_loss	-16152206.3733
+Rewards_train	-5000000.0
+Math_train_er	288205836.365
+Rewards_test	-2000000.0
+Math_test_er	41421775.1455
+Epoch time:  4.6460750103  Global Time:  00:08:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 241
+Log_train_loss	-15402385.1623
+Rewards_train	-5000000.0
+Math_train_er	404017521.954
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44896388054  Global Time:  00:08:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 242
+Log_train_loss	-14910102.4204
+Rewards_train	-5000000.0
+Math_train_er	674954169.814
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40317106247  Global Time:  00:08:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 243
+Log_train_loss	-15072728.4061
+Rewards_train	-5000000.0
+Math_train_er	443844745.128
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4132361412  Global Time:  00:08:27
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 244
+Log_train_loss	-14131413.7022
+Rewards_train	-5000000.0
+Math_train_er	561614897.558
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41897201538  Global Time:  00:08:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 245
+Log_train_loss	-10236635.2931
+Rewards_train	-5000000.0
+Math_train_er	152709.476334
+Rewards_test	-2000000.0
+Math_test_er	65562.5990251
+Epoch time:  4.73529195786  Global Time:  00:08:33
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 246
+Log_train_loss	-8698945.31573
+Rewards_train	-5000000.0
+Math_train_er	159777.463904
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4150800705  Global Time:  00:08:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 247
+Log_train_loss	-9590964.04291
+Rewards_train	-5000000.0
+Math_train_er	159447.403461
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41076993942  Global Time:  00:08:36
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 248
+Log_train_loss	-12630835.0637
+Rewards_train	-5000000.0
+Math_train_er	9011042.78459
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47558116913  Global Time:  00:08:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 249
+Log_train_loss	-14409120.0401
+Rewards_train	-5000000.0
+Math_train_er	103417532.746
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47601699829  Global Time:  00:08:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 250
+Log_train_loss	-15365281.4287
+Rewards_train	-5000000.0
+Math_train_er	172817.895029
+Rewards_test	-2000000.0
+Math_test_er	52715.6352244
+Epoch time:  4.54319596291  Global Time:  00:08:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 251
+Log_train_loss	-12765176.3358
+Rewards_train	-5000000.0
+Math_train_er	24620885.6723
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44766902924  Global Time:  00:08:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 252
+Log_train_loss	-9908516.56591
+Rewards_train	-5000000.0
+Math_train_er	192852.149932
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41265797615  Global Time:  00:08:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 253
+Log_train_loss	-9670393.7327
+Rewards_train	-5000000.0
+Math_train_er	152886.324568
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.5208799839  Global Time:  00:08:48
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 254
+Log_train_loss	-8535151.37035
+Rewards_train	-5000000.0
+Math_train_er	164213.165598
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44297385216  Global Time:  00:08:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 255
+Log_train_loss	-8333873.95927
+Rewards_train	-5000000.0
+Math_train_er	169466.512905
+Rewards_test	-2000000.0
+Math_test_er	64522.88278
+Epoch time:  4.5020802021  Global Time:  00:08:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 256
+Log_train_loss	-10753536.6946
+Rewards_train	-5000000.0
+Math_train_er	76068558.3232
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48659801483  Global Time:  00:08:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 257
+Log_train_loss	-13990676.5813
+Rewards_train	-5000000.0
+Math_train_er	685106594.035
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47895097733  Global Time:  00:08:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 258
+Log_train_loss	-14664706.2
+Rewards_train	-5000000.0
+Math_train_er	536667452.838
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41737508774  Global Time:  00:08:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 259
+Log_train_loss	-14039117.4762
+Rewards_train	-5000000.0
+Math_train_er	683199097.366
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4594399929  Global Time:  00:09:00
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 260
+Log_train_loss	-13891414.311
+Rewards_train	-5000000.0
+Math_train_er	595789876.39
+Rewards_test	-2000000.0
+Math_test_er	227975568.537
+Epoch time:  4.57875800133  Global Time:  00:09:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 261
+Log_train_loss	-13592588.2049
+Rewards_train	-5000000.0
+Math_train_er	905341322.571
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41506910324  Global Time:  00:09:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 262
+Log_train_loss	-13668698.4149
+Rewards_train	-5000000.0
+Math_train_er	1064307365.68
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42224097252  Global Time:  00:09:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 263
+Log_train_loss	-14807845.539
+Rewards_train	-5000000.0
+Math_train_er	499673598.331
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41022586823  Global Time:  00:09:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 264
+Log_train_loss	-15266410.1447
+Rewards_train	-5000000.0
+Math_train_er	399573588.616
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40960097313  Global Time:  00:09:10
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 265
+Log_train_loss	-15272380.3415
+Rewards_train	-5000000.0
+Math_train_er	341814046.616
+Rewards_test	-2000000.0
+Math_test_er	122065489.176
+Epoch time:  4.54140901566  Global Time:  00:09:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 266
+Log_train_loss	-15201405.8602
+Rewards_train	-5000000.0
+Math_train_er	484283811.446
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41231203079  Global Time:  00:09:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 267
+Log_train_loss	-15460208.3031
+Rewards_train	-5000000.0
+Math_train_er	801818698.331
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41760587692  Global Time:  00:09:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 268
+Log_train_loss	-14361830.0223
+Rewards_train	-5000000.0
+Math_train_er	681185805.611
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41577196121  Global Time:  00:09:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 269
+Log_train_loss	-14562900.8708
+Rewards_train	-5000000.0
+Math_train_er	696624751.814
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47130012512  Global Time:  00:09:20
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 270
+Log_train_loss	-14495708.8196
+Rewards_train	-5000000.0
+Math_train_er	1072867907.96
+Rewards_test	-2000000.0
+Math_test_er	242691864.459
+Epoch time:  4.46481108665  Global Time:  00:09:25
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 271
+Log_train_loss	-14712221.2442
+Rewards_train	-5000000.0
+Math_train_er	825270597.874
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45326089859  Global Time:  00:09:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 272
+Log_train_loss	-14787700.1679
+Rewards_train	-5000000.0
+Math_train_er	818135832.377
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46317315102  Global Time:  00:09:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 273
+Log_train_loss	-14390648.632
+Rewards_train	-5000000.0
+Math_train_er	785290468.626
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52060508728  Global Time:  00:09:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 274
+Log_train_loss	-14519762.317
+Rewards_train	-5000000.0
+Math_train_er	707922261.315
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41706395149  Global Time:  00:09:31
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 275
+Log_train_loss	-14898092.93
+Rewards_train	-5000000.0
+Math_train_er	901200203.67
+Rewards_test	-2000000.0
+Math_test_er	188627645.783
+Epoch time:  4.49278998375  Global Time:  00:09:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 276
+Log_train_loss	-14903185.08
+Rewards_train	-5000000.0
+Math_train_er	583088827.358
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47852611542  Global Time:  00:09:37
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 277
+Log_train_loss	-14574768.0399
+Rewards_train	-5000000.0
+Math_train_er	613968920.659
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49753594398  Global Time:  00:09:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 278
+Log_train_loss	-14899057.9915
+Rewards_train	-5000000.0
+Math_train_er	211418844.51
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43478918076  Global Time:  00:09:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 279
+Log_train_loss	-14925929.8239
+Rewards_train	-5000000.0
+Math_train_er	306251425.714
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41844296455  Global Time:  00:09:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 280
+Log_train_loss	-14945697.156
+Rewards_train	-5000000.0
+Math_train_er	37813710.0087
+Rewards_test	-2000000.0
+Math_test_er	34860145.7865
+Epoch time:  4.51057195663  Global Time:  00:09:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 281
+Log_train_loss	-14955592.0319
+Rewards_train	-5000000.0
+Math_train_er	89215768.9431
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42305493355  Global Time:  00:09:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 282
+Log_train_loss	-14450348.9001
+Rewards_train	-5000000.0
+Math_train_er	491396291.574
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43306207657  Global Time:  00:09:48
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 283
+Log_train_loss	-14447235.5208
+Rewards_train	-5000000.0
+Math_train_er	585797849.38
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42018699646  Global Time:  00:09:50
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 284
+Log_train_loss	-14124536.6069
+Rewards_train	-5000000.0
+Math_train_er	301963862.776
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40819001198  Global Time:  00:09:51
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 285
+Log_train_loss	-13780772.9319
+Rewards_train	-5000000.0
+Math_train_er	115463588.838
+Rewards_test	-2000000.0
+Math_test_er	58578469.5239
+Epoch time:  4.59680294991  Global Time:  00:09:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 286
+Log_train_loss	-13104752.1905
+Rewards_train	-5000000.0
+Math_train_er	188657180.64
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46807813644  Global Time:  00:09:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 287
+Log_train_loss	-12975939.3332
+Rewards_train	-5000000.0
+Math_train_er	107465817.586
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46485090256  Global Time:  00:09:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 288
+Log_train_loss	-12957827.6977
+Rewards_train	-5000000.0
+Math_train_er	113831290.556
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41763997078  Global Time:  00:10:00
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 289
+Log_train_loss	-13135019.2523
+Rewards_train	-5000000.0
+Math_train_er	121037915.239
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49694299698  Global Time:  00:10:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 290
+Log_train_loss	-13315758.8547
+Rewards_train	-5000000.0
+Math_train_er	182843357.724
+Rewards_test	-2000000.0
+Math_test_er	89021603.5605
+Epoch time:  4.57158398628  Global Time:  00:10:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 291
+Log_train_loss	-13617784.9662
+Rewards_train	-5000000.0
+Math_train_er	119484775.379
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44162678719  Global Time:  00:10:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 292
+Log_train_loss	-13494493.4034
+Rewards_train	-5000000.0
+Math_train_er	271098252.566
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46667599678  Global Time:  00:10:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 293
+Log_train_loss	-13686999.295
+Rewards_train	-5000000.0
+Math_train_er	305944811.603
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49802899361  Global Time:  00:10:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 294
+Log_train_loss	-14070780.0297
+Rewards_train	-5000000.0
+Math_train_er	283590993.422
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42175388336  Global Time:  00:10:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 295
+Log_train_loss	-13545797.2293
+Rewards_train	-5000000.0
+Math_train_er	84516733.9676
+Rewards_test	-2000000.0
+Math_test_er	89906226.6648
+Epoch time:  4.46594500542  Global Time:  00:10:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 296
+Log_train_loss	-12778467.2279
+Rewards_train	-5000000.0
+Math_train_er	143116141.022
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50578594208  Global Time:  00:10:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 297
+Log_train_loss	-12645177.5859
+Rewards_train	-5000000.0
+Math_train_er	190958759.746
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43570399284  Global Time:  00:10:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 298
+Log_train_loss	-11823195.3516
+Rewards_train	-5000000.0
+Math_train_er	237337087.776
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42022299767  Global Time:  00:10:21
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 299
+Log_train_loss	-12005176.1299
+Rewards_train	-5000000.0
+Math_train_er	458422630.133
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40998411179  Global Time:  00:10:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 300
+Log_train_loss	-11506620.6278
+Rewards_train	-5000000.0
+Math_train_er	282343285.359
+Rewards_test	-2000000.0
+Math_test_er	61298385.097
+Epoch time:  4.64297699928  Global Time:  00:10:27
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 301
+Log_train_loss	-11331273.5596
+Rewards_train	-5000000.0
+Math_train_er	233677043.277
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43870711327  Global Time:  00:10:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 302
+Log_train_loss	-12070085.3748
+Rewards_train	-5000000.0
+Math_train_er	339550609.601
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41663217545  Global Time:  00:10:30
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 303
+Log_train_loss	-12315129.7309
+Rewards_train	-5000000.0
+Math_train_er	174352695.554
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42997694016  Global Time:  00:10:31
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 304
+Log_train_loss	-12743875.0025
+Rewards_train	-5000000.0
+Math_train_er	188335372.977
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44147992134  Global Time:  00:10:33
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 305
+Log_train_loss	-13367033.8781
+Rewards_train	-5000000.0
+Math_train_er	526632561.619
+Rewards_test	-2000000.0
+Math_test_er	33365826.4932
+Epoch time:  4.61745810509  Global Time:  00:10:37
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 306
+Log_train_loss	-13348417.2109
+Rewards_train	-5000000.0
+Math_train_er	174062086.49
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46097183228  Global Time:  00:10:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 307
+Log_train_loss	-13248718.5644
+Rewards_train	-5000000.0
+Math_train_er	187363150.097
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45083808899  Global Time:  00:10:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 308
+Log_train_loss	-13350739.6579
+Rewards_train	-5000000.0
+Math_train_er	147495003.9
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42420721054  Global Time:  00:10:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 309
+Log_train_loss	-14628802.6651
+Rewards_train	-5000000.0
+Math_train_er	359276013.801
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52720713615  Global Time:  00:10:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 310
+Log_train_loss	-14532373.929
+Rewards_train	-5000000.0
+Math_train_er	402034162.637
+Rewards_test	-2000000.0
+Math_test_er	294177714.786
+Epoch time:  4.36366200447  Global Time:  00:10:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 311
+Log_train_loss	-14530850.9371
+Rewards_train	-5000000.0
+Math_train_er	398828705.89
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44801282883  Global Time:  00:10:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 312
+Log_train_loss	-13974867.7589
+Rewards_train	-5000000.0
+Math_train_er	330745047.91
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50371384621  Global Time:  00:10:50
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 313
+Log_train_loss	-14493881.4432
+Rewards_train	-5000000.0
+Math_train_er	272839190.241
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49260902405  Global Time:  00:10:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 314
+Log_train_loss	-14135152.287
+Rewards_train	-5000000.0
+Math_train_er	285797998.531
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47065806389  Global Time:  00:10:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 315
+Log_train_loss	-14288868.7014
+Rewards_train	-5000000.0
+Math_train_er	406621900.134
+Rewards_test	-2000000.0
+Math_test_er	116530347.08
+Epoch time:  4.48461413383  Global Time:  00:10:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 316
+Log_train_loss	-14704930.9009
+Rewards_train	-5000000.0
+Math_train_er	330204047.634
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.51216197014  Global Time:  00:10:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 317
+Log_train_loss	-14676163.4089
+Rewards_train	-5000000.0
+Math_train_er	478808012.113
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42880511284  Global Time:  00:11:01
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 318
+Log_train_loss	-14730382.3165
+Rewards_train	-5000000.0
+Math_train_er	265336537.287
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42380785942  Global Time:  00:11:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 319
+Log_train_loss	-14926392.5013
+Rewards_train	-5000000.0
+Math_train_er	67361513.2306
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4882581234  Global Time:  00:11:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 320
+Log_train_loss	-14938212.7211
+Rewards_train	-5000000.0
+Math_train_er	7359725.39459
+Rewards_test	-2000000.0
+Math_test_er	50660611.8041
+Epoch time:  4.57443118095  Global Time:  00:11:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 321
+Log_train_loss	-14780393.7596
+Rewards_train	-5000000.0
+Math_train_er	52662502.7026
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44940185547  Global Time:  00:11:10
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 322
+Log_train_loss	-14059943.0765
+Rewards_train	-5000000.0
+Math_train_er	736538521.683
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42010402679  Global Time:  00:11:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 323
+Log_train_loss	-13771265.4637
+Rewards_train	-5000000.0
+Math_train_er	832338064.151
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41474199295  Global Time:  00:11:13
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 324
+Log_train_loss	-13651911.9566
+Rewards_train	-5000000.0
+Math_train_er	904524148.63
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40710616112  Global Time:  00:11:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 325
+Log_train_loss	-13990251.443
+Rewards_train	-5000000.0
+Math_train_er	772174926.398
+Rewards_test	-2000000.0
+Math_test_er	184488961.797
+Epoch time:  4.60245895386  Global Time:  00:11:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 326
+Log_train_loss	-12527573.3428
+Rewards_train	-5000000.0
+Math_train_er	399281324.678
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44426679611  Global Time:  00:11:20
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 327
+Log_train_loss	-12039701.5228
+Rewards_train	-5000000.0
+Math_train_er	129662471.562
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41572189331  Global Time:  00:11:21
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 328
+Log_train_loss	-12164112.8316
+Rewards_train	-5000000.0
+Math_train_er	204137853.494
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45305299759  Global Time:  00:11:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 329
+Log_train_loss	-13321881.7364
+Rewards_train	-5000000.0
+Math_train_er	711646292.756
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49795007706  Global Time:  00:11:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 330
+Log_train_loss	-12768260.9713
+Rewards_train	-5000000.0
+Math_train_er	549708124.8
+Rewards_test	-2000000.0
+Math_test_er	221870375.979
+Epoch time:  4.54778790474  Global Time:  00:11:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 331
+Log_train_loss	-13082288.4184
+Rewards_train	-5000000.0
+Math_train_er	651841694.85
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46453595161  Global Time:  00:11:30
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 332
+Log_train_loss	-12425334.0337
+Rewards_train	-5000000.0
+Math_train_er	398265010.567
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.5321598053  Global Time:  00:11:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 333
+Log_train_loss	-12727015.9896
+Rewards_train	-5000000.0
+Math_train_er	475102042.689
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44325304031  Global Time:  00:11:33
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 334
+Log_train_loss	-12535924.3296
+Rewards_train	-5000000.0
+Math_train_er	339673878.983
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43897986412  Global Time:  00:11:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 335
+Log_train_loss	-12082714.4449
+Rewards_train	-5000000.0
+Math_train_er	260862807.422
+Rewards_test	-2000000.0
+Math_test_er	50003306.7739
+Epoch time:  4.53984093666  Global Time:  00:11:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 336
+Log_train_loss	-12274079.6388
+Rewards_train	-5000000.0
+Math_train_er	190748134.203
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47911000252  Global Time:  00:11:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 337
+Log_train_loss	-10429390.1427
+Rewards_train	-5000000.0
+Math_train_er	71549232.2796
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45423412323  Global Time:  00:11:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 338
+Log_train_loss	-8656856.62331
+Rewards_train	-5000000.0
+Math_train_er	160631.478012
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46453905106  Global Time:  00:11:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 339
+Log_train_loss	-8834766.07301
+Rewards_train	-5000000.0
+Math_train_er	167452.811899
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41717100143  Global Time:  00:11:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 340
+Log_train_loss	-9056661.60187
+Rewards_train	-5000000.0
+Math_train_er	162147.174612
+Rewards_test	-2000000.0
+Math_test_er	70129.239965
+Epoch time:  6.99622702599  Global Time:  00:11:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 341
+Log_train_loss	-9493026.38261
+Rewards_train	-5000000.0
+Math_train_er	168575.677824
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4717810154  Global Time:  00:11:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 342
+Log_train_loss	-9560628.90279
+Rewards_train	-5000000.0
+Math_train_er	780832.329995
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46072506905  Global Time:  00:11:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 343
+Log_train_loss	-11174745.485
+Rewards_train	-5000000.0
+Math_train_er	61423007.8707
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48549199104  Global Time:  00:11:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 344
+Log_train_loss	-11812641.3696
+Rewards_train	-5000000.0
+Math_train_er	249773991.051
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52078390121  Global Time:  00:11:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 345
+Log_train_loss	-12786863.071
+Rewards_train	-5000000.0
+Math_train_er	203549.21593
+Rewards_test	-2000000.0
+Math_test_er	78552.351982
+Epoch time:  13.6929790974  Global Time:  00:12:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 346
+Log_train_loss	-11243540.5852
+Rewards_train	-5000000.0
+Math_train_er	55384304.8033
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45212101936  Global Time:  00:12:13
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 347
+Log_train_loss	-10743732.1285
+Rewards_train	-5000000.0
+Math_train_er	21554995.5309
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41699790955  Global Time:  00:12:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 348
+Log_train_loss	-12565303.0534
+Rewards_train	-5000000.0
+Math_train_er	239618360.806
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43308997154  Global Time:  00:12:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 349
+Log_train_loss	-14181631.6215
+Rewards_train	-5000000.0
+Math_train_er	808707555.982
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46167588234  Global Time:  00:12:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 350
+Log_train_loss	-14064901.8766
+Rewards_train	-5000000.0
+Math_train_er	1446963294.98
+Rewards_test	-2000000.0
+Math_test_er	248801697.178
+Epoch time:  34.2315678596  Global Time:  00:12:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 351
+Log_train_loss	-14118669.2664
+Rewards_train	-5000000.0
+Math_train_er	721140661.401
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4543838501  Global Time:  00:12:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 352
+Log_train_loss	-14037311.3159
+Rewards_train	-5000000.0
+Math_train_er	552404040.97
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42918896675  Global Time:  00:12:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 353
+Log_train_loss	-12629309.2953
+Rewards_train	-5000000.0
+Math_train_er	222173738.323
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41955494881  Global Time:  00:12:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 354
+Log_train_loss	-12526792.6222
+Rewards_train	-5000000.0
+Math_train_er	491225148.939
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4528939724  Global Time:  00:12:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 355
+Log_train_loss	-13047280.7909
+Rewards_train	-5000000.0
+Math_train_er	888746092.732
+Rewards_test	-2000000.0
+Math_test_er	83859479.4158
+Epoch time:  7.65396308899  Global Time:  00:13:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 356
+Log_train_loss	-12989181.9987
+Rewards_train	-5000000.0
+Math_train_er	534464177.978
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52294993401  Global Time:  00:13:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 357
+Log_train_loss	-11514171.2907
+Rewards_train	-5000000.0
+Math_train_er	54775608.3182
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42500805855  Global Time:  00:13:08
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 358
+Log_train_loss	-11545493.0536
+Rewards_train	-5000000.0
+Math_train_er	4488073.94703
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44248914719  Global Time:  00:13:10
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 359
+Log_train_loss	-11631431.9273
+Rewards_train	-5000000.0
+Math_train_er	8855296.27596
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44609594345  Global Time:  00:13:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 360
+Log_train_loss	-11632315.9021
+Rewards_train	-5000000.0
+Math_train_er	212316.839236
+Rewards_test	-2000000.0
+Math_test_er	82918.9973459
+Epoch time:  4.60749793053  Global Time:  00:13:16
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 361
+Log_train_loss	-9698430.66821
+Rewards_train	-5000000.0
+Math_train_er	172381.916193
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42200994492  Global Time:  00:13:17
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 362
+Log_train_loss	-10366677.2391
+Rewards_train	-5000000.0
+Math_train_er	1187631.60172
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42419290543  Global Time:  00:13:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 363
+Log_train_loss	-11317669.08
+Rewards_train	-5000000.0
+Math_train_er	1317809.55701
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41380500793  Global Time:  00:13:20
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 364
+Log_train_loss	-11261646.1194
+Rewards_train	-5000000.0
+Math_train_er	526417.412797
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41809010506  Global Time:  00:13:21
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 365
+Log_train_loss	-11132169.8219
+Rewards_train	-5000000.0
+Math_train_er	144911265.457
+Rewards_test	-2000000.0
+Math_test_er	324356755.087
+Epoch time:  4.59957098961  Global Time:  00:13:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 366
+Log_train_loss	-12426741.5347
+Rewards_train	-5000000.0
+Math_train_er	230631933.275
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46126484871  Global Time:  00:13:27
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 367
+Log_train_loss	-9712510.6558
+Rewards_train	-5000000.0
+Math_train_er	3973329.84588
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4244427681  Global Time:  00:13:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 368
+Log_train_loss	-8864810.91369
+Rewards_train	-5000000.0
+Math_train_er	154163.192399
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45651483536  Global Time:  00:13:30
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 369
+Log_train_loss	-8875023.41838
+Rewards_train	-5000000.0
+Math_train_er	154275.297652
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48124217987  Global Time:  00:13:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 370
+Log_train_loss	-8826149.89304
+Rewards_train	-5000000.0
+Math_train_er	147041.7129
+Rewards_test	-2000000.0
+Math_test_er	59455.1742949
+Epoch time:  4.40247511864  Global Time:  00:13:36
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 371
+Log_train_loss	-8821896.8513
+Rewards_train	-5000000.0
+Math_train_er	158232.242153
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41276288033  Global Time:  00:13:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 372
+Log_train_loss	-8810802.19536
+Rewards_train	-5000000.0
+Math_train_er	149860.836788
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52047395706  Global Time:  00:13:39
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 373
+Log_train_loss	-9023288.97797
+Rewards_train	-5000000.0
+Math_train_er	150987.969543
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45099401474  Global Time:  00:13:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 374
+Log_train_loss	-8964841.72068
+Rewards_train	-5000000.0
+Math_train_er	151412.936639
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46726512909  Global Time:  00:13:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 375
+Log_train_loss	-8936184.32084
+Rewards_train	-5000000.0
+Math_train_er	150887.9519
+Rewards_test	-2000000.0
+Math_test_er	59935.8097234
+Epoch time:  4.40158295631  Global Time:  00:13:46
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 376
+Log_train_loss	-8986876.69735
+Rewards_train	-5000000.0
+Math_train_er	154754.258214
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48559999466  Global Time:  00:13:48
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 377
+Log_train_loss	-8705849.0564
+Rewards_train	-5000000.0
+Math_train_er	158796.539346
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46661686897  Global Time:  00:13:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 378
+Log_train_loss	-8582453.32276
+Rewards_train	-5000000.0
+Math_train_er	159148.603715
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46284484863  Global Time:  00:13:51
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 379
+Log_train_loss	-8794556.53554
+Rewards_train	-5000000.0
+Math_train_er	151018.361506
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45790505409  Global Time:  00:13:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 380
+Log_train_loss	-8840999.23525
+Rewards_train	-5000000.0
+Math_train_er	152526.119521
+Rewards_test	-2000000.0
+Math_test_er	60194.3504236
+Epoch time:  4.64396595955  Global Time:  00:13:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 381
+Log_train_loss	-8839959.06039
+Rewards_train	-5000000.0
+Math_train_er	151920.112475
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44587612152  Global Time:  00:13:58
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 382
+Log_train_loss	-8847693.23154
+Rewards_train	-5000000.0
+Math_train_er	151233.264583
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44012093544  Global Time:  00:14:00
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 383
+Log_train_loss	-8879769.09386
+Rewards_train	-5000000.0
+Math_train_er	154296.87966
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44564700127  Global Time:  00:14:01
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 384
+Log_train_loss	-10696431.3909
+Rewards_train	-5000000.0
+Math_train_er	129434190.863
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48945403099  Global Time:  00:14:03
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 385
+Log_train_loss	-11252330.7221
+Rewards_train	-5000000.0
+Math_train_er	200365.192021
+Rewards_test	-2000000.0
+Math_test_er	80242.6256148
+Epoch time:  4.48427915573  Global Time:  00:14:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 386
+Log_train_loss	-9167515.85869
+Rewards_train	-5000000.0
+Math_train_er	838248.377023
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47529506683  Global Time:  00:14:09
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 387
+Log_train_loss	-8947310.96552
+Rewards_train	-5000000.0
+Math_train_er	155470.83139
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45149087906  Global Time:  00:14:10
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 388
+Log_train_loss	-9125858.93059
+Rewards_train	-5000000.0
+Math_train_er	153779.006363
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52260518074  Global Time:  00:14:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 389
+Log_train_loss	-11648622.1528
+Rewards_train	-5000000.0
+Math_train_er	279092024.106
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45091295242  Global Time:  00:14:13
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 390
+Log_train_loss	-13611144.4842
+Rewards_train	-5000000.0
+Math_train_er	1008537248.75
+Rewards_test	-2000000.0
+Math_test_er	450170369.506
+Epoch time:  4.44750404358  Global Time:  00:14:18
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 391
+Log_train_loss	-14203707.3635
+Rewards_train	-5000000.0
+Math_train_er	462906459.794
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52694201469  Global Time:  00:14:19
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 392
+Log_train_loss	-14202323.393
+Rewards_train	-5000000.0
+Math_train_er	722788567.222
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42017388344  Global Time:  00:14:21
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 393
+Log_train_loss	-14203777.2033
+Rewards_train	-5000000.0
+Math_train_er	419757842.151
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42007613182  Global Time:  00:14:22
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 394
+Log_train_loss	-13949317.377
+Rewards_train	-5000000.0
+Math_train_er	672615082.61
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42250013351  Global Time:  00:14:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 395
+Log_train_loss	-14382000.3643
+Rewards_train	-5000000.0
+Math_train_er	702232362.963
+Rewards_test	-2000000.0
+Math_test_er	433094017.686
+Epoch time:  4.58234000206  Global Time:  00:14:28
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 396
+Log_train_loss	-14228681.9788
+Rewards_train	-5000000.0
+Math_train_er	361372162.789
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44256496429  Global Time:  00:14:29
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 397
+Log_train_loss	-14284744.8796
+Rewards_train	-5000000.0
+Math_train_er	467809419.836
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46460914612  Global Time:  00:14:31
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 398
+Log_train_loss	-13764582.093
+Rewards_train	-5000000.0
+Math_train_er	526349545.776
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43902587891  Global Time:  00:14:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 399
+Log_train_loss	-13622030.3398
+Rewards_train	-5000000.0
+Math_train_er	643982105.852
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45219516754  Global Time:  00:14:34
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 400
+Log_train_loss	-13639442.5602
+Rewards_train	-5000000.0
+Math_train_er	667624643.616
+Rewards_test	-2000000.0
+Math_test_er	435752088.633
+Epoch time:  4.58473920822  Global Time:  00:14:38
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 401
+Log_train_loss	-13854447.8769
+Rewards_train	-5000000.0
+Math_train_er	575114799.667
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43831586838  Global Time:  00:14:40
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 402
+Log_train_loss	-14164544.1348
+Rewards_train	-5000000.0
+Math_train_er	399316247.279
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44128012657  Global Time:  00:14:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 403
+Log_train_loss	-14273374.9392
+Rewards_train	-5000000.0
+Math_train_er	365963538.425
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47127199173  Global Time:  00:14:43
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 404
+Log_train_loss	-10031427.1814
+Rewards_train	-5000000.0
+Math_train_er	32191225.962
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48251390457  Global Time:  00:14:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 405
+Log_train_loss	-11604955.0545
+Rewards_train	-5000000.0
+Math_train_er	823228635.646
+Rewards_test	-2000000.0
+Math_test_er	233161059.057
+Epoch time:  4.49930095673  Global Time:  00:14:49
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 406
+Log_train_loss	-13712910.309
+Rewards_train	-5000000.0
+Math_train_er	752684535.873
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44919300079  Global Time:  00:14:50
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 407
+Log_train_loss	-13701297.7069
+Rewards_train	-5000000.0
+Math_train_er	517577868.69
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52789306641  Global Time:  00:14:52
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 408
+Log_train_loss	-13650565.8243
+Rewards_train	-5000000.0
+Math_train_er	568649693.805
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46920108795  Global Time:  00:14:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 409
+Log_train_loss	-13234436.9343
+Rewards_train	-5000000.0
+Math_train_er	424657987.514
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.47583007812  Global Time:  00:14:55
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 410
+Log_train_loss	-11978915.6556
+Rewards_train	-5000000.0
+Math_train_er	149248.547964
+Rewards_test	-2000000.0
+Math_test_er	61016.4418308
+Epoch time:  4.5277030468  Global Time:  00:14:59
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 411
+Log_train_loss	-11550929.0455
+Rewards_train	-5000000.0
+Math_train_er	221547755.796
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46641898155  Global Time:  00:15:01
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 412
+Log_train_loss	-10566370.9967
+Rewards_train	-5000000.0
+Math_train_er	209432943.901
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46247696877  Global Time:  00:15:02
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 413
+Log_train_loss	-9488498.92482
+Rewards_train	-5000000.0
+Math_train_er	206274241.92
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46880602837  Global Time:  00:15:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 414
+Log_train_loss	-8847687.42135
+Rewards_train	-5000000.0
+Math_train_er	153251.795576
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.48540377617  Global Time:  00:15:05
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 415
+Log_train_loss	-8804319.55075
+Rewards_train	-5000000.0
+Math_train_er	150525.200189
+Rewards_test	-2000000.0
+Math_test_er	61697.5896834
+Epoch time:  4.58781099319  Global Time:  00:15:10
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 416
+Log_train_loss	-8824427.11002
+Rewards_train	-5000000.0
+Math_train_er	149443.063059
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41854190826  Global Time:  00:15:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 417
+Log_train_loss	-8875533.28477
+Rewards_train	-5000000.0
+Math_train_er	147850.22023
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.40899515152  Global Time:  00:15:12
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 418
+Log_train_loss	-8803257.27062
+Rewards_train	-5000000.0
+Math_train_er	152194.683987
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4415640831  Global Time:  00:15:14
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 419
+Log_train_loss	-8900284.49064
+Rewards_train	-5000000.0
+Math_train_er	154067.962904
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.51087498665  Global Time:  00:15:15
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 420
+Log_train_loss	-8914153.95806
+Rewards_train	-5000000.0
+Math_train_er	146411.395604
+Rewards_test	-2000000.0
+Math_test_er	60167.7279894
+Epoch time:  4.58873796463  Global Time:  00:15:20
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 421
+Log_train_loss	-8900472.1715
+Rewards_train	-5000000.0
+Math_train_er	155467.364029
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.46902608871  Global Time:  00:15:21
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 422
+Log_train_loss	-8914673.29437
+Rewards_train	-5000000.0
+Math_train_er	151889.566279
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.4878180027  Global Time:  00:15:23
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 423
+Log_train_loss	-8911166.75914
+Rewards_train	-5000000.0
+Math_train_er	151161.287708
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.49205517769  Global Time:  00:15:24
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 424
+Log_train_loss	-8845775.06014
+Rewards_train	-5000000.0
+Math_train_er	152764.119585
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.41757583618  Global Time:  00:15:26
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 425
+Log_train_loss	-8790013.57356
+Rewards_train	-5000000.0
+Math_train_er	144815.752002
+Rewards_test	-2000000.0
+Math_test_er	58789.1704262
+Epoch time:  4.51591181755  Global Time:  00:15:30
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 426
+Log_train_loss	-8782963.48097
+Rewards_train	-5000000.0
+Math_train_er	151062.3658
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52283596992  Global Time:  00:15:32
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 427
+Log_train_loss	-8814530.66861
+Rewards_train	-5000000.0
+Math_train_er	147780.667209
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42076396942  Global Time:  00:15:33
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 428
+Log_train_loss	-8811631.49216
+Rewards_train	-5000000.0
+Math_train_er	148477.598915
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42846798897  Global Time:  00:15:35
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 429
+Log_train_loss	-8822455.26129
+Rewards_train	-5000000.0
+Math_train_er	151112.04475
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43652796745  Global Time:  00:15:36
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 430
+Log_train_loss	-8815316.24716
+Rewards_train	-5000000.0
+Math_train_er	145545.817791
+Rewards_test	-2000000.0
+Math_test_er	59159.457695
+Epoch time:  4.61660814285  Global Time:  00:15:41
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 431
+Log_train_loss	-8818210.18152
+Rewards_train	-5000000.0
+Math_train_er	151840.746184
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44831180573  Global Time:  00:15:42
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 432
+Log_train_loss	-9109369.55902
+Rewards_train	-5000000.0
+Math_train_er	148239.344174
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44601082802  Global Time:  00:15:44
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 433
+Log_train_loss	-10222783.2244
+Rewards_train	-5000000.0
+Math_train_er	129039.185007
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.43845891953  Global Time:  00:15:45
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 434
+Log_train_loss	-10918999.4994
+Rewards_train	-5000000.0
+Math_train_er	116914.75604
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45230817795  Global Time:  00:15:47
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 435
+Log_train_loss	-9670788.71963
+Rewards_train	-5000000.0
+Math_train_er	149675.402995
+Rewards_test	-2000000.0
+Math_test_er	58365.4960185
+Epoch time:  4.61451506615  Global Time:  00:15:51
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 436
+Log_train_loss	-8815663.15486
+Rewards_train	-5000000.0
+Math_train_er	150725.757991
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45465898514  Global Time:  00:15:53
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 437
+Log_train_loss	-8807225.09787
+Rewards_train	-5000000.0
+Math_train_er	155073.929168
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45905995369  Global Time:  00:15:54
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 438
+Log_train_loss	-8879236.36807
+Rewards_train	-5000000.0
+Math_train_er	149992.345806
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.50729703903  Global Time:  00:15:56
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 439
+Log_train_loss	-8889275.1779
+Rewards_train	-5000000.0
+Math_train_er	150684.862662
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45759296417  Global Time:  00:15:57
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 440
+Log_train_loss	-8892123.01304
+Rewards_train	-5000000.0
+Math_train_er	148150.520534
+Rewards_test	-2000000.0
+Math_test_er	59452.0205844
+Epoch time:  4.37245893478  Global Time:  00:16:01
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 441
+Log_train_loss	-9145340.96069
+Rewards_train	-5000000.0
+Math_train_er	143697.9919
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.45768499374  Global Time:  00:16:03
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 442
+Log_train_loss	-9685917.58761
+Rewards_train	-4895000.0
+Math_train_er	133401.052253
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.52053904533  Global Time:  00:16:04
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 443
+Log_train_loss	-3922102.69958
+Rewards_train	-2389000.0
+Math_train_er	99784.7465597
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.42558598518  Global Time:  00:16:06
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 444
+Log_train_loss	2415090.81604
+Rewards_train	5000.0
+Math_train_er	84894.5234244
+Rewards_test	0
+Math_test_er	0
+Epoch time:  1.44723391533  Global Time:  00:16:07
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+
+Epoch 445
+Log_train_loss	6650955.44253
+Rewards_train	2000000.0
+Math_train_er	0.0
+Rewards_test	800000.0
+Math_test_er	0.0
+Epoch time:  3.36527109146  Global Time:  00:16:11
+func:  np_avg_val max_ops:  5 sim_seed 69690 tf seed 69690
+@@checking random thousand samples
+test_seed 23619.0 num_tests 1000

@@ -1,0 +1,6 @@
+model_checkpoint_path: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_avgvalconv/model/-110"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_avgvalconv/model/-90"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_avgvalconv/model/-95"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_avgvalconv/model/-100"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_avgvalconv/model/-105"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_avgvalconv/model/-110"

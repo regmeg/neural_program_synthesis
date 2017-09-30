@@ -1,0 +1,6 @@
+model_checkpoint_path: "/home/user/projects/neural_program_synthesis/models/scp_pulled/1500RNNnp_avg_val/model/-5565"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/1500RNNnp_avg_val/model/-5545"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/1500RNNnp_avg_val/model/-5550"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/1500RNNnp_avg_val/model/-5555"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/1500RNNnp_avg_val/model/-5560"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/1500RNNnp_avg_val/model/-5565"

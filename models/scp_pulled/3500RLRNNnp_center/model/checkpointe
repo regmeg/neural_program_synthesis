@@ -1,0 +1,6 @@
+model_checkpoint_path: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_center/model/-3720"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_center/model/-3700"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_center/model/-3705"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_center/model/-3710"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_center/model/-3715"
+all_model_checkpoint_paths: "/home/user/projects/neural_program_synthesis/models/scp_pulled/3500RLRNNnp_center/model/-3720"

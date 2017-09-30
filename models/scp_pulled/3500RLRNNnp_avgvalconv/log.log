@@ -1,0 +1,1489 @@
+###########CFG dict is###########
+{u'add_noise': u'True',
+ u'augument_grad': u'False',
+ u'batch_size': u'100',
+ u'clip': u'False',
+ u'convergance_check_epochs': u'500',
+ u'datatype': u"<dtype: 'float64'>",
+ u'debug': u'False',
+ u'drop_rate': u'0.15',
+ u'dst': u'RLRNN/np_avg_val-5ops/total_num_epochs#21000~state_size#200~test_ratio#0.33~num_samples#3500~batch_size#100~learning_rate#0.005~epsilon#0.001~num_features#4~state_fn#relu~pen_sofmax#False~augument_grad#False~max_reward#1000~relaunch#True~seed#35428',
+ u'epsilon': u'0.001',
+ u'grad_clip_val_max': u'10000.0',
+ u'grad_clip_val_min': u'-10000.0',
+ u'grad_norm': u'1000.0',
+ u'hardmax_break': u'True',
+ u'iters_per_epoch': u'1',
+ u'learning_rate': u'0.005',
+ u'logoff': u'False',
+ u'loss_swap_per': u'50',
+ u'loss_weight': u'0.5',
+ u'max_output_ops': u'5',
+ u'max_reward': u'1000.0',
+ u'model': u'RLRNN',
+ u'name': u'total_num_epochs#21000~state_size#200~test_ratio#0.33~num_samples#3500~batch_size#100~learning_rate#0.005~epsilon#0.001~num_features#4~state_fn#relu~pen_sofmax#False~augument_grad#False~max_reward#1000~relaunch#True~seed#35428',
+ u'norm': u'True',
+ u'num_epochs': u'21000',
+ u'num_features': u'4',
+ u'num_samples': u'3500',
+ u'param_init': u'0.1',
+ u'pen_sofmax': u'False',
+ u'relaunch': u'True',
+ u'rerun_cfg': u'',
+ u'rnns_same_state': u'False',
+ u'samples_value_rng': u'(-100, 100)',
+ u'seed': u'35428',
+ u'share_state': u'True',
+ u'sim_start_time': u'2017_09_23_083445',
+ u'smax_pen_r': u'0',
+ u'softmax_sat': u'1',
+ u'state_fn': u'relu',
+ u'state_size': u'200',
+ u'test_cycle': u'5',
+ u'test_ratio': u'0.33',
+ u'total_num_epochs': u'21000',
+ u'train_fn': u'<function np_avg_val at 0x40f7488>'}
+#############################
+norming the grads
+grads are
+[(<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_0:0' shape=(204, 200) dtype=float64>, <tf.Variable 'W_mem:0' shape=(204, 200) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_1:0' shape=(200,) dtype=float64>, <tf.Variable 'RNN_mem/Params/b_mem:0' shape=(200,) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_2:0' shape=(200, 4) dtype=float64>, <tf.Variable 'W2_mem:0' shape=(200, 4) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_3:0' shape=(4,) dtype=float64>, <tf.Variable 'RNN_mem/Params/b2_mem:0' shape=(4,) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_4:0' shape=(4, 4) dtype=float64>, <tf.Variable 'W3_mem:0' shape=(4, 4) dtype=float64_ref>), (<tf.Tensor 'RNN_mem/clip_by_global_norm/RNN_mem/clip_by_global_norm/_5:0' shape=(4,) dtype=float64>, <tf.Variable 'RNN_mem/Params/b3_mem:0' shape=(4,) dtype=float64_ref>)]
+norming the grads
+grads are
+[(<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_0:0' shape=(204, 200) dtype=float64>, <tf.Variable 'W:0' shape=(204, 200) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_1:0' shape=(200,) dtype=float64>, <tf.Variable 'RNN_op/Params/b:0' shape=(200,) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_2:0' shape=(200, 5) dtype=float64>, <tf.Variable 'W2:0' shape=(200, 5) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_3:0' shape=(5,) dtype=float64>, <tf.Variable 'RNN_op/Params/b2:0' shape=(5,) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_4:0' shape=(4, 4) dtype=float64>, <tf.Variable 'W3:0' shape=(4, 4) dtype=float64_ref>), (<tf.Tensor 'RNN_op/clip_by_global_norm/RNN_op/clip_by_global_norm/_5:0' shape=(4,) dtype=float64>, <tf.Variable 'RNN_op/Params/b3:0' shape=(4,) dtype=float64_ref>)]
+writing grad W_0_grad
+writing grad RNN_op/Params/b_0_grad
+writing grad W2_0_grad
+writing grad RNN_op/Params/b2_0_grad
+writing grad W3_0_grad
+writing grad RNN_op/Params/b3_0_grad
+num batches train: 23
+num batches test: 11
+W1
+[[ 0.047 -0.079 -0.048 ...,  0.017 -0.086  0.047]
+ [-0.136 -0.004 -0.007 ..., -0.028 -0.114  0.071]
+ [-0.002 -0.13   0.072 ..., -0.053  0.084  0.122]
+ ..., 
+ [-0.145 -0.022 -0.026 ..., -0.03   0.048 -0.002]
+ [ 0.008 -0.134 -0.    ...,  0.017 -0.163  0.058]
+ [-0.144  0.126 -0.083 ..., -0.119  0.008  0.053]]
+W2
+[[-0.061 -0.039  0.095 -0.046 -0.028]
+ [-0.091 -0.067  0.042  0.087  0.02 ]
+ [ 0.064 -0.204 -0.129  0.161 -0.143]
+ [-0.121 -0.026 -0.176 -0.027 -0.035]
+ [-0.065 -0.079 -0.025 -0.002  0.217]
+ [-0.05  -0.064  0.069 -0.044 -0.024]
+ [ 0.121 -0.058  0.093 -0.024 -0.204]
+ [ 0.049 -0.052 -0.041 -0.013  0.03 ]
+ [-0.121  0.056  0.199 -0.101  0.214]
+ [-0.039  0.227 -0.025 -0.132  0.006]
+ [-0.093  0.175  0.08  -0.068  0.056]
+ [-0.127 -0.01  -0.107 -0.081  0.068]
+ [-0.099 -0.134 -0.212  0.096 -0.149]
+ [ 0.01  -0.102  0.017  0.103 -0.1  ]
+ [-0.059  0.203  0.019 -0.062  0.068]
+ [-0.079 -0.181 -0.159 -0.133 -0.01 ]
+ [-0.03  -0.069 -0.216  0.198 -0.07 ]
+ [ 0.136  0.051  0.006  0.087 -0.09 ]
+ [-0.079 -0.05   0.044 -0.19  -0.046]
+ [-0.022  0.069  0.013 -0.062  0.205]
+ [-0.186 -0.015  0.13   0.091 -0.033]
+ [-0.005 -0.125  0.068 -0.1    0.11 ]
+ [-0.065 -0.209 -0.199  0.192 -0.041]
+ [-0.125  0.166  0.021 -0.076  0.006]
+ [-0.195 -0.086 -0.055 -0.068  0.043]
+ [ 0.22   0.054  0.01  -0.158  0.001]
+ [-0.024 -0.007  0.052  0.175  0.004]
+ [ 0.167 -0.168  0.098 -0.012 -0.116]
+ [ 0.178 -0.038 -0.074  0.129  0.037]
+ [-0.16  -0.076 -0.125 -0.006  0.009]
+ [ 0.077  0.114  0.034  0.111  0.027]
+ [ 0.048  0.181  0.013 -0.019 -0.004]
+ [ 0.039 -0.001 -0.025 -0.11  -0.012]
+ [ 0.032 -0.082  0.015 -0.086  0.079]
+ [ 0.224 -0.039  0.15  -0.059 -0.041]
+ [ 0.118 -0.133  0.035  0.086 -0.085]
+ [-0.043  0.122  0.078 -0.082 -0.164]
+ [-0.096  0.025  0.075 -0.219  0.079]
+ [-0.169 -0.029  0.036  0.026 -0.136]
+ [-0.009 -0.118 -0.196  0.085 -0.152]
+ [ 0.122 -0.077 -0.182 -0.035  0.189]
+ [ 0.078 -0.013  0.007  0.13  -0.004]
+ [-0.093 -0.055 -0.148  0.059  0.07 ]
+ [ 0.004 -0.067  0.044  0.122 -0.202]
+ [-0.021  0.024  0.071 -0.006  0.005]
+ [-0.122 -0.026  0.107 -0.113  0.203]
+ [ 0.001 -0.171  0.036 -0.1    0.119]
+ [ 0.017 -0.034  0.052 -0.063  0.03 ]
+ [-0.071  0.005 -0.054  0.075  0.08 ]
+ [ 0.171  0.141  0.069 -0.122  0.067]
+ [ 0.137  0.069  0.083 -0.079  0.023]
+ [ 0.057  0.121 -0.176  0.008  0.066]
+ [ 0.033  0.01   0.11   0.227 -0.2  ]
+ [-0.085  0.069 -0.159  0.008 -0.02 ]
+ [ 0.079  0.039 -0.051  0.069  0.02 ]
+ [-0.101  0.113 -0.163 -0.024  0.11 ]
+ [-0.038 -0.175  0.154  0.073  0.065]
+ [ 0.001 -0.154 -0.152 -0.112  0.047]
+ [-0.058 -0.177  0.035 -0.021  0.139]
+ [-0.018  0.185 -0.063  0.083  0.078]
+ [-0.077 -0.017 -0.219 -0.186  0.066]
+ [-0.001 -0.06  -0.182 -0.126 -0.102]
+ [ 0.056 -0.177 -0.061  0.129  0.134]
+ [-0.018 -0.009 -0.027  0.04   0.024]
+ [ 0.053  0.    -0.049  0.158  0.062]
+ [-0.103  0.097  0.102  0.075 -0.103]
+ [-0.176  0.121  0.071 -0.042  0.04 ]
+ [-0.138  0.001  0.032 -0.029  0.017]
+ [-0.05   0.153  0.054  0.053 -0.209]
+ [-0.054  0.047 -0.061  0.145 -0.035]
+ [ 0.122  0.034  0.149  0.117  0.088]
+ [ 0.113 -0.109 -0.05  -0.176 -0.102]
+ [-0.2    0.153 -0.072  0.128 -0.209]
+ [-0.141 -0.054 -0.009 -0.001  0.034]
+ [ 0.058  0.108  0.031 -0.098 -0.003]
+ [-0.193 -0.164  0.068 -0.178 -0.003]
+ [-0.11  -0.055  0.18  -0.032 -0.087]
+ [ 0.162  0.163 -0.003  0.048  0.096]
+ [ 0.184  0.125 -0.147  0.005 -0.018]
+ [-0.153  0.109  0.048  0.053 -0.036]
+ [-0.193  0.079 -0.086  0.04  -0.097]
+ [-0.099  0.022 -0.09   0.019  0.196]
+ [ 0.006  0.206  0.106 -0.128 -0.107]
+ [-0.045 -0.069  0.029 -0.003  0.101]
+ [-0.027  0.024 -0.083 -0.021 -0.035]
+ [ 0.169 -0.06  -0.051 -0.115 -0.006]
+ [-0.148 -0.087 -0.126 -0.027 -0.117]
+ [ 0.029 -0.043 -0.097 -0.02   0.121]
+ [-0.119  0.148 -0.115 -0.195 -0.077]
+ [ 0.026 -0.077  0.075 -0.115  0.193]
+ [-0.061 -0.192  0.037  0.071 -0.21 ]
+ [ 0.076 -0.193 -0.065  0.022 -0.184]
+ [-0.126  0.183 -0.006  0.094 -0.084]
+ [ 0.02   0.07   0.005  0.074 -0.057]
+ [ 0.04   0.176 -0.173  0.111  0.144]
+ [ 0.016  0.09  -0.032  0.179 -0.034]
+ [ 0.005 -0.061  0.107  0.103  0.072]
+ [ 0.033 -0.111  0.041 -0.026 -0.123]
+ [-0.069 -0.205  0.099 -0.095  0.118]
+ [ 0.003 -0.012 -0.068 -0.119  0.034]
+ [-0.059  0.034  0.072  0.048 -0.145]
+ [-0.227  0.106 -0.01  -0.219  0.084]
+ [-0.077  0.068  0.058 -0.03   0.207]
+ [-0.102 -0.044 -0.126  0.064 -0.116]
+ [-0.029  0.173 -0.04  -0.061  0.093]
+ [-0.104  0.076 -0.22  -0.045  0.085]
+ [-0.092  0.066 -0.121 -0.008 -0.096]
+ [-0.119 -0.102 -0.053 -0.151  0.036]
+ [ 0.026  0.143  0.144  0.02  -0.152]
+ [ 0.045 -0.002  0.052  0.025  0.113]
+ [ 0.174 -0.109 -0.151  0.023 -0.06 ]
+ [-0.059 -0.006  0.088  0.106  0.096]
+ [ 0.131 -0.047  0.071 -0.027 -0.031]
+ [-0.005 -0.052  0.145 -0.076 -0.052]
+ [-0.049 -0.058  0.08   0.107 -0.058]
+ [ 0.075  0.024  0.023  0.086 -0.168]
+ [ 0.076  0.118 -0.061 -0.045  0.072]
+ [ 0.152  0.009 -0.084 -0.061  0.002]
+ [-0.116 -0.008 -0.028 -0.063 -0.097]
+ [-0.007  0.082 -0.131 -0.079 -0.151]
+ [-0.045  0.007  0.014  0.089 -0.089]
+ [-0.147  0.044  0.172 -0.117  0.09 ]
+ [ 0.028 -0.046 -0.089  0.144  0.044]
+ [ 0.155  0.05   0.142 -0.012  0.006]
+ [-0.123  0.197  0.014  0.123 -0.001]
+ [-0.082  0.114 -0.097  0.106  0.099]
+ [ 0.182 -0.222 -0.057  0.107 -0.075]
+ [-0.18  -0.122 -0.066  0.081 -0.119]
+ [ 0.219  0.005 -0.173  0.031  0.166]
+ [ 0.044  0.099 -0.096  0.093  0.078]
+ [-0.103 -0.083 -0.186 -0.125  0.001]
+ [-0.129  0.016 -0.044  0.029 -0.056]
+ [-0.003  0.15  -0.029  0.045  0.008]
+ [ 0.148 -0.147  0.157  0.127 -0.149]
+ [ 0.022 -0.085 -0.13   0.137  0.056]
+ [ 0.093  0.011 -0.084  0.045 -0.178]
+ [-0.045 -0.061  0.035  0.145 -0.183]
+ [ 0.097  0.218 -0.048 -0.05  -0.084]
+ [ 0.185 -0.007 -0.02   0.195 -0.149]
+ [-0.192  0.086  0.027 -0.096 -0.021]
+ [-0.095 -0.06   0.001  0.054  0.16 ]
+ [-0.048 -0.076 -0.108  0.071 -0.1  ]
+ [ 0.076  0.093 -0.131 -0.038 -0.012]
+ [-0.051 -0.016 -0.051  0.088 -0.157]
+ [ 0.161  0.006 -0.101  0.054 -0.07 ]
+ [-0.058  0.113  0.006 -0.134 -0.091]
+ [-0.051  0.116  0.002  0.173  0.111]
+ [ 0.069 -0.132  0.062  0.047  0.137]
+ [ 0.128  0.013  0.129 -0.017 -0.138]
+ [ 0.067 -0.218 -0.059 -0.064  0.07 ]
+ [ 0.148 -0.21  -0.046 -0.01   0.014]
+ [ 0.215 -0.021  0.029  0.125 -0.092]
+ [ 0.135 -0.085 -0.033  0.061  0.007]
+ [ 0.1   -0.12   0.152  0.148  0.014]
+ [-0.013  0.016 -0.15  -0.038  0.055]
+ [ 0.135 -0.138  0.121  0.032  0.155]
+ [-0.063 -0.005 -0.045 -0.027  0.192]
+ [-0.141 -0.224  0.111  0.003  0.055]
+ [ 0.014  0.075 -0.201 -0.055  0.196]
+ [ 0.199  0.046 -0.112 -0.144  0.158]
+ [ 0.018 -0.089 -0.173 -0.041  0.037]
+ [ 0.198  0.056  0.018  0.11  -0.107]
+ [ 0.111  0.013  0.047 -0.16  -0.058]
+ [ 0.124  0.087  0.1    0.088 -0.13 ]
+ [-0.175  0.036  0.055  0.067  0.132]
+ [-0.159 -0.052 -0.017  0.183  0.015]
+ [-0.113 -0.136 -0.069 -0.015 -0.036]
+ [-0.044  0.058  0.019 -0.104  0.192]
+ [ 0.076  0.048  0.209 -0.133  0.202]
+ [ 0.096 -0.015  0.226  0.142 -0.08 ]
+ [-0.002 -0.111 -0.136 -0.086 -0.011]
+ [ 0.009  0.18  -0.029 -0.002  0.086]
+ [-0.064  0.124  0.077 -0.087  0.04 ]
+ [-0.038 -0.071  0.148 -0.066 -0.016]
+ [ 0.06   0.057 -0.128  0.139 -0.037]
+ [ 0.08   0.222  0.078 -0.118 -0.015]
+ [-0.074  0.071  0.154  0.106  0.026]
+ [-0.112  0.067 -0.119 -0.043 -0.013]
+ [ 0.058  0.049 -0.033 -0.124  0.057]
+ [-0.183 -0.062  0.136  0.156 -0.019]
+ [-0.111 -0.099 -0.055  0.032  0.061]
+ [-0.103 -0.166 -0.029 -0.04  -0.026]
+ [ 0.001 -0.111 -0.055  0.13   0.067]
+ [ 0.103  0.024 -0.074 -0.185  0.036]
+ [ 0.007  0.184 -0.018  0.064 -0.144]
+ [ 0.068 -0.143 -0.16  -0.046  0.11 ]
+ [ 0.042  0.063  0.132  0.077 -0.134]
+ [-0.203  0.217 -0.043 -0.15   0.011]
+ [-0.017 -0.039 -0.13  -0.019  0.198]
+ [ 0.099 -0.162 -0.162  0.169 -0.021]
+ [ 0.072  0.001 -0.02  -0.125  0.02 ]
+ [-0.077  0.06  -0.036 -0.102 -0.124]
+ [-0.108 -0.052  0.059 -0.214 -0.104]
+ [ 0.194 -0.034  0.031  0.116 -0.037]
+ [-0.058  0.199  0.213  0.135 -0.025]
+ [-0.182  0.121 -0.007 -0.057  0.074]
+ [-0.016 -0.071 -0.126 -0.159 -0.027]
+ [ 0.022 -0.027  0.035  0.22  -0.056]
+ [ 0.048  0.121  0.188  0.091  0.019]
+ [ 0.064  0.026  0.037 -0.047 -0.149]]
+W3
+[[ 1.057  0.156 -0.042  0.402]
+ [-0.319 -0.593 -0.933  0.448]
+ [-0.412  0.131  1.172  0.007]
+ [-0.386 -0.624 -0.344  1.204]]
+W1_mem
+[[-0.109 -0.086  0.021 ..., -0.103 -0.08   0.008]
+ [ 0.179 -0.055 -0.072 ...,  0.123  0.125  0.063]
+ [ 0.068 -0.128  0.083 ...,  0.053 -0.088 -0.114]
+ ..., 
+ [ 0.155  0.038 -0.087 ...,  0.177  0.13   0.146]
+ [-0.015  0.065  0.016 ...,  0.018  0.121  0.116]
+ [-0.035  0.154  0.06  ...,  0.184  0.04   0.111]]
+W2_mem
+[[-0.059 -0.068 -0.116  0.156]
+ [-0.049  0.054 -0.098 -0.042]
+ [-0.158 -0.059  0.121  0.016]
+ [-0.042  0.097  0.085  0.115]
+ [-0.089 -0.038  0.123  0.006]
+ [-0.04  -0.226 -0.033 -0.017]
+ [ 0.06  -0.03  -0.081 -0.128]
+ [-0.018  0.116  0.1   -0.131]
+ [ 0.055  0.013  0.096  0.142]
+ [ 0.204  0.17   0.01   0.004]
+ [-0.124 -0.031 -0.024  0.002]
+ [-0.006  0.148  0.169  0.041]
+ [-0.051  0.005  0.119  0.158]
+ [-0.001  0.091 -0.134  0.067]
+ [-0.149 -0.041 -0.002  0.009]
+ [-0.113  0.156  0.102  0.004]
+ [ 0.052  0.033  0.051  0.029]
+ [ 0.107 -0.127  0.163  0.026]
+ [ 0.017  0.013 -0.074  0.197]
+ [ 0.074 -0.062 -0.055  0.057]
+ [-0.108  0.029 -0.21   0.1  ]
+ [ 0.131  0.041 -0.12  -0.225]
+ [ 0.095 -0.143 -0.04  -0.048]
+ [-0.126 -0.156 -0.184  0.12 ]
+ [ 0.201 -0.004 -0.022  0.024]
+ [-0.159 -0.218 -0.112  0.07 ]
+ [ 0.055  0.011 -0.188  0.024]
+ [ 0.032  0.119 -0.08   0.051]
+ [ 0.067  0.021  0.041  0.144]
+ [ 0.139 -0.027  0.016 -0.05 ]
+ [-0.073 -0.069  0.002  0.028]
+ [-0.216  0.107  0.101 -0.073]
+ [-0.036 -0.056 -0.058 -0.159]
+ [ 0.059 -0.019  0.086 -0.084]
+ [-0.222  0.055 -0.117 -0.025]
+ [ 0.14  -0.106  0.097  0.126]
+ [-0.01  -0.167  0.016 -0.088]
+ [ 0.055  0.037  0.001  0.114]
+ [-0.045 -0.012  0.072 -0.131]
+ [ 0.054  0.02  -0.142  0.011]
+ [ 0.171  0.137  0.016 -0.151]
+ [-0.038 -0.182  0.101 -0.065]
+ [ 0.091  0.002 -0.058  0.131]
+ [ 0.042 -0.103 -0.098 -0.039]
+ [ 0.03   0.092 -0.131 -0.017]
+ [-0.049  0.13  -0.094 -0.078]
+ [-0.13  -0.046 -0.014  0.046]
+ [ 0.17  -0.066  0.101  0.003]
+ [-0.057 -0.073  0.048 -0.067]
+ [ 0.041 -0.151 -0.055 -0.182]
+ [ 0.011 -0.044  0.112 -0.09 ]
+ [ 0.094 -0.008 -0.105  0.18 ]
+ [-0.169 -0.126 -0.076 -0.174]
+ [-0.137 -0.06  -0.074 -0.076]
+ [ 0.143 -0.165 -0.069  0.163]
+ [-0.115 -0.151  0.151 -0.107]
+ [-0.137 -0.168  0.015  0.022]
+ [-0.179  0.097  0.017  0.099]
+ [ 0.059 -0.003  0.016  0.045]
+ [-0.024 -0.051  0.021  0.003]
+ [ 0.049  0.204  0.032  0.084]
+ [-0.09   0.126  0.028  0.059]
+ [ 0.079  0.033  0.039 -0.097]
+ [ 0.017 -0.124 -0.116  0.042]
+ [-0.038 -0.004 -0.152  0.039]
+ [-0.008  0.045 -0.039  0.051]
+ [-0.053  0.007 -0.119  0.222]
+ [-0.127 -0.101  0.129  0.014]
+ [ 0.066  0.041  0.107 -0.123]
+ [-0.151 -0.014  0.018  0.053]
+ [-0.021  0.095 -0.023  0.082]
+ [-0.034  0.026  0.045  0.104]
+ [-0.064 -0.054 -0.036 -0.018]
+ [-0.08  -0.183 -0.078  0.142]
+ [-0.172 -0.032 -0.011  0.123]
+ [-0.039 -0.022 -0.12   0.056]
+ [ 0.061  0.087 -0.049 -0.004]
+ [-0.024  0.044  0.02   0.152]
+ [-0.148 -0.034  0.053 -0.01 ]
+ [-0.005 -0.139  0.088  0.018]
+ [-0.153 -0.125  0.129  0.099]
+ [-0.185  0.109  0.101 -0.08 ]
+ [-0.006 -0.207 -0.021 -0.192]
+ [-0.127 -0.008 -0.028  0.161]
+ [ 0.     0.173  0.141 -0.009]
+ [ 0.093  0.021 -0.13   0.011]
+ [ 0.019  0.008 -0.149 -0.136]
+ [ 0.093 -0.062 -0.005  0.16 ]
+ [-0.124 -0.051  0.025  0.109]
+ [ 0.089  0.143  0.209 -0.142]
+ [-0.001 -0.161  0.061 -0.1  ]
+ [-0.018 -0.016  0.01   0.068]
+ [ 0.112  0.016 -0.069 -0.043]
+ [-0.064  0.132 -0.028  0.153]
+ [-0.127 -0.044 -0.048 -0.05 ]
+ [ 0.17  -0.134  0.134  0.047]
+ [ 0.159 -0.097  0.17   0.205]
+ [ 0.068 -0.112 -0.091  0.016]
+ [-0.126 -0.108 -0.005  0.056]
+ [ 0.068  0.125  0.039  0.086]
+ [ 0.041  0.111 -0.036 -0.038]
+ [ 0.133  0.062 -0.121  0.072]
+ [ 0.012  0.018  0.15  -0.068]
+ [ 0.088  0.059  0.126 -0.061]
+ [ 0.11  -0.145  0.018 -0.009]
+ [ 0.013 -0.059 -0.055  0.126]
+ [ 0.075  0.033  0.006  0.049]
+ [-0.027 -0.172  0.135  0.144]
+ [ 0.068  0.042 -0.06   0.179]
+ [ 0.163 -0.095  0.145  0.041]
+ [ 0.027 -0.049 -0.047 -0.036]
+ [-0.124  0.075 -0.143  0.072]
+ [-0.032  0.125  0.031 -0.139]
+ [ 0.001  0.168 -0.079 -0.07 ]
+ [-0.168  0.038  0.048  0.061]
+ [ 0.061  0.083 -0.052 -0.006]
+ [ 0.038  0.047 -0.057 -0.004]
+ [-0.119 -0.068  0.169 -0.102]
+ [-0.213  0.153  0.131 -0.01 ]
+ [-0.015  0.155 -0.003 -0.065]
+ [ 0.18  -0.145  0.022  0.092]
+ [-0.172  0.169  0.067 -0.122]
+ [-0.091 -0.008 -0.076  0.021]
+ [-0.081 -0.006 -0.021  0.033]
+ [-0.202 -0.038  0.043  0.023]
+ [ 0.02  -0.047 -0.013 -0.145]
+ [ 0.07   0.066  0.062 -0.046]
+ [ 0.089  0.025  0.021  0.089]
+ [-0.112 -0.083 -0.054  0.061]
+ [-0.006 -0.087 -0.127  0.097]
+ [-0.021  0.098 -0.152 -0.045]
+ [ 0.197  0.158  0.05   0.002]
+ [ 0.175 -0.072  0.043 -0.043]
+ [ 0.156  0.089  0.038  0.181]
+ [ 0.102 -0.046 -0.147  0.118]
+ [-0.001 -0.093 -0.049  0.038]
+ [-0.001 -0.057 -0.     0.012]
+ [ 0.022 -0.194 -0.215 -0.032]
+ [-0.18  -0.206  0.026  0.02 ]
+ [-0.187  0.088 -0.018 -0.1  ]
+ [-0.018 -0.118 -0.046 -0.082]
+ [ 0.038  0.092  0.021  0.003]
+ [ 0.151 -0.174 -0.036  0.206]
+ [ 0.038 -0.099  0.003 -0.032]
+ [ 0.142  0.17  -0.033  0.013]
+ [ 0.001 -0.105 -0.002 -0.041]
+ [ 0.075  0.099  0.219 -0.159]
+ [-0.151 -0.054 -0.024 -0.038]
+ [-0.095 -0.222 -0.074  0.067]
+ [-0.092 -0.016  0.026 -0.04 ]
+ [-0.033  0.06  -0.135  0.063]
+ [-0.068 -0.189 -0.031  0.005]
+ [ 0.04  -0.083  0.109  0.122]
+ [ 0.201  0.06   0.019 -0.137]
+ [ 0.079  0.1    0.079  0.075]
+ [-0.007 -0.144 -0.02   0.151]
+ [ 0.021  0.14   0.071 -0.017]
+ [-0.094 -0.074  0.068  0.069]
+ [ 0.078  0.03  -0.182 -0.117]
+ [-0.043 -0.038 -0.015  0.14 ]
+ [ 0.12  -0.193  0.062  0.125]
+ [ 0.056  0.12   0.151 -0.06 ]
+ [-0.032 -0.171 -0.063  0.194]
+ [ 0.037 -0.087  0.214  0.051]
+ [ 0.003 -0.011 -0.017  0.132]
+ [ 0.05  -0.025  0.019  0.008]
+ [-0.103 -0.149  0.173  0.13 ]
+ [-0.087  0.088  0.09  -0.093]
+ [-0.073 -0.002  0.065 -0.039]
+ [ 0.091 -0.046  0.033 -0.   ]
+ [-0.057  0.105 -0.108  0.048]
+ [ 0.038 -0.112  0.041  0.197]
+ [ 0.059 -0.139  0.142  0.096]
+ [-0.169  0.015  0.083  0.002]
+ [-0.228  0.182  0.118 -0.07 ]
+ [ 0.131 -0.176 -0.021  0.014]
+ [ 0.121 -0.051 -0.089 -0.102]
+ [-0.094  0.074  0.069  0.044]
+ [-0.007 -0.128  0.061 -0.015]
+ [-0.052 -0.052  0.067 -0.049]
+ [ 0.012  0.143  0.087 -0.167]
+ [ 0.029 -0.027  0.002  0.161]
+ [ 0.119 -0.024 -0.16  -0.095]
+ [ 0.106  0.076  0.015  0.049]
+ [ 0.19  -0.095  0.094 -0.003]
+ [-0.087 -0.19   0.108  0.105]
+ [ 0.014  0.189  0.143  0.17 ]
+ [ 0.213  0.045  0.026 -0.121]
+ [-0.001  0.115 -0.219  0.172]
+ [-0.022 -0.004  0.004 -0.009]
+ [ 0.113 -0.11  -0.134  0.02 ]
+ [-0.012  0.017 -0.033 -0.163]
+ [-0.107  0.083 -0.101  0.075]
+ [ 0.008 -0.092  0.039 -0.013]
+ [-0.194  0.071  0.046  0.044]
+ [ 0.013 -0.038 -0.141  0.103]
+ [-0.068 -0.199 -0.081  0.011]
+ [-0.108 -0.092 -0.165 -0.095]
+ [ 0.024  0.021  0.055 -0.004]
+ [-0.205 -0.214 -0.024 -0.009]]
+W3_mem
+[[-0.331  0.321  1.375  0.055]
+ [-0.317 -0.114  0.199  0.349]
+ [ 1.234  0.199  0.178 -1.167]
+ [ 0.364 -0.509  1.378 -0.887]]
+
+Epoch 0
+Log_train_loss	-38561050.5732
+Rewards_train	-10436000.0
+Math_train_er	1857353462.09
+Rewards_test	-5038000.0
+Math_test_er	959268440.82
+Epoch time:  8.26129603386  Global Time:  00:00:08
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 1
+Log_train_loss	-40965729.4951
+Rewards_train	-10492000.0
+Math_train_er	4823791626.31
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.11598396301  Global Time:  00:00:11
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 2
+Log_train_loss	-42640338.0236
+Rewards_train	-10912000.0
+Math_train_er	7677801956.81
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.09132289886  Global Time:  00:00:14
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 3
+Log_train_loss	-40454169.345
+Rewards_train	-10709000.0
+Math_train_er	1632748475.62
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.1543879509  Global Time:  00:00:17
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 4
+Log_train_loss	-40626884.5895
+Rewards_train	-10490000.0
+Math_train_er	1160201724.53
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.180382967  Global Time:  00:00:20
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 5
+Log_train_loss	-38267927.2169
+Rewards_train	-9666000.0
+Math_train_er	555058141.19
+Rewards_test	-4807000.0
+Math_test_er	211657229.186
+Epoch time:  8.14719605446  Global Time:  00:00:28
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 6
+Log_train_loss	-39258346.3633
+Rewards_train	-10293000.0
+Math_train_er	238370656.096
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.2229719162  Global Time:  00:00:32
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 7
+Log_train_loss	-40171538.274
+Rewards_train	-10320000.0
+Math_train_er	634642278.33
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.20784592628  Global Time:  00:00:35
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 8
+Log_train_loss	-39799155.9721
+Rewards_train	-10173000.0
+Math_train_er	1055466016.79
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.23215293884  Global Time:  00:00:38
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 9
+Log_train_loss	-36140351.7708
+Rewards_train	-9295000.0
+Math_train_er	298039712.541
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.14075088501  Global Time:  00:00:41
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 10
+Log_train_loss	-31423157.7319
+Rewards_train	-8266000.0
+Math_train_er	91594018.0809
+Rewards_test	-4135000.0
+Math_test_er	59673306.9873
+Epoch time:  8.83929300308  Global Time:  00:00:50
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 11
+Log_train_loss	-29367350.8664
+Rewards_train	-8049000.0
+Math_train_er	23563943.7246
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.28211402893  Global Time:  00:00:53
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 12
+Log_train_loss	-27222975.1182
+Rewards_train	-7902000.0
+Math_train_er	31022180.4845
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.23863601685  Global Time:  00:00:57
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 13
+Log_train_loss	-28529044.3148
+Rewards_train	-7776000.0
+Math_train_er	19359414.151
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.39054703712  Global Time:  00:01:00
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 14
+Log_train_loss	-30241306.1614
+Rewards_train	-7993000.0
+Math_train_er	116150364.134
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.17697405815  Global Time:  00:01:03
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 15
+Log_train_loss	-29760335.2333
+Rewards_train	-7384000.0
+Math_train_er	44918997.0782
+Rewards_test	-3799000.0
+Math_test_er	29374817.8406
+Epoch time:  8.93634200096  Global Time:  00:01:12
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 16
+Log_train_loss	-27599880.4526
+Rewards_train	-7671000.0
+Math_train_er	84588823.8479
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.17818689346  Global Time:  00:01:15
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 17
+Log_train_loss	-27649568.5468
+Rewards_train	-7503000.0
+Math_train_er	215009601.383
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.15692400932  Global Time:  00:01:18
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 18
+Log_train_loss	-26806055.6556
+Rewards_train	-7440000.0
+Math_train_er	1592774736.72
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.28115391731  Global Time:  00:01:22
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 19
+Log_train_loss	-24110195.6433
+Rewards_train	-7244000.0
+Math_train_er	1284994107.22
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.16516900063  Global Time:  00:01:25
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 20
+Log_train_loss	-25435700.5841
+Rewards_train	-8560000.0
+Math_train_er	6057782670.28
+Rewards_test	-4254000.0
+Math_test_er	2831009434.57
+Epoch time:  7.74886012077  Global Time:  00:01:33
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 21
+Log_train_loss	-31284184.3463
+Rewards_train	-8532000.0
+Math_train_er	2048123776.4
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.9950671196  Global Time:  00:01:36
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 22
+Log_train_loss	-29747933.3583
+Rewards_train	-8091000.0
+Math_train_er	1985970968.72
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.96465706825  Global Time:  00:01:39
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 23
+Log_train_loss	-25909240.2196
+Rewards_train	-7321000.0
+Math_train_er	232970063.251
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.06728100777  Global Time:  00:01:42
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 24
+Log_train_loss	-28487318.1755
+Rewards_train	-7678000.0
+Math_train_er	476056129.397
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.92299580574  Global Time:  00:01:45
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 25
+Log_train_loss	-26099079.8674
+Rewards_train	-6768000.0
+Math_train_er	152476.96334
+Rewards_test	-3505000.0
+Math_test_er	72389.2512586
+Epoch time:  7.94561219215  Global Time:  00:01:53
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 26
+Log_train_loss	-25230978.5766
+Rewards_train	-6992000.0
+Math_train_er	160306.761055
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.01145482063  Global Time:  00:01:56
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 27
+Log_train_loss	-25177706.4325
+Rewards_train	-6964000.0
+Math_train_er	527612.732718
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.96413803101  Global Time:  00:01:59
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 28
+Log_train_loss	-26333054.3957
+Rewards_train	-7139000.0
+Math_train_er	1893341.06566
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.14869379997  Global Time:  00:02:02
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 29
+Log_train_loss	-23344561.694
+Rewards_train	-6535000.0
+Math_train_er	135003.368791
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.95264005661  Global Time:  00:02:05
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 30
+Log_train_loss	-20182720.3916
+Rewards_train	-5784000.0
+Math_train_er	2638496.4962
+Rewards_test	-3064000.0
+Math_test_er	141865.353507
+Epoch time:  7.82603287697  Global Time:  00:02:12
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 31
+Log_train_loss	-17893097.8737
+Rewards_train	-5665000.0
+Math_train_er	13127211.8734
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.04498910904  Global Time:  00:02:15
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 32
+Log_train_loss	-16707901.5534
+Rewards_train	-5345000.0
+Math_train_er	8991879.55764
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.04447793961  Global Time:  00:02:19
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 33
+Log_train_loss	-18195285.4342
+Rewards_train	-5838000.0
+Math_train_er	8092629.35312
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.20648598671  Global Time:  00:02:22
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 34
+Log_train_loss	-20562787.2764
+Rewards_train	-6572000.0
+Math_train_er	18187388.9752
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.8657541275  Global Time:  00:02:25
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 35
+Log_train_loss	-19980194.1004
+Rewards_train	-5933000.0
+Math_train_er	20596919.2011
+Rewards_test	-3151000.0
+Math_test_er	14949196.6123
+Epoch time:  7.82513093948  Global Time:  00:02:32
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 36
+Log_train_loss	-16596457.642
+Rewards_train	-5415000.0
+Math_train_er	15327229.6395
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.00773382187  Global Time:  00:02:35
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 37
+Log_train_loss	-12867593.5155
+Rewards_train	-4519000.0
+Math_train_er	113071137.424
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.03495311737  Global Time:  00:02:38
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 38
+Log_train_loss	-14202388.5621
+Rewards_train	-4801000.0
+Math_train_er	29459000.8179
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.25843191147  Global Time:  00:02:42
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 39
+Log_train_loss	-10180432.0957
+Rewards_train	-3800000.0
+Math_train_er	4064576.21746
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.04619407654  Global Time:  00:02:45
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 40
+Log_train_loss	-7797581.0221
+Rewards_train	-2876000.0
+Math_train_er	36225506.2596
+Rewards_test	-1538000.0
+Math_test_er	9291509.70764
+Epoch time:  8.06575798988  Global Time:  00:02:53
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 41
+Log_train_loss	-6380941.94022
+Rewards_train	-3085000.0
+Math_train_er	614383.034103
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.05769896507  Global Time:  00:02:56
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 42
+Log_train_loss	-1106986.14465
+Rewards_train	-1794000.0
+Math_train_er	46606.4525457
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.18351197243  Global Time:  00:02:59
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 43
+Log_train_loss	3713506.0701
+Rewards_train	-449000.0
+Math_train_er	45222.1210271
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.39532113075  Global Time:  00:03:02
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 44
+Log_train_loss	5433370.1601
+Rewards_train	147000.0
+Math_train_er	43334.9254061
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.23564100266  Global Time:  00:03:06
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 45
+Log_train_loss	4591483.12706
+Rewards_train	866000.0
+Math_train_er	44578.6718112
+Rewards_test	506000.0
+Math_test_er	20074.0402477
+Epoch time:  8.43594717979  Global Time:  00:03:14
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 46
+Log_train_loss	5740463.90415
+Rewards_train	258000.0
+Math_train_er	43098.5037689
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.23356699944  Global Time:  00:03:17
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 47
+Log_train_loss	4305167.38287
+Rewards_train	-242000.0
+Math_train_er	42651.9191103
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.37261795998  Global Time:  00:03:21
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 48
+Log_train_loss	5414283.93533
+Rewards_train	166000.0
+Math_train_er	43789.3376098
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.31474685669  Global Time:  00:03:24
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 49
+Log_train_loss	7074898.24181
+Rewards_train	717000.0
+Math_train_er	44839.4525743
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.29946208  Global Time:  00:03:27
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 50
+Log_train_loss	3653242.05794
+Rewards_train	-456000.0
+Math_train_er	46168.302133
+Rewards_test	-255000.0
+Math_test_er	20907.6975567
+Epoch time:  8.47012782097  Global Time:  00:03:36
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 51
+Log_train_loss	2837820.86311
+Rewards_train	-718000.0
+Math_train_er	43855.9013471
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.33871102333  Global Time:  00:03:39
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 52
+Log_train_loss	5468369.86182
+Rewards_train	155000.0
+Math_train_er	42812.3984921
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.34518408775  Global Time:  00:03:43
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 53
+Log_train_loss	6367498.02046
+Rewards_train	444000.0
+Math_train_er	42059.2829125
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.22818279266  Global Time:  00:03:46
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 54
+Log_train_loss	5338539.09353
+Rewards_train	89000.0
+Math_train_er	41724.9303473
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.25758719444  Global Time:  00:03:49
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 55
+Log_train_loss	7626810.29169
+Rewards_train	1081000.0
+Math_train_er	53342.5076125
+Rewards_test	591000.0
+Math_test_er	23968.3884559
+Epoch time:  8.52644896507  Global Time:  00:03:58
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 56
+Log_train_loss	13745831.6337
+Rewards_train	2844000.0
+Math_train_er	51446.5561995
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.4359588623  Global Time:  00:04:01
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 57
+Log_train_loss	15635892.6818
+Rewards_train	2829000.0
+Math_train_er	54337.5988126
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.35590791702  Global Time:  00:04:04
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 58
+Log_train_loss	16226947.4854
+Rewards_train	3011000.0
+Math_train_er	54421.8117794
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.39480400085  Global Time:  00:04:08
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 59
+Log_train_loss	15786945.8459
+Rewards_train	3879000.0
+Math_train_er	45325.9355833
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.22493505478  Global Time:  00:04:11
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 60
+Log_train_loss	9937911.98597
+Rewards_train	4425000.0
+Math_train_er	30680.4449586
+Rewards_test	2032000.0
+Math_test_er	22047.5123421
+Epoch time:  5.99855685234  Global Time:  00:04:17
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 61
+Log_train_loss	15043143.8664
+Rewards_train	4306000.0
+Math_train_er	38317.7009648
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.87530493736  Global Time:  00:04:20
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 62
+Log_train_loss	16467933.3159
+Rewards_train	3130000.0
+Math_train_er	54419.4829854
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.43622994423  Global Time:  00:04:23
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 63
+Log_train_loss	17416106.6254
+Rewards_train	3655000.0
+Math_train_er	54387.5309999
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.4036090374  Global Time:  00:04:27
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 64
+Log_train_loss	17239623.3984
+Rewards_train	3557000.0
+Math_train_er	54392.6944255
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.48508810997  Global Time:  00:04:30
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 65
+Log_train_loss	16180283.1853
+Rewards_train	3361000.0
+Math_train_er	54402.4543423
+Rewards_test	1500000.0
+Math_test_er	24410.8648445
+Epoch time:  8.57621908188  Global Time:  00:04:39
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 66
+Log_train_loss	17116968.1763
+Rewards_train	3781000.0
+Math_train_er	51976.8517541
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.36648321152  Global Time:  00:04:42
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 67
+Log_train_loss	16853210.6098
+Rewards_train	3907000.0
+Math_train_er	49665.1354442
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.17146801949  Global Time:  00:04:45
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 68
+Log_train_loss	17541244.8292
+Rewards_train	4005000.0
+Math_train_er	52121.3500778
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.27689099312  Global Time:  00:04:49
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 69
+Log_train_loss	14437489.8616
+Rewards_train	4250000.0
+Math_train_er	35915.5692266
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.79970693588  Global Time:  00:04:51
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 70
+Log_train_loss	16509524.9063
+Rewards_train	3732000.0
+Math_train_er	54367.7986159
+Rewards_test	1759000.0
+Math_test_er	24393.2503617
+Epoch time:  8.16883611679  Global Time:  00:05:00
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 71
+Log_train_loss	17254296.6765
+Rewards_train	3868000.0
+Math_train_er	52088.2567128
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.38584804535  Global Time:  00:05:03
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 72
+Log_train_loss	15933363.2158
+Rewards_train	3690000.0
+Math_train_er	47348.8017269
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.1080429554  Global Time:  00:05:06
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 73
+Log_train_loss	14956910.6226
+Rewards_train	4257000.0
+Math_train_er	37483.6092219
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.80455207825  Global Time:  00:05:09
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 74
+Log_train_loss	12133445.1176
+Rewards_train	4103000.0
+Math_train_er	26338.0139816
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.40738511086  Global Time:  00:05:11
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 75
+Log_train_loss	15939040.1871
+Rewards_train	3837000.0
+Math_train_er	54367.7780736
+Rewards_test	1787000.0
+Math_test_er	24395.2109972
+Epoch time:  7.98720407486  Global Time:  00:05:19
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 76
+Log_train_loss	16666154.7241
+Rewards_train	3536000.0
+Math_train_er	52139.9805921
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.33043599129  Global Time:  00:05:23
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 77
+Log_train_loss	16756849.1894
+Rewards_train	3868000.0
+Math_train_er	49962.2916508
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.23273706436  Global Time:  00:05:26
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 78
+Log_train_loss	16230954.2211
+Rewards_train	3319000.0
+Math_train_er	51777.8927073
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.42143511772  Global Time:  00:05:29
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 79
+Log_train_loss	16460012.1406
+Rewards_train	3151000.0
+Math_train_er	54405.9391163
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.48952889442  Global Time:  00:05:33
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 80
+Log_train_loss	16790578.9502
+Rewards_train	4292000.0
+Math_train_er	49800.8833402
+Rewards_test	2081000.0
+Math_test_er	15713.6978489
+Epoch time:  8.62521409988  Global Time:  00:05:41
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 81
+Log_train_loss	16762220.3557
+Rewards_train	3872000.0
+Math_train_er	49596.3443572
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.27701282501  Global Time:  00:05:45
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 82
+Log_train_loss	16364424.5081
+Rewards_train	3669000.0
+Math_train_er	49641.7429508
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.24479389191  Global Time:  00:05:48
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 83
+Log_train_loss	16253300.3347
+Rewards_train	3599000.0
+Math_train_er	49893.5979444
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.39223599434  Global Time:  00:05:51
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 84
+Log_train_loss	13607188.6601
+Rewards_train	4355000.0
+Math_train_er	31256.3605972
+Rewards_test	0
+Math_test_er	0
+Epoch time:  2.55232691765  Global Time:  00:05:54
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 85
+Log_train_loss	15615360.2499
+Rewards_train	3466000.0
+Math_train_er	54402.3795334
+Rewards_test	1556000.0
+Math_test_er	24411.3299627
+Epoch time:  8.87714219093  Global Time:  00:06:03
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 86
+Log_train_loss	17755077.8262
+Rewards_train	3879000.0
+Math_train_er	54379.1283755
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.38357210159  Global Time:  00:06:06
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 87
+Log_train_loss	17032235.7182
+Rewards_train	3501000.0
+Math_train_er	54408.5185113
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.39367294312  Global Time:  00:06:09
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 88
+Log_train_loss	16859953.3894
+Rewards_train	3396000.0
+Math_train_er	54403.4317103
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.62965416908  Global Time:  00:06:13
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 89
+Log_train_loss	16516756.802
+Rewards_train	3221000.0
+Math_train_er	54411.9633376
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.3917529583  Global Time:  00:06:16
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 90
+Log_train_loss	16841528.7832
+Rewards_train	3277000.0
+Math_train_er	54390.8689168
+Rewards_test	1514000.0
+Math_test_er	24400.3336154
+Epoch time:  9.77737092972  Global Time:  00:06:26
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 91
+Log_train_loss	15692102.9467
+Rewards_train	3018000.0
+Math_train_er	52013.5932535
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.32130599022  Global Time:  00:06:30
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 92
+Log_train_loss	16781213.7371
+Rewards_train	3396000.0
+Math_train_er	54391.0598508
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.40977191925  Global Time:  00:06:33
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 93
+Log_train_loss	15477211.9389
+Rewards_train	2689000.0
+Math_train_er	54427.2102774
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.58964109421  Global Time:  00:06:37
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 94
+Log_train_loss	15405993.9942
+Rewards_train	2654000.0
+Math_train_er	54423.7254626
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.45198893547  Global Time:  00:06:40
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 95
+Log_train_loss	15156229.3917
+Rewards_train	3018000.0
+Math_train_er	54413.8213011
+Rewards_test	1423000.0
+Math_test_er	24411.3268617
+Epoch time:  8.62310290337  Global Time:  00:06:49
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 96
+Log_train_loss	14790406.0009
+Rewards_train	2332000.0
+Math_train_er	54439.6790687
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.43093013763  Global Time:  00:06:52
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 97
+Log_train_loss	14687554.3343
+Rewards_train	2304000.0
+Math_train_er	54438.7397635
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.61682009697  Global Time:  00:06:56
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 98
+Log_train_loss	14040579.1199
+Rewards_train	1870000.0
+Math_train_er	54452.3478678
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.4119989872  Global Time:  00:06:59
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 99
+Log_train_loss	13535502.0339
+Rewards_train	1555000.0
+Math_train_er	54480.3396837
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.38640809059  Global Time:  00:07:02
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 100
+Log_train_loss	13983403.446
+Rewards_train	3935000.0
+Math_train_er	54370.858206
+Rewards_test	1927000.0
+Math_test_er	22255.3876783
+Epoch time:  9.46349811554  Global Time:  00:07:12
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 101
+Log_train_loss	13152749.7107
+Rewards_train	1331000.0
+Math_train_er	54487.0540579
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.58685684204  Global Time:  00:07:16
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 102
+Log_train_loss	13527407.5606
+Rewards_train	1702000.0
+Math_train_er	54466.6469424
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.41251087189  Global Time:  00:07:19
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 103
+Log_train_loss	13295098.1337
+Rewards_train	1527000.0
+Math_train_er	54476.1143748
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.4916779995  Global Time:  00:07:22
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 104
+Log_train_loss	13284095.7004
+Rewards_train	1534000.0
+Math_train_er	54475.6406841
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.57116293907  Global Time:  00:07:26
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 105
+Log_train_loss	13424569.0842
+Rewards_train	4159000.0
+Math_train_er	52002.5057429
+Rewards_test	1976000.0
+Math_test_er	24384.6368186
+Epoch time:  8.55418109894  Global Time:  00:07:35
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 106
+Log_train_loss	13159573.9661
+Rewards_train	1877000.0
+Math_train_er	52059.3588318
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.36482810974  Global Time:  00:07:38
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 107
+Log_train_loss	12716941.0641
+Rewards_train	1163000.0
+Math_train_er	54499.4282367
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.48132014275  Global Time:  00:07:41
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 108
+Log_train_loss	12781008.006
+Rewards_train	1289000.0
+Math_train_er	54501.1394001
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.62635087967  Global Time:  00:07:45
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 109
+Log_train_loss	13451536.9408
+Rewards_train	2038000.0
+Math_train_er	54475.8912143
+Rewards_test	0
+Math_test_er	0
+Epoch time:  3.36762404442  Global Time:  00:07:48
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+
+Epoch 110
+Log_train_loss	11407621.6756
+Rewards_train	4600000.0
+Math_train_er	0.0
+Rewards_test	2200000.0
+Math_test_er	0.0
+Epoch time:  6.28951907158  Global Time:  00:07:55
+func:  np_avg_val max_ops:  5 sim_seed 35428 tf seed 35428
+@@checking random thousand samples
+test_seed 10791.0 num_tests 1000
