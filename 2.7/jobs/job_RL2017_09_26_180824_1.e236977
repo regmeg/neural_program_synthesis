@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/rb7e15/2.7v/model.py", line 88, in <module>
+    main()
+  File "/home/rb7e15/2.7v/model.py", line 45, in main
+    except FileExistsError, err:
+NameError: global name 'FileExistsError' is not defined

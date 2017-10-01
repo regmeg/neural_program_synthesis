@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "source the env"
+module load python
+export CC=/home/rb7e15/gcc/bin/gcc
+export LD_LIBRARY_PATH=/home/rb7e15/gcc/lib64:$LD_LIBRARY_PATH
+source /home/rb7e15/2.7v/TFenv/bin/activate
+
+echo  "launch the command"
+python /home/rb7e15/2.7v/model.py --total_num_epochs=27000 --state_size=300 --test_ratio=0.33 --num_samples=3500 --batch_size=100 --learning_rate=0.01 --epsilon=0.001 --max_output_ops=5 --num_features=4 --train_fn=np_avg_val --model=RNN --norm=True --clip=False --softmax_sat=100 --state_fn=relu --smax_pen_r=0.0 --augument_grad=True --relaunch=True --seed=81825 --name=total_num_epochs#27000~state_size#300~test_ratio#0.33~num_samples#3500~batch_size#100~learning_rate#0.01~epsilon#0.001~num_features#4~norm#True~clip#False~softmax_sat#100~state_fn#relu~smax_pen_r#0.0~augument_grad#True~relaunch#True~seed#81825

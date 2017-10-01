@@ -1,0 +1,24 @@
+Running PBS prologue script on scholar003
+
+ =======================================================
+ job started on Wed Sep 20 11:47:57 BST 2017
+
+ JOB ID: 236524
+ JOB NAME: job_RL2017_09_20_130712_0
+ Num Hosts: 1
+ Num Tasks: 8
+ Nodes used: 
+ scholar003
+ =======================================================
+ Job Output Follows:
+ =======================================================
+
+source the env
+launch the command
+
+ =======================================================
+ job finished at Wed Sep 20 16:14:58 BST 2017
+
+Requested resource limits were ncpus=1,neednodes=1:ppn=8,nodes=1:ppn=8,pmem=1900mb,walltime=04:26:40
+Used resource limits were cput=09:11:29,mem=229604kb,vmem=3996836kb,walltime=04:27:01
+

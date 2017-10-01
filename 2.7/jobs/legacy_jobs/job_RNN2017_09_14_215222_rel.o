@@ -1,0 +1,29 @@
+Running PBS prologue script on scholar007
+
+ =======================================================
+ job started on Thu Sep 14 23:04:55 BST 2017
+
+ JOB ID: 235906
+ JOB NAME: job_RNN2017_09_14_215222_rel
+ Num Hosts: 1
+ Num Tasks: 8
+ Nodes used: 
+ scholar007
+ =======================================================
+0 S rb7e15    91694  91647  0  80   0 -  2318 wait   16:59 ?        00:00:00 /bin/bash /var/spool/torque/mom_priv/jobs/235867.aristotle.lyceum2.soton.ac.uk.SC
+Other jobs running on this node:
+job 1 is owned by rb7e15, PBS job id is 235867
+Doing nothing
+ Job Output Follows:
+ =======================================================
+
+source the env
+launch the command
+235933.aristotle.lyceum2.soton.ac.uk
+
+ =======================================================
+ job finished at Fri Sep 15 06:54:20 BST 2017
+
+Requested resource limits were ncpus=1,neednodes=1:ppn=8,nodes=1:ppn=8,pmem=1900mb,walltime=09:26:40
+Used resource limits were cput=15:33:30,mem=463856kb,vmem=4275236kb,walltime=07:49:25
+

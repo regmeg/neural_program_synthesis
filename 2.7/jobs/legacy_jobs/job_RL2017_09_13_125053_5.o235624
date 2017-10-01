@@ -1,0 +1,25 @@
+Running PBS prologue script on scholar017
+
+ =======================================================
+ job started on Wed Sep 13 13:34:35 BST 2017
+
+ JOB ID: 235624
+ JOB NAME: job_RL2017_09_13_125053_5
+ Num Hosts: 1
+ Num Tasks: 8
+ Nodes used: 
+ scholar017
+ =======================================================
+ Job Output Follows:
+ =======================================================
+
+source the env
+launch the command
+235691.aristotle.lyceum2.soton.ac.uk
+
+ =======================================================
+ job finished at Wed Sep 13 15:14:28 BST 2017
+
+Requested resource limits were ncpus=1,neednodes=1:ppn=8,nodes=1:ppn=8,pmem=1900mb,walltime=01:40:00
+Used resource limits were cput=02:58:11,mem=230920kb,vmem=3995896kb,walltime=01:39:53
+

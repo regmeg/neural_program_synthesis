@@ -1,0 +1,43 @@
+/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/ops/gradients_impl.py:93: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+Traceback (most recent call last):
+  File "/home/rb7e15/2.7v/model.py", line 88, in <module>
+    main()
+  File "/home/rb7e15/2.7v/model.py", line 83, in main
+    run_session_RL_RNN(model, cfg, x_train, x_test, y_train, y_test)
+  File "/home/rb7e15/2.7v/session.py", line 1642, in run_session_RL_RNN
+    p = m.policy_rollout(sess, _current_state_train, _current_state_train_mem, [x_sample[i]], [y_sample[i]], cfg, False)
+  File "/home/rb7e15/2.7v/rl_rnn.py", line 178, in policy_rollout
+    self.training: training
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 789, in run
+    run_metadata_ptr)
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 997, in _run
+    feed_dict_string, options, run_metadata)
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1132, in _do_run
+    target_list, options, run_metadata)
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1152, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Input to reshape is a tensor with 1 values, but the requested shape requires a multiple of 100
+	 [[Node: RNN_op/perform_selection/reshape_s = Reshape[T=DT_INT64, Tshape=DT_INT32, _device="/job:localhost/replica:0/task:0/cpu:0"](RNN_op/perform_selection/ArgMax, RNN_op/perform_selection/reshape_s/shape)]]
+
+Caused by op u'RNN_op/perform_selection/reshape_s', defined at:
+  File "/home/rb7e15/2.7v/model.py", line 88, in <module>
+    main()
+  File "/home/rb7e15/2.7v/model.py", line 82, in main
+    model = RLRNN(cfg, ops_env, mem)
+  File "/home/rb7e15/2.7v/rl_rnn.py", line 44, in __init__
+    self.selected = self.perform_selection_RL(self.train[u'log_probs'], cfg)
+  File "/home/rb7e15/2.7v/nn_base.py", line 265, in perform_selection_RL
+    reshape_s = tf.reshape(selection , [cfg[u'batch_size'], -1], name = u"reshape_s")
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/ops/gen_array_ops.py", line 2451, in reshape
+    name=name)
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/framework/op_def_library.py", line 767, in apply_op
+    op_def=op_def)
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/framework/ops.py", line 2506, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "/home/rb7e15/2.7v/TFenv/lib/python2.7/site-packages/tensorflow/python/framework/ops.py", line 1269, in __init__
+    self._traceback = _extract_stack()
+
+InvalidArgumentError (see above for traceback): Input to reshape is a tensor with 1 values, but the requested shape requires a multiple of 100
+	 [[Node: RNN_op/perform_selection/reshape_s = Reshape[T=DT_INT64, Tshape=DT_INT32, _device="/job:localhost/replica:0/task:0/cpu:0"](RNN_op/perform_selection/ArgMax, RNN_op/perform_selection/reshape_s/shape)]]
+
